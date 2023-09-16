@@ -539,28 +539,56 @@ namespace Main
 
         public static void TryUnpackNarcs(List<DirNames> IDs)
         {
-            Parallel.ForEach(IDs, id => {
+            Parallel.ForEach(IDs, id =>
+            {
                 if (gameDirs.TryGetValue(id, out (string packedPath, string unpackedPath) paths))
                 {
-                    DirectoryInfo di = new DirectoryInfo(paths.unpackedPath);
+                    DirectoryInfo di = new(paths.unpackedPath);
 
                     if (!di.Exists || di.GetFiles().Length == 0)
                     {
-                        Narc opened = Narc.Open(paths.packedPath);
-
-                        if (opened is null)
+                        try
                         {
-                            throw new NullReferenceException();
+                            Narc opened = Narc.Open(paths.packedPath) ?? throw new NullReferenceException();
+                            opened.ExtractToFolder(paths.unpackedPath);
+                        }
+                        catch (Exception)
+                        {
+                            if (paths.packedPath.Contains("personal\\personal.narc"))
+                            {
+                                paths.packedPath.Replace("personal\\", "personal_pearl\\");
+                                try
+                                {
+                                    Narc opened = Narc.Open(paths.packedPath) ?? throw new NullReferenceException();
+                                    opened.ExtractToFolder(paths.unpackedPath);
+                                }
+                                catch (Exception)
+                                {
+                                    paths.packedPath.Replace("_pearl", "_diamond");
+                                    try
+                                    {
+                                        Narc opened = Narc.Open(paths.packedPath) ?? throw new NullReferenceException();
+                                        opened.ExtractToFolder(paths.unpackedPath);
+                                    }
+                                    catch (Exception)
+                                    {
+
+                                        return;
+                                    }
+                                    return;
+                                }
+                            }
+                            return;
                         }
 
-                        opened.ExtractToFolder(paths.unpackedPath);
                     }
                 }
             });
         }
         public static void ForceUnpackNarcs(List<DirNames> IDs)
         {
-            Parallel.ForEach(IDs, id => {
+            Parallel.ForEach(IDs, id =>
+            {
                 if (gameDirs.TryGetValue(id, out (string packedPath, string unpackedPath) paths))
                 {
                     Narc opened = Narc.Open(paths.packedPath);

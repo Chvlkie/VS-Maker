@@ -27,9 +27,9 @@ namespace NarcAPI {
             return narc;
         }
 
-        public static Narc Open(String filePath) {
-            Narc narc = new Narc(Path.GetFileNameWithoutExtension(filePath));
-            BinaryReader br = new BinaryReader(File.OpenRead(filePath));
+        public static Narc? Open(String filePath) {
+            Narc narc = new(Path.GetFileNameWithoutExtension(filePath));
+            BinaryReader br = new(File.OpenRead(filePath));
 
             if (br.ReadUInt32() != NARC_FILE_MAGIC_NUM) {
                 return null;
@@ -42,7 +42,7 @@ namespace NarcAPI {
         }
 
         public static Narc FromFolder(String dirPath) {
-            Narc narc = new Narc(Path.GetDirectoryName(dirPath));
+            Narc narc = new(Path.GetDirectoryName(dirPath));
             String[] fileNames = Directory.GetFiles(dirPath, "*.*", SearchOption.AllDirectories);
             uint numberOfElements = (uint)fileNames.Length;
             narc.Elements = new MemoryStream[numberOfElements];
