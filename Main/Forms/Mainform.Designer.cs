@@ -41,6 +41,12 @@
             toolStripProgressBar = new ToolStripProgressBar();
             mainContent = new TabControl();
             mainContent_trainerClass = new TabPage();
+            panel3 = new Panel();
+            button3 = new Button();
+            trainerClass_vsGfx_box = new PictureBox();
+            button2 = new Button();
+            comboBox4 = new ComboBox();
+            trainerClass_introGfx_label = new Label();
             trainerClass_Used_panel = new Panel();
             trainerClass_Uses_list = new ListBox();
             trainerClassUse_label = new Label();
@@ -80,10 +86,23 @@
             toolStripSeparator2 = new ToolStripSeparator();
             panel1 = new Panel();
             panel2 = new Panel();
+            trainerClass_GoToTrainer_btn = new Button();
+            panel4 = new Panel();
+            trainerClass_frames_label = new Label();
+            comboBox5 = new ComboBox();
+            trainerClass_PrizeMoney_label = new Label();
+            numericUpDown1 = new NumericUpDown();
+            button4 = new Button();
+            trainerClass_Gender_label = new Label();
+            comboBox6 = new ComboBox();
+            button5 = new Button();
+            trainerClass_PrizeMoney_btn = new Button();
             main_toolstrip.SuspendLayout();
             statusStrip1.SuspendLayout();
             mainContent.SuspendLayout();
             mainContent_trainerClass.SuspendLayout();
+            panel3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)trainerClass_vsGfx_box).BeginInit();
             trainerClass_Used_panel.SuspendLayout();
             trainerClass_Music_panel.SuspendLayout();
             trainerClass_Info_panel.SuspendLayout();
@@ -93,6 +112,8 @@
             quick_toolstrip.SuspendLayout();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
+            panel4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             SuspendLayout();
             // 
             // main_toolstrip
@@ -198,6 +219,8 @@
             // mainContent_trainerClass
             // 
             mainContent_trainerClass.AccessibleRole = AccessibleRole.None;
+            mainContent_trainerClass.Controls.Add(panel4);
+            mainContent_trainerClass.Controls.Add(panel3);
             mainContent_trainerClass.Controls.Add(trainerClass_Used_panel);
             mainContent_trainerClass.Controls.Add(trainerClass_Music_panel);
             mainContent_trainerClass.Controls.Add(trainerClass_Info_panel);
@@ -211,24 +234,85 @@
             mainContent_trainerClass.Text = "Trainer Class";
             mainContent_trainerClass.UseVisualStyleBackColor = true;
             // 
+            // panel3
+            // 
+            panel3.Controls.Add(button3);
+            panel3.Controls.Add(trainerClass_vsGfx_box);
+            panel3.Controls.Add(button2);
+            panel3.Controls.Add(comboBox4);
+            panel3.Controls.Add(trainerClass_introGfx_label);
+            panel3.Location = new Point(505, 224);
+            panel3.Name = "panel3";
+            panel3.Size = new Size(268, 235);
+            panel3.TabIndex = 6;
+            // 
+            // button3
+            // 
+            button3.Location = new Point(210, 9);
+            button3.Name = "button3";
+            button3.Size = new Size(53, 23);
+            button3.TabIndex = 33;
+            button3.Text = "Save";
+            button3.UseVisualStyleBackColor = true;
+            // 
+            // trainerClass_vsGfx_box
+            // 
+            trainerClass_vsGfx_box.BackColor = Color.White;
+            trainerClass_vsGfx_box.BorderStyle = BorderStyle.Fixed3D;
+            trainerClass_vsGfx_box.Location = new Point(5, 40);
+            trainerClass_vsGfx_box.Name = "trainerClass_vsGfx_box";
+            trainerClass_vsGfx_box.Size = new Size(256, 192);
+            trainerClass_vsGfx_box.TabIndex = 34;
+            trainerClass_vsGfx_box.TabStop = false;
+            // 
+            // button2
+            // 
+            button2.Location = new Point(296, 22);
+            button2.Name = "button2";
+            button2.Size = new Size(53, 23);
+            button2.TabIndex = 33;
+            button2.Text = "Save";
+            button2.UseVisualStyleBackColor = true;
+            // 
+            // comboBox4
+            // 
+            comboBox4.FormattingEnabled = true;
+            comboBox4.Location = new Point(87, 9);
+            comboBox4.Name = "comboBox4";
+            comboBox4.Size = new Size(108, 23);
+            comboBox4.TabIndex = 33;
+            // 
+            // trainerClass_introGfx_label
+            // 
+            trainerClass_introGfx_label.AutoSize = true;
+            trainerClass_introGfx_label.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            trainerClass_introGfx_label.ImageAlign = ContentAlignment.MiddleLeft;
+            trainerClass_introGfx_label.Location = new Point(5, 15);
+            trainerClass_introGfx_label.Name = "trainerClass_introGfx_label";
+            trainerClass_introGfx_label.Size = new Size(76, 15);
+            trainerClass_introGfx_label.TabIndex = 33;
+            trainerClass_introGfx_label.Text = "VS Graphics:";
+            trainerClass_introGfx_label.TextAlign = ContentAlignment.MiddleLeft;
+            // 
             // trainerClass_Used_panel
             // 
             trainerClass_Used_panel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            trainerClass_Used_panel.Controls.Add(trainerClass_GoToTrainer_btn);
             trainerClass_Used_panel.Controls.Add(trainerClass_Uses_list);
             trainerClass_Used_panel.Controls.Add(trainerClassUse_label);
-            trainerClass_Used_panel.Location = new Point(573, 209);
+            trainerClass_Used_panel.Location = new Point(209, 224);
             trainerClass_Used_panel.Name = "trainerClass_Used_panel";
-            trainerClass_Used_panel.Size = new Size(200, 250);
+            trainerClass_Used_panel.Size = new Size(290, 235);
             trainerClass_Used_panel.TabIndex = 4;
             // 
             // trainerClass_Uses_list
             // 
-            trainerClass_Uses_list.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            trainerClass_Uses_list.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
             trainerClass_Uses_list.FormattingEnabled = true;
             trainerClass_Uses_list.ItemHeight = 15;
             trainerClass_Uses_list.Location = new Point(5, 33);
             trainerClass_Uses_list.Name = "trainerClass_Uses_list";
-            trainerClass_Uses_list.Size = new Size(190, 184);
+            trainerClass_Uses_list.Size = new Size(190, 199);
             trainerClass_Uses_list.TabIndex = 27;
             // 
             // trainerClassUse_label
@@ -236,7 +320,7 @@
             trainerClassUse_label.AutoSize = true;
             trainerClassUse_label.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             trainerClassUse_label.ImageAlign = ContentAlignment.MiddleLeft;
-            trainerClassUse_label.Location = new Point(3, 15);
+            trainerClassUse_label.Location = new Point(5, 12);
             trainerClassUse_label.Name = "trainerClassUse_label";
             trainerClassUse_label.Size = new Size(117, 15);
             trainerClassUse_label.TabIndex = 28;
@@ -251,22 +335,22 @@
             trainerClass_Music_panel.Controls.Add(comboBox2);
             trainerClass_Music_panel.Controls.Add(label1);
             trainerClass_Music_panel.Controls.Add(trainerClass_EyeContactMusic_Main_label);
-            trainerClass_Music_panel.Location = new Point(209, 93);
+            trainerClass_Music_panel.Location = new Point(209, 78);
             trainerClass_Music_panel.Name = "trainerClass_Music_panel";
-            trainerClass_Music_panel.Size = new Size(358, 78);
+            trainerClass_Music_panel.Size = new Size(358, 63);
             trainerClass_Music_panel.TabIndex = 3;
             // 
             // comboBox1
             // 
             comboBox1.FormattingEnabled = true;
-            comboBox1.Location = new Point(6, 31);
+            comboBox1.Location = new Point(5, 36);
             comboBox1.Name = "comboBox1";
             comboBox1.Size = new Size(61, 23);
             comboBox1.TabIndex = 32;
             // 
             // button1
             // 
-            button1.Location = new Point(296, 31);
+            button1.Location = new Point(296, 36);
             button1.Name = "button1";
             button1.Size = new Size(53, 23);
             button1.TabIndex = 31;
@@ -276,7 +360,7 @@
             // comboBox3
             // 
             comboBox3.FormattingEnabled = true;
-            comboBox3.Location = new Point(73, 31);
+            comboBox3.Location = new Point(72, 36);
             comboBox3.Name = "comboBox3";
             comboBox3.Size = new Size(61, 23);
             comboBox3.TabIndex = 30;
@@ -284,7 +368,7 @@
             // comboBox2
             // 
             comboBox2.FormattingEnabled = true;
-            comboBox2.Location = new Point(148, 31);
+            comboBox2.Location = new Point(147, 36);
             comboBox2.Name = "comboBox2";
             comboBox2.Size = new Size(142, 23);
             comboBox2.TabIndex = 29;
@@ -294,7 +378,7 @@
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label1.ImageAlign = ContentAlignment.MiddleLeft;
-            label1.Location = new Point(148, 8);
+            label1.Location = new Point(147, 12);
             label1.Name = "label1";
             label1.Size = new Size(102, 15);
             label1.TabIndex = 27;
@@ -306,7 +390,7 @@
             trainerClass_EyeContactMusic_Main_label.AutoSize = true;
             trainerClass_EyeContactMusic_Main_label.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             trainerClass_EyeContactMusic_Main_label.ImageAlign = ContentAlignment.MiddleLeft;
-            trainerClass_EyeContactMusic_Main_label.Location = new Point(6, 8);
+            trainerClass_EyeContactMusic_Main_label.Location = new Point(5, 12);
             trainerClass_EyeContactMusic_Main_label.Name = "trainerClass_EyeContactMusic_Main_label";
             trainerClass_EyeContactMusic_Main_label.Size = new Size(115, 15);
             trainerClass_EyeContactMusic_Main_label.TabIndex = 25;
@@ -322,12 +406,12 @@
             trainerClass_Info_panel.Controls.Add(trainerClassName_Label);
             trainerClass_Info_panel.Location = new Point(209, 3);
             trainerClass_Info_panel.Name = "trainerClass_Info_panel";
-            trainerClass_Info_panel.Size = new Size(358, 84);
+            trainerClass_Info_panel.Size = new Size(358, 69);
             trainerClass_Info_panel.TabIndex = 2;
             // 
             // trainerClassIdDisplay
             // 
-            trainerClassIdDisplay.Location = new Point(6, 36);
+            trainerClassIdDisplay.Location = new Point(5, 36);
             trainerClassIdDisplay.Name = "trainerClassIdDisplay";
             trainerClassIdDisplay.ReadOnly = true;
             trainerClassIdDisplay.Size = new Size(96, 23);
@@ -348,7 +432,7 @@
             trainerClassId_Label.AutoSize = true;
             trainerClassId_Label.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             trainerClassId_Label.ImageAlign = ContentAlignment.MiddleLeft;
-            trainerClassId_Label.Location = new Point(6, 12);
+            trainerClassId_Label.Location = new Point(5, 12);
             trainerClassId_Label.Name = "trainerClassId_Label";
             trainerClassId_Label.Size = new Size(94, 15);
             trainerClassId_Label.TabIndex = 13;
@@ -358,7 +442,7 @@
             // trainerClassName
             // 
             trainerClassName.AllowDrop = true;
-            trainerClassName.Location = new Point(148, 36);
+            trainerClassName.Location = new Point(147, 36);
             trainerClassName.Name = "trainerClassName";
             trainerClassName.Size = new Size(142, 23);
             trainerClassName.TabIndex = 11;
@@ -368,7 +452,7 @@
             trainerClassName_Label.AutoSize = true;
             trainerClassName_Label.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             trainerClassName_Label.ImageAlign = ContentAlignment.MiddleLeft;
-            trainerClassName_Label.Location = new Point(148, 12);
+            trainerClassName_Label.Location = new Point(147, 12);
             trainerClassName_Label.Name = "trainerClassName_Label";
             trainerClassName_Label.Size = new Size(114, 15);
             trainerClassName_Label.TabIndex = 10;
@@ -377,6 +461,8 @@
             // 
             // trainerClass_Spite_Panel
             // 
+            trainerClass_Spite_Panel.Controls.Add(comboBox5);
+            trainerClass_Spite_Panel.Controls.Add(trainerClass_frames_label);
             trainerClass_Spite_Panel.Controls.Add(trainerClassPicBox);
             trainerClass_Spite_Panel.Controls.Add(trainerClassPic_label);
             trainerClass_Spite_Panel.Location = new Point(573, 3);
@@ -390,7 +476,7 @@
             trainerClassPicBox.BorderStyle = BorderStyle.Fixed3D;
             trainerClassPicBox.Location = new Point(5, 35);
             trainerClassPicBox.Name = "trainerClassPicBox";
-            trainerClassPicBox.Size = new Size(190, 133);
+            trainerClassPicBox.Size = new Size(190, 109);
             trainerClassPicBox.TabIndex = 26;
             trainerClassPicBox.TabStop = false;
             // 
@@ -399,7 +485,7 @@
             trainerClassPic_label.AutoSize = true;
             trainerClassPic_label.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             trainerClassPic_label.ImageAlign = ContentAlignment.MiddleLeft;
-            trainerClassPic_label.Location = new Point(3, 12);
+            trainerClassPic_label.Location = new Point(5, 12);
             trainerClassPic_label.Name = "trainerClassPic_label";
             trainerClassPic_label.Size = new Size(115, 15);
             trainerClassPic_label.TabIndex = 27;
@@ -424,9 +510,9 @@
             trainerClassListBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             trainerClassListBox.FormattingEnabled = true;
             trainerClassListBox.ItemHeight = 15;
-            trainerClassListBox.Location = new Point(5, 120);
+            trainerClassListBox.Location = new Point(5, 119);
             trainerClassListBox.Name = "trainerClassListBox";
-            trainerClassListBox.Size = new Size(190, 304);
+            trainerClassListBox.Size = new Size(190, 334);
             trainerClassListBox.TabIndex = 1;
             trainerClassListBox.SelectedIndexChanged += trainerClassListBox_SelectedIndexChanged;
             // 
@@ -599,6 +685,117 @@
             panel2.Size = new Size(784, 490);
             panel2.TabIndex = 5;
             // 
+            // trainerClass_GoToTrainer_btn
+            // 
+            trainerClass_GoToTrainer_btn.Location = new Point(202, 33);
+            trainerClass_GoToTrainer_btn.Name = "trainerClass_GoToTrainer_btn";
+            trainerClass_GoToTrainer_btn.Size = new Size(85, 23);
+            trainerClass_GoToTrainer_btn.TabIndex = 35;
+            trainerClass_GoToTrainer_btn.Text = "Go To Trainer";
+            trainerClass_GoToTrainer_btn.UseVisualStyleBackColor = true;
+            // 
+            // panel4
+            // 
+            panel4.Controls.Add(trainerClass_PrizeMoney_btn);
+            panel4.Controls.Add(button5);
+            panel4.Controls.Add(comboBox6);
+            panel4.Controls.Add(trainerClass_Gender_label);
+            panel4.Controls.Add(button4);
+            panel4.Controls.Add(numericUpDown1);
+            panel4.Controls.Add(trainerClass_PrizeMoney_label);
+            panel4.Location = new Point(209, 147);
+            panel4.Name = "panel4";
+            panel4.Size = new Size(358, 71);
+            panel4.TabIndex = 7;
+            // 
+            // trainerClass_frames_label
+            // 
+            trainerClass_frames_label.AutoSize = true;
+            trainerClass_frames_label.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            trainerClass_frames_label.ImageAlign = ContentAlignment.MiddleLeft;
+            trainerClass_frames_label.Location = new Point(142, 149);
+            trainerClass_frames_label.Name = "trainerClass_frames_label";
+            trainerClass_frames_label.Size = new Size(50, 15);
+            trainerClass_frames_label.TabIndex = 28;
+            trainerClass_frames_label.Text = "Frames:";
+            trainerClass_frames_label.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // comboBox5
+            // 
+            comboBox5.FormattingEnabled = true;
+            comboBox5.Location = new Point(142, 167);
+            comboBox5.Name = "comboBox5";
+            comboBox5.Size = new Size(50, 23);
+            comboBox5.TabIndex = 35;
+            // 
+            // trainerClass_PrizeMoney_label
+            // 
+            trainerClass_PrizeMoney_label.AutoSize = true;
+            trainerClass_PrizeMoney_label.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            trainerClass_PrizeMoney_label.ImageAlign = ContentAlignment.MiddleLeft;
+            trainerClass_PrizeMoney_label.Location = new Point(5, 12);
+            trainerClass_PrizeMoney_label.Name = "trainerClass_PrizeMoney_label";
+            trainerClass_PrizeMoney_label.Size = new Size(79, 15);
+            trainerClass_PrizeMoney_label.TabIndex = 36;
+            trainerClass_PrizeMoney_label.Text = "Prize Money:";
+            trainerClass_PrizeMoney_label.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // numericUpDown1
+            // 
+            numericUpDown1.Location = new Point(5, 36);
+            numericUpDown1.Name = "numericUpDown1";
+            numericUpDown1.Size = new Size(69, 23);
+            numericUpDown1.TabIndex = 37;
+            // 
+            // button4
+            // 
+            button4.Location = new Point(80, 36);
+            button4.Name = "button4";
+            button4.Size = new Size(53, 23);
+            button4.TabIndex = 33;
+            button4.Text = "Save";
+            button4.UseVisualStyleBackColor = true;
+            // 
+            // trainerClass_Gender_label
+            // 
+            trainerClass_Gender_label.AutoSize = true;
+            trainerClass_Gender_label.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            trainerClass_Gender_label.ImageAlign = ContentAlignment.MiddleLeft;
+            trainerClass_Gender_label.Location = new Point(147, 12);
+            trainerClass_Gender_label.Name = "trainerClass_Gender_label";
+            trainerClass_Gender_label.Size = new Size(52, 15);
+            trainerClass_Gender_label.TabIndex = 38;
+            trainerClass_Gender_label.Text = "Gender:";
+            trainerClass_Gender_label.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // comboBox6
+            // 
+            comboBox6.FormattingEnabled = true;
+            comboBox6.Location = new Point(147, 36);
+            comboBox6.Name = "comboBox6";
+            comboBox6.Size = new Size(142, 23);
+            comboBox6.TabIndex = 33;
+            // 
+            // button5
+            // 
+            button5.Location = new Point(296, 36);
+            button5.Name = "button5";
+            button5.Size = new Size(53, 23);
+            button5.TabIndex = 39;
+            button5.Text = "Save";
+            button5.UseVisualStyleBackColor = true;
+            // 
+            // trainerClass_PrizeMoney_btn
+            // 
+            trainerClass_PrizeMoney_btn.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            trainerClass_PrizeMoney_btn.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            trainerClass_PrizeMoney_btn.Location = new Point(109, 7);
+            trainerClass_PrizeMoney_btn.Name = "trainerClass_PrizeMoney_btn";
+            trainerClass_PrizeMoney_btn.Size = new Size(24, 24);
+            trainerClass_PrizeMoney_btn.TabIndex = 5;
+            trainerClass_PrizeMoney_btn.Text = "?";
+            trainerClass_PrizeMoney_btn.UseVisualStyleBackColor = true;
+            // 
             // Mainform
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -617,6 +814,9 @@
             statusStrip1.PerformLayout();
             mainContent.ResumeLayout(false);
             mainContent_trainerClass.ResumeLayout(false);
+            panel3.ResumeLayout(false);
+            panel3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)trainerClass_vsGfx_box).EndInit();
             trainerClass_Used_panel.ResumeLayout(false);
             trainerClass_Used_panel.PerformLayout();
             trainerClass_Music_panel.ResumeLayout(false);
@@ -633,6 +833,9 @@
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
             panel2.ResumeLayout(false);
+            panel4.ResumeLayout(false);
+            panel4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -688,11 +891,28 @@
         private Panel panel1;
         private Panel panel2;
         private Panel trainerClass_Music_panel;
-        private Button button1;
         private ComboBox comboBox3;
         private ComboBox comboBox2;
         private Label label1;
         private Label trainerClass_EyeContactMusic_Main_label;
         private ComboBox comboBox1;
+        private Panel panel3;
+        private PictureBox trainerClass_vsGfx_box;
+        private Button button2;
+        private ComboBox comboBox4;
+        private Label trainerClass_introGfx_label;
+        private Button button3;
+        private Button button1;
+        private Button trainerClass_GoToTrainer_btn;
+        private Panel panel4;
+        private Label trainerClass_frames_label;
+        private Button button4;
+        private NumericUpDown numericUpDown1;
+        private Label trainerClass_PrizeMoney_label;
+        private ComboBox comboBox5;
+        private Button trainerClass_PrizeMoney_btn;
+        private Button button5;
+        private ComboBox comboBox6;
+        private Label trainerClass_Gender_label;
     }
 }
