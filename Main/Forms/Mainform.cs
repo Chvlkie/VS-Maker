@@ -3,6 +3,7 @@ using Images;
 using Main.Data;
 using Main.ROMFiles;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using System;
 using System.Diagnostics;
 using System.Text;
 using static Main.RomInfo;
@@ -339,6 +340,10 @@ namespace Main
             {
                 SetupTrainerClassEditor();
             }
+            else if (mainContent.SelectedTab == mainContent_trainer)
+            {
+                SetupTrainerEditor();
+            }
         }
 
         /// <summary>
@@ -394,7 +399,7 @@ namespace Main
             trainerClasses = new List<TrainerClass>();
 
             /* Extract essential NARCs sub-archives*/
-            statusLabelMessage("Setting up Trainer Editor...");
+            statusLabelMessage("Getting Trainer Classes...");
             Update();
             DSUtils.TryUnpackNarcs(new List<DirNames> {
                 DirNames.trainerProperties,
@@ -420,7 +425,8 @@ namespace Main
                 {
                     TrainerClassId = i + 1,
                     TrainerClassName = classNames[i],
-                    UsedByTrainers = new List<Trainer>()
+                    UsedByTrainers = new List<Trainer>(),
+                    TrainerSpriteFrames = 0
                 };
                 item.UsedByTrainers.AddRange(trainers.Where(x => x.TrainerClassId == item.TrainerClassId));
                 trainerClasses.Add(item);
@@ -429,15 +435,15 @@ namespace Main
 
         private void SetupTrainerClassEditor()
         {
-            disableHandlers = true;
-            trainerClassName.Text = string.Empty;
-            trainerClassIdDisplay.Text = string.Empty;
-            trainerClassName.ReadOnly = true;
-            saveClassName_btn.Enabled = false;
-            player_trainer_class.Items.Clear();
-            trainerClassListBox.Items.Clear();
+            int trainerClassIndex = trainerClassListBox.SelectedIndex;
+            int? trainerUseIndex = trainerClass_Uses_list.SelectedIndex;
+            ClearTrainerClassLists();
+            DisableTrainerClassEditor();
             GetTrainers();
             GetTrainerClasses();
+            statusLabelMessage("Setting up Trainer Class Editor...");
+            Update();
+
             foreach (var item in trainerClasses)
             {
                 if (item.IsPlayerClass)
@@ -447,6 +453,37 @@ namespace Main
                 else
                 {
                     trainerClassListBox.Items.Add($"[{item.DisplayTrainerClassId}] - {item.TrainerClassName}");
+                }
+            }
+
+            statusLabelMessage();
+            trainerClassListBox.Enabled = true;
+            trainerClassListBox.SelectedIndex = trainerClassIndex;
+            if (trainerUseIndex.HasValue)
+            {
+                trainerClass_Uses_list.SelectedIndex = trainerUseIndex.Value;
+            }
+        }
+
+        private void SetupTrainerEditor()
+        {
+            DisableTrainerClassEditor();
+            trainers_Player_list.Items.Clear();
+            trainers_list.Items.Clear();
+            GetTrainers();
+            GetTrainerClasses();
+            statusLabelMessage("Setting up Trainer Editor...");
+            Update();
+
+            foreach (var item in trainers)
+            {
+                if (item.IsPlayerTrainer)
+                {
+                    trainers_Player_list.Items.Add($"[{item.DisplayTrainerId}] - {item.TrainerName}");
+                }
+                else
+                {
+                    trainers_list.Items.Add($"[{item.DisplayTrainerId}] - {item.TrainerName}");
                 }
             }
             disableHandlers = false;
@@ -477,6 +514,7 @@ namespace Main
                 string newName = trainerClassName.Text;
                 UpdateCurrentTrainerClassName(newName, index);
                 MessageBox.Show("Trainer Class name updated!", "Success!");
+                ClearTrainerClassLists();
                 SetupTrainerClassEditor();
                 trainerClassListBox.SelectedIndex = index - 2;
                 GetTrainerClassInfo(index);
@@ -490,15 +528,33 @@ namespace Main
             trainerClassNames.SaveToFileDefaultDir(trainerClassMessageNumber, showSuccessMessage: false);
         }
 
+        private void GetTrainerInfo(int index)
+        {
+            DisableTrainerClassEditor();
+            var trainer = trainers[index];
+
+            trainer_Name.Text = trainer.TrainerName;
+            trainer_Class_comboBox.Items.Clear();
+
+            foreach (var item in trainerClasses)
+            {
+                trainer_Class_comboBox.Items.Add($"[{item.DisplayTrainerClassId}] - {item.TrainerClassName}");
+            }
+
+            trainer.TrainerSpriteFrames = LoadTrainerClassPic(trainer.TrainerClassId -1);
+            UpdateTrainerClassPic(trainerPicBox);
+
+            trainer_Class_comboBox.SelectedIndex = trainer.TrainerClassId - 1;
+        }
+
         private void GetTrainerClassInfo(int index)
         {
+            DisableTrainerClassEditor();
             var trainerClass = trainerClasses[index];
 
             trainerClassName.Text = trainerClass.TrainerClassName;
-            trainerClassIdDisplay.Text = trainerClass.DisplayTrainerClassId;
-            trainerClassName.ReadOnly = false;
-            saveClassName_btn.Enabled = true;
             trainerClass_Uses_list.Items.Clear();
+
             if (trainerClass.InUse)
             {
                 foreach (var item in trainerClass.UsedByTrainers)
@@ -506,9 +562,10 @@ namespace Main
                     trainerClass_Uses_list.Items.Add($"[{item.DisplayTrainerId}] - {item.TrainerName}");
                 }
             }
-            int maxFrames = LoadTrainerClassPic(index);
+            trainerClass.TrainerSpriteFrames = LoadTrainerClassPic(index);
             UpdateTrainerClassPic(trainerClassPicBox);
 
+            EnableTrainerClassEditor(trainerClass);
         }
 
         private int LoadTrainerClassPic(int trClassID)
@@ -557,6 +614,78 @@ namespace Main
         private void trainerClass_PrizeMoney_btn_Click(object sender, EventArgs e)
         {
             MessageBox.Show("This is the Base Rate Multiplier for calculating Prize Money.\nIt is multiplied by the level of a Trainer's last Pokémon.", "About Prize Money", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void ClearTrainerClassLists()
+        {
+            // Clear Lists
+            trainerClassListBox.Items.Clear();
+            player_trainer_class.Items.Clear();
+            trainerClass_Uses_list.Items.Clear();
+        }
+        private void DisableTrainerClassEditor()
+        {
+            // Disable fields
+            trainerClassName.Enabled = false;
+            trainerClass_PrizeMoney_num.Enabled = false;
+            trainerClass_Gender_comboBox.Enabled = false;
+            trainerClass_EyeContactMain_comboBox.Enabled = false;
+            trainerClass_EyeContactAlt_comboBox.Enabled = false;
+            trainerClass_frames_num.Enabled = false;
+            trainerClass_Theme_comboBox.Enabled = false;
+            trainerClass_Uses_list.Enabled = false;
+            trainerClassListBox.Enabled = false;
+            player_trainer_class.Enabled = false;
+            trainerClass_battleMusic.Enabled = false;
+
+            // Disable buttons
+            saveClassName_btn.Enabled = false;
+            saveClassTheme_btn.Enabled = false;
+            savePrizeMoney_btn.Enabled = false;
+            saveGender_btn.Enabled = false;
+            saveEyeContact_btn.Enabled = false;
+            trainerClass_GoToTrainer_btn.Enabled = false;
+        }
+
+        private void EnableTrainerClassEditor(TrainerClass trainerClass)
+        {
+            trainerClassListBox.Enabled = true;
+            // Enable fields
+            if (!string.IsNullOrEmpty(trainerClass.TrainerClassName))
+            {
+                trainerClassName.Enabled = true;
+                saveClassName_btn.Enabled = true;
+            }
+
+            if (trainerClass.InUse)
+            {
+                trainerClass_Uses_list.Enabled = true;
+            }
+
+            if (trainerClass.TrainerSpriteFrames > 0)
+            {
+                trainerClass_frames_num.Enabled = true;
+            }
+        }
+
+        private void trainerClass_Uses_list_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            trainerClass_GoToTrainer_btn.Enabled = true;
+        }
+
+        private void trainerClass_GoToTrainer_btn_Click(object sender, EventArgs e)
+        {
+
+            int index = trainerClass_Uses_list.SelectedIndex;
+            var text = trainerClass_Uses_list.Items[index].ToString();
+            int id = int.Parse(text.Remove(0, 1).Remove(3));
+
+            DisableTrainerClassEditor();
+            mainContent.SelectedTab = mainContent_trainer;
+            SetupTrainerEditor();
+            trainers_list.SelectedIndex = id - 2;
+
+            GetTrainerInfo(id - 1);
         }
     }
 }

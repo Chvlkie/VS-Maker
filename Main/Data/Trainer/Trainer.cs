@@ -15,6 +15,7 @@ namespace Main.Data
         public string? TrainerName { get; set; }
         public string? TrainerClassName { get; set; }
         public bool IsDouble;
-        public bool IsPlayerTrainer => TrainerId == 1 || TrainerId == 2;
+        public bool IsPlayerTrainer => TrainerId == 1;
+        public int TrainerSpriteFrames { get; set; }
     }
 }
