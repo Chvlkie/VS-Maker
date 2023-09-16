@@ -52,11 +52,11 @@
     <PackageReference Include="Microsoft-WindowsAPICodePack-Core" Version="1.1.5" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
     <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
-    <PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\DSPRE_New\Ekona\Ekona.csproj" />
+    <ProjectReference Include="..\Ekona\Ekona.csproj" />
+    <ProjectReference Include="..\Images\Images\Images.csproj" />
   </ItemGroup>
 
   <ItemGroup>

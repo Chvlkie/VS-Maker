@@ -1,4 +1,6 @@
-using Main.Data.TrainerClass;
+using Ekona.Images;
+using Images;
+using Main.Data;
 using Main.ROMFiles;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Diagnostics;
@@ -14,13 +16,23 @@ namespace Main
             InitializeComponent();
         }
 
+        private bool disableHandlers = false;
+
         /* ROM Information */
         public static string gameCode;
         public static byte europeByte;
         private RomInfo romInfo;
         public Dictionary<ushort, ushort> eventToHeader = new Dictionary<ushort, ushort>();
 
-        private bool disableHandlers = false;
+        // Data
+        public List<Trainer> trainers;
+        public List<TrainerClass> trainerClasses;
+
+        PaletteBase trainerPal;
+        ImageBase trainerTile;
+        SpriteBase trainerSprite;
+
+
         private void openRom_toolstrip_Click(object sender, EventArgs e)
         {
             OpenRom();
@@ -147,10 +159,6 @@ namespace Main
                     return;
                 }
             }
-
-            /* Setup essential editors */
-            SetupHeaderEditor();
-
             //mainTabControl.Show();
             openRom_toolstrip.Enabled = false;
             openFolder_toolstrip.Enabled = false;
@@ -164,33 +172,19 @@ namespace Main
             mainContent.Visible = true;
 
             statusLabelMessage();
-            this.Text += "  -  " + RomInfo.fileName;
-        }
-
-        private void SetupHeaderEditor()
-        {
-            /* Extract essential NARCs sub-archives*/
-
-            statusLabelMessage("Attempting to unpack Header Editor NARCs... Please wait.");
-            Update();
-
-            DSUtils.TryUnpackNarcs(new List<DirNames> { DirNames.synthOverlay, DirNames.textArchives, DirNames.dynamicHeaders });
-
-            statusLabelMessage("Reading internal names... Please wait.");
-            Update();
+            this.Text += "  -  " + fileName;
         }
 
         private void OpenRom()
         {
-            OpenFileDialog openRom = new OpenFileDialog
+            OpenFileDialog openRom = new()
             {
                 Filter = DSUtils.NDSRomFilter
-            }; // Select ROM
+            };
             if (openRom.ShowDialog(this) != DialogResult.OK)
             {
                 return;
             }
-
             SetupROMLanguage(openRom.FileName);
             /* Set ROM gameVersion and language */
             romInfo = new RomInfo(gameCode, openRom.FileName, useSuffix: true);
@@ -255,8 +249,11 @@ namespace Main
             statusLabelMessage("Attempting to unpack NARCs from folder...");
             Update();
             ReadROMInitData();
+            // Setup data lists
+            GetTrainers();
+            GetTrainerClasses();
             // Setup data for initial trainer class tab.
-            SetupTrainerClass();
+            SetupTrainerClassEditor();
         }
 
         private void OpenRomFolder()
@@ -291,7 +288,7 @@ namespace Main
             CheckROMLanguage();
             ReadROMInitData();
             // Setup data for initial trainer class tab.
-            SetupTrainerClass();
+            SetupTrainerClassEditor();
         }
 
         private void statusLabelMessage(string msg = "Ready")
@@ -319,6 +316,7 @@ namespace Main
             catch (Exception ex)
             {
                 MessageBox.Show("The extracted folder is not setup correctly.\nEssential files are missing.\n\n" + ex.Message, "Error Opening Folder", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                throw;
             }
         }
 
@@ -331,6 +329,7 @@ namespace Main
             catch (Exception ex)
             {
                 MessageBox.Show("The extracted folder is not setup correctly.\nEssential files are missing.\n\n" + ex.Message, "Error Opening Folder", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                throw;
             }
         }
 
@@ -338,21 +337,21 @@ namespace Main
         {
             if (mainContent.SelectedTab == mainContent_trainerClass)
             {
-                SetupTrainerClass();
+                SetupTrainerClassEditor();
             }
         }
 
-        private void SetupTrainerClass()
+        /// <summary>
+        /// Get a list of Trainers.
+        /// </summary>
+        private void GetTrainers()
         {
-            disableHandlers = true;
-            trainerClassName.Text = string.Empty;
-            trainerClassIdDisplay.Text = string.Empty;
-            trainerClassName.ReadOnly = true;
-            saveClassName_btn.Enabled = false;
-            /* Extract essential NARCs sub-archives*/
-            statusLabelMessage("Setting up Trainer Editor...");
-            Update();
+            // Clear list data
+            trainers = new List<Trainer>();
 
+            /* Extract essential NARCs sub-archives*/
+            statusLabelMessage("Getting Trainers...");
+            Update();
             DSUtils.TryUnpackNarcs(new List<DirNames> {
                 DirNames.trainerProperties,
                 DirNames.trainerParty,
@@ -362,25 +361,92 @@ namespace Main
                 DirNames.speciesData
             });
 
-            string[] classNames = RomInfo.GetTrainerClassNames();
-            player_trainer_class.Items.Clear();
-            trainerClassListBox.Items.Clear();
+            string[] trainerNames = GetSimpleTrainerNames();
+
+            //if (classNames.Length > byte.MaxValue + 1)
+            //{
+            //    MessageBox.Show("There can't be more than 256 trainer classes! [Found " + classNames.Length + "].\nAborting.",
+            //        "Too many trainer classes", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //    return;
+            //}
+
+            for (int i = 0; i < trainerNames.Length; i++)
+            {
+                string suffix = "\\" + i.ToString("D4");
+                var trainerProperties = new TrainerProperties((ushort)i, new FileStream(gameDirs[DirNames.trainerProperties].unpackedDir + suffix, FileMode.Open));
+                var item = new Trainer
+                {
+                    TrainerId = i + 1,
+                    TrainerName = trainerNames[i],
+                    TrainerClassId = trainerProperties.trainerClass + 1
+                };
+
+                trainers.Add(item);
+            }
+        }
+
+        /// <summary>
+        /// Get a list of TrainerClasses
+        /// </summary>
+        private void GetTrainerClasses()
+        {
+            // Clear list data
+            trainerClasses = new List<TrainerClass>();
+
+            /* Extract essential NARCs sub-archives*/
+            statusLabelMessage("Setting up Trainer Editor...");
+            Update();
+            DSUtils.TryUnpackNarcs(new List<DirNames> {
+                DirNames.trainerProperties,
+                DirNames.trainerParty,
+                DirNames.trainerGraphics,
+                DirNames.textArchives,
+                DirNames.monIcons,
+                DirNames.speciesData
+            });
+
+            string[] classNames = GetTrainerClassNames();
+
             if (classNames.Length > byte.MaxValue + 1)
             {
                 MessageBox.Show("There can't be more than 256 trainer classes! [Found " + classNames.Length + "].\nAborting.",
                     "Too many trainer classes", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+
             for (int i = 0; i < classNames.Length; i++)
             {
-                string id = string.Format("[{0}]", (i + 1).ToString("D3"));
-                if (i < 2)
+                var item = new TrainerClass
                 {
-                    player_trainer_class.Items.Add($"{id} {classNames[i]}");
+                    TrainerClassId = i + 1,
+                    TrainerClassName = classNames[i],
+                    UsedByTrainers = new List<Trainer>()
+                };
+                item.UsedByTrainers.AddRange(trainers.Where(x => x.TrainerClassId == item.TrainerClassId));
+                trainerClasses.Add(item);
+            }
+        }
+
+        private void SetupTrainerClassEditor()
+        {
+            disableHandlers = true;
+            trainerClassName.Text = string.Empty;
+            trainerClassIdDisplay.Text = string.Empty;
+            trainerClassName.ReadOnly = true;
+            saveClassName_btn.Enabled = false;
+            player_trainer_class.Items.Clear();
+            trainerClassListBox.Items.Clear();
+            GetTrainers();
+            GetTrainerClasses();
+            foreach (var item in trainerClasses)
+            {
+                if (item.IsPlayerClass)
+                {
+                    player_trainer_class.Items.Add($"[{item.DisplayTrainerClassId}] - {item.TrainerClassName}");
                 }
                 else
                 {
-                    trainerClassListBox.Items.Add($"{id} {classNames[i]}");
+                    trainerClassListBox.Items.Add($"[{item.DisplayTrainerClassId}] - {item.TrainerClassName}");
                 }
             }
             disableHandlers = false;
@@ -401,7 +467,6 @@ namespace Main
         private void saveClassName_btn_Click(object sender, EventArgs e)
         {
             int index = trainerClassListBox.SelectedIndex + 2;
-            int id = index + 1;
             if (trainerClassName.Text.Length > TrainerFile.maxClassNameLen)
             {
                 MessageBox.Show($"Trainer Class name cannot exceed {TrainerFile.maxClassNameLen} characters.", "Trainer Class Name Length", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -412,7 +477,7 @@ namespace Main
                 string newName = trainerClassName.Text;
                 UpdateCurrentTrainerClassName(newName, index);
                 MessageBox.Show("Trainer Class name updated!", "Success!");
-                SetupTrainerClass();
+                SetupTrainerClassEditor();
                 trainerClassListBox.SelectedIndex = index - 2;
                 GetTrainerClassInfo(index);
             }
@@ -427,23 +492,66 @@ namespace Main
 
         private void GetTrainerClassInfo(int index)
         {
-            var trainerClass = new TrainerClass
-            {
-                TrainerClassId = index + 1,
-                TrainerClassName = GetSingleTrainerClassName(index)
-            };
+            var trainerClass = trainerClasses[index];
 
             trainerClassName.Text = trainerClass.TrainerClassName;
-            trainerClassIdDisplay.Text = trainerClass.TrainerClassId.ToString("D3");
+            trainerClassIdDisplay.Text = trainerClass.DisplayTrainerClassId;
             trainerClassName.ReadOnly = false;
             saveClassName_btn.Enabled = true;
-
+            trainerClass_Uses_list.Items.Clear();
+            if (trainerClass.InUse)
+            {
+                foreach (var item in trainerClass.UsedByTrainers)
+                {
+                    trainerClass_Uses_list.Items.Add($"[{item.DisplayTrainerId}] - {item.TrainerName}");
+                }
+            }
+            int maxFrames = LoadTrainerClassPic(index);
+            UpdateTrainerClassPic(trainerClassPicBox);
 
         }
 
-        private void GetTrainersUsingClass(int  index)
+        private int LoadTrainerClassPic(int trClassID)
         {
+            int paletteFileID = (trClassID * 5 + 1);
+            string paletteFilename = paletteFileID.ToString("D4");
+            trainerPal = new NCLR(gameDirs[DirNames.trainerGraphics].unpackedDir + "\\" + paletteFilename, paletteFileID, paletteFilename);
 
+            int tilesFileID = trClassID * 5;
+            string tilesFilename = tilesFileID.ToString("D4");
+            trainerTile = new NCGR(gameDirs[DirNames.trainerGraphics].unpackedDir + "\\" + tilesFilename, tilesFileID, tilesFilename);
+
+            if (gameFamily == gFamEnum.DP)
+            {
+                return 0;
+            }
+
+            int spriteFileID = (trClassID * 5 + 2);
+            string spriteFilename = spriteFileID.ToString("D4");
+            trainerSprite = new NCER(gameDirs[DirNames.trainerGraphics].unpackedDir + "\\" + spriteFilename, spriteFileID, spriteFilename);
+
+            return trainerSprite.Banks.Length - 1;
+        }
+
+        private void UpdateTrainerClassPic(PictureBox pb, int frameNumber = 0)
+        {
+            if (trainerSprite == null)
+            {
+                Console.WriteLine("Sprite is null!");
+                return;
+            }
+
+            int bank0OAMcount = trainerSprite.Banks[0].oams.Length;
+            int[] OAMenabled = new int[bank0OAMcount];
+            for (int i = 0; i < OAMenabled.Length; i++)
+            {
+                OAMenabled[i] = i;
+            }
+
+            frameNumber = Math.Min(trainerSprite.Banks.Length, frameNumber);
+            Image trSprite = trainerSprite.Get_Image(trainerTile, trainerPal, frameNumber, trainerClassPicBox.Width, trainerClassPicBox.Height, false, false, false, true, true, -1, OAMenabled);
+            pb.Image = trSprite;
+            pb.Update();
         }
     }
 }

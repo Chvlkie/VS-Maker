@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 
 namespace Main.Data
 {
-    public class TrainerClass
+    public class Trainer
     {
+        public int TrainerId { get; set; }
         public int TrainerClassId { get; set; }
+        public string DisplayTrainerId => TrainerId.ToString("D3");
         public string DisplayTrainerClassId => TrainerClassId.ToString("D3");
+        public string? TrainerName { get; set; }
         public string? TrainerClassName { get; set; }
-        public bool IsPlayerClass => TrainerClassId == 1 || TrainerClassId == 2;
-        public List<Trainer> UsedByTrainers { get; set; }
-        public bool InUse => UsedByTrainers.Count > 0;
+        public bool IsDouble;
+        public bool IsPlayerTrainer => TrainerId == 1 || TrainerId == 2;
     }
 }
