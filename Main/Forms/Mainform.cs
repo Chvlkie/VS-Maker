@@ -553,5 +553,10 @@ namespace Main
             pb.Image = trSprite;
             pb.Update();
         }
+
+        private void trainerClass_PrizeMoney_btn_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("This is the Base Rate Multiplier for calculating Prize Money.\nIt is multiplied by the level of a Trainer's last Pokémon.", "About Prize Money", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
     }
 }
