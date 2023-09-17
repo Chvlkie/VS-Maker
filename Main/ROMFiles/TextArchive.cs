@@ -14,7 +14,7 @@ namespace Main.ROMFiles {
     /// </summary>
     public class TextArchive : RomFile {
         #region Fields (2)
-        public List<string> messages;
+        public List<string> Messages;
         public int initialKey;
         #endregion Fields
 
@@ -33,9 +33,9 @@ namespace Main.ROMFiles {
             }
 
             if (msg == null) {
-                messages = new List<string>();
+                Messages = new List<string>();
             } else {
-                messages = msg;
+                Messages = msg;
             }
 
             initialKey = readText.ReadUInt16();
@@ -149,7 +149,7 @@ namespace Main.ROMFiles {
                         key1 += 0x493D;
                         key1 &= 0xFFFF;
                     }
-                    messages.Add(pokemonText.ToString());
+                    Messages.Add(pokemonText.ToString());
                 }
             }
 
@@ -320,11 +320,11 @@ namespace Main.ROMFiles {
         }
 
         public override string ToString() {
-            return string.Join(Environment.NewLine, messages);
+            return string.Join(Environment.NewLine, Messages);
         }
 
         public override byte[] ToByteArray() {
-            return this.ToByteArray(messages);
+            return this.ToByteArray(Messages);
         }
         public void SaveToFileDefaultDir(int IDtoReplace, bool showSuccessMessage = true) {
             SaveToFileDefaultDir(DirNames.textArchives, IDtoReplace, showSuccessMessage);

@@ -970,19 +970,19 @@ namespace Main
         public string GetBuildingModelsDirPath(bool interior) => interior ? gameDirs[DirNames.interiorBuildingModels].unpackedDir : gameDirs[DirNames.exteriorBuildingModels].unpackedDir;
         public string GetRomNameFromWorkdir() => workDir.Substring(0, workDir.Length - folderSuffix.Length - 1);
         public static int GetHeaderCount() => (int)new FileInfo(internalNamesLocation).Length / internalNameLength;
-        public static List<string> GetLocationNames() => new TextArchive(locationNamesTextNumber).messages;
-        public static string[] GetSimpleTrainerNames() => new TextArchive(trainerNamesMessageNumber).messages.ToArray();
-        public static string GetSingleTrainerClassName(int id) => new TextArchive(trainerClassMessageNumber).messages[id];
-        public static string[] GetTrainerClassNames() => new TextArchive(trainerClassMessageNumber).messages.ToArray();
-        public static string[] GetItemNames() => new TextArchive(itemNamesTextNumber).messages.ToArray();
+        public static List<string> GetLocationNames() => new TextArchive(locationNamesTextNumber).Messages;
+        public static string[] GetSimpleTrainerNames() => new TextArchive(trainerNamesMessageNumber).Messages.ToArray();
+        public static string GetSingleTrainerClassName(int id) => new TextArchive(trainerClassMessageNumber).Messages[id];
+        public static string[] GetTrainerClassNames() => new TextArchive(trainerClassMessageNumber).Messages.ToArray();
+        public static string[] GetItemNames() => new TextArchive(itemNamesTextNumber).Messages.ToArray();
         public static string[] GetItemNames(int startIndex = 0, int? count = null)
         {
             TextArchive itemNames = new TextArchive(itemNamesTextNumber);
-            return itemNames.messages.GetRange(startIndex, count == null ? itemNames.messages.Count - 1 : (int)count).ToArray();
+            return itemNames.Messages.GetRange(startIndex, count == null ? itemNames.Messages.Count - 1 : (int)count).ToArray();
         }
-        public static string[] GetPokemonNames() => new TextArchive(pokemonNamesTextNumbers[0]).messages.ToArray();
-        public static string[] GetAbilityNames() => new TextArchive(abilityNamesTextNumber).messages.ToArray();
-        public static string[] GetAttackNames() => new TextArchive(attackNamesTextNumber).messages.ToArray();
+        public static string[] GetPokemonNames() => new TextArchive(pokemonNamesTextNumbers[0]).Messages.ToArray();
+        public static string[] GetAbilityNames() => new TextArchive(abilityNamesTextNumber).Messages.ToArray();
+        public static string[] GetAttackNames() => new TextArchive(attackNamesTextNumber).Messages.ToArray();
         public int GetAreaDataCount() => Directory.GetFiles(gameDirs[DirNames.areaData].unpackedDir).Length;
         public int GetMapTexturesCount() => Directory.GetFiles(gameDirs[DirNames.mapTextures].unpackedDir).Length;
         public int GetBuildingTexturesCount() => Directory.GetFiles(gameDirs[DirNames.buildingTextures].unpackedDir).Length;
