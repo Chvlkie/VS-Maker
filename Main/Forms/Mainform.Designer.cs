@@ -408,7 +408,7 @@
             trainerClass_Gender_label.AutoSize = true;
             trainerClass_Gender_label.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             trainerClass_Gender_label.ImageAlign = ContentAlignment.MiddleLeft;
-            trainerClass_Gender_label.Location = new Point(198, 46);
+            trainerClass_Gender_label.Location = new Point(189, 46);
             trainerClass_Gender_label.Name = "trainerClass_Gender_label";
             trainerClass_Gender_label.Size = new Size(52, 15);
             trainerClass_Gender_label.TabIndex = 38;
