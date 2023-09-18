@@ -208,9 +208,7 @@ namespace Main
             openRom_btn.Enabled = false;
             openFolder_btn.Enabled = false;
             save_toolstrip.Enabled = true;
-            export_toolstrip.Enabled = true;
             save_btn.Enabled = true;
-            exportNarc_btn.Enabled = true;
             mainContent.Enabled = true;
             mainContent.Visible = true;
 
@@ -385,9 +383,7 @@ namespace Main
             // Disable buttons
             saveClassName_btn.Enabled = false;
             saveClassTheme_btn.Enabled = false;
-            savePrizeMoney_btn.Enabled = false;
-            saveGender_btn.Enabled = false;
-            saveEyeContact_btn.Enabled = false;
+
             trainerClass_GoToTrainer_btn.Enabled = false;
         }
 
@@ -869,6 +865,23 @@ namespace Main
                     trainer_Pokemon6_panel.Enabled = false;
                     break;
             }
+        }
+
+        private void trainer_Double_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (trainer_Double_checkBox.Checked)
+            {
+                trainer_NumPoke_num.Maximum = 3;
+                if (trainer_NumPoke_num.Value > 3)
+                {
+                    trainer_NumPoke_num.Value = 3;
+                }
+            }
+            else
+            {
+                trainer_NumPoke_num.Maximum = 6;
+            }
+            EnablePokemon();
         }
     }
 }
