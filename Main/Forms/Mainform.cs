@@ -1,6 +1,7 @@
 using Ekona.Images;
 using Images;
 using Main.Data;
+using Main.Forms;
 using Main.ROMFiles;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Diagnostics;
@@ -34,6 +35,12 @@ namespace Main
         private ImageBase trainerTile;
 
         #endregion Editor Data
+
+        #region Forms
+
+        private PokemonEditor pokemonEditor;
+
+        #endregion Forms
 
         public Mainform()
         {
@@ -766,8 +773,102 @@ namespace Main
             }
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void button3_Click(object sender, EventArgs e)
         {
+            OpenPokemonEditor(1);
+        }
+
+        private void OpenPokemonEditor(int pokemonId)
+        {
+            pokemonEditor = new PokemonEditor();
+            pokemonEditor.Show();
+        }
+
+        private void trainerEditor_tab_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (trainerEditor_tab.SelectedTab == trainerEditor_Pokemon)
+            {
+                SetupPokemonTab();
+            }
+        }
+
+        private void SetupPokemonTab()
+        {
+            EnablePokemon();
+        }
+
+        private void trainer_NumPoke_num_ValueChanged(object sender, EventArgs e)
+        {
+            EnablePokemon();
+        }
+
+        private void EnablePokemon()
+        {
+            switch (trainer_NumPoke_num.Value)
+            {
+                case 1:
+                    trainer_Pokemon1_panel.Enabled = true;
+                    trainer_Pokemon2_panel.Enabled = false;
+                    trainer_Pokemon3_panel.Enabled = false;
+                    trainer_Pokemon4_panel.Enabled = false;
+                    trainer_Pokemon5_panel.Enabled = false;
+                    trainer_Pokemon6_panel.Enabled = false;
+                    break;
+
+                case 2:
+                    trainer_Pokemon1_panel.Enabled = true;
+                    trainer_Pokemon2_panel.Enabled = true;
+                    trainer_Pokemon3_panel.Enabled = false;
+                    trainer_Pokemon4_panel.Enabled = false;
+                    trainer_Pokemon5_panel.Enabled = false;
+                    trainer_Pokemon6_panel.Enabled = false;
+                    break;
+
+                case 3:
+                    trainer_Pokemon1_panel.Enabled = true;
+                    trainer_Pokemon2_panel.Enabled = true;
+                    trainer_Pokemon3_panel.Enabled = true;
+                    trainer_Pokemon4_panel.Enabled = false;
+                    trainer_Pokemon5_panel.Enabled = false;
+                    trainer_Pokemon6_panel.Enabled = false;
+                    break;
+
+                case 4:
+                    trainer_Pokemon1_panel.Enabled = true;
+                    trainer_Pokemon2_panel.Enabled = true;
+                    trainer_Pokemon3_panel.Enabled = true;
+                    trainer_Pokemon4_panel.Enabled = true;
+                    trainer_Pokemon5_panel.Enabled = false;
+                    trainer_Pokemon6_panel.Enabled = false;
+                    break;
+
+                case 5:
+                    trainer_Pokemon1_panel.Enabled = true;
+                    trainer_Pokemon2_panel.Enabled = true;
+                    trainer_Pokemon3_panel.Enabled = true;
+                    trainer_Pokemon4_panel.Enabled = true;
+                    trainer_Pokemon5_panel.Enabled = true;
+                    trainer_Pokemon6_panel.Enabled = false;
+                    break;
+
+                case 6:
+                    trainer_Pokemon1_panel.Enabled = true;
+                    trainer_Pokemon2_panel.Enabled = true;
+                    trainer_Pokemon3_panel.Enabled = true;
+                    trainer_Pokemon4_panel.Enabled = true;
+                    trainer_Pokemon5_panel.Enabled = true;
+                    trainer_Pokemon6_panel.Enabled = true;
+                    break;
+
+                default:
+                    trainer_Pokemon1_panel.Enabled = false;
+                    trainer_Pokemon2_panel.Enabled = false;
+                    trainer_Pokemon3_panel.Enabled = false;
+                    trainer_Pokemon4_panel.Enabled = false;
+                    trainer_Pokemon5_panel.Enabled = false;
+                    trainer_Pokemon6_panel.Enabled = false;
+                    break;
+            }
         }
     }
 }
