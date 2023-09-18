@@ -85,6 +85,7 @@
             playerClass_Label = new Label();
             mainContent_trainer = new TabPage();
             panel9 = new Panel();
+            button1 = new Button();
             label8 = new Label();
             trainer_Message = new RichTextBox();
             trainer_MessageTrigger_list = new ListBox();
@@ -126,6 +127,8 @@
             label11 = new Label();
             comboBox3 = new ComboBox();
             panel7 = new Panel();
+            button13 = new Button();
+            button14 = new Button();
             save_TrainerName_btn = new Button();
             trainer_Name = new TextBox();
             trainer_Name_Label = new Label();
@@ -184,9 +187,6 @@
             panel1 = new Panel();
             panel2 = new Panel();
             saveFileDialog1 = new SaveFileDialog();
-            button13 = new Button();
-            button14 = new Button();
-            button1 = new Button();
             main_toolstrip.SuspendLayout();
             statusStrip1.SuspendLayout();
             mainContent.SuspendLayout();
@@ -832,6 +832,17 @@
             panel9.Size = new Size(564, 142);
             panel9.TabIndex = 5;
             // 
+            // button1
+            // 
+            button1.Image = Properties.Resources.saveIconSm;
+            button1.Location = new Point(501, 112);
+            button1.Name = "button1";
+            button1.Size = new Size(56, 23);
+            button1.TabIndex = 46;
+            button1.Text = "Save";
+            button1.TextImageRelation = TextImageRelation.ImageBeforeText;
+            button1.UseVisualStyleBackColor = true;
+            // 
             // label8
             // 
             label8.AutoSize = true;
@@ -1274,6 +1285,28 @@
             panel7.Size = new Size(358, 68);
             panel7.TabIndex = 3;
             // 
+            // button13
+            // 
+            button13.Image = Properties.Resources.undoIconSm;
+            button13.Location = new Point(218, 28);
+            button13.Name = "button13";
+            button13.Size = new Size(131, 23);
+            button13.TabIndex = 16;
+            button13.Text = "Undo All Changes";
+            button13.TextImageRelation = TextImageRelation.ImageBeforeText;
+            button13.UseVisualStyleBackColor = true;
+            // 
+            // button14
+            // 
+            button14.Image = Properties.Resources.saveIconSm;
+            button14.Location = new Point(218, 3);
+            button14.Name = "button14";
+            button14.Size = new Size(131, 23);
+            button14.TabIndex = 15;
+            button14.Text = "Save All Changes";
+            button14.TextImageRelation = TextImageRelation.ImageBeforeText;
+            button14.UseVisualStyleBackColor = true;
+            // 
             // save_TrainerName_btn
             // 
             save_TrainerName_btn.Image = Properties.Resources.saveIconSm;
@@ -1388,7 +1421,7 @@
             // 
             trainerPicBox.BackColor = Color.White;
             trainerPicBox.BorderStyle = BorderStyle.Fixed3D;
-            trainerPicBox.Location = new Point(5, 29);
+            trainerPicBox.Location = new Point(5, 28);
             trainerPicBox.Name = "trainerPicBox";
             trainerPicBox.Size = new Size(188, 107);
             trainerPicBox.TabIndex = 26;
@@ -1847,39 +1880,6 @@
             panel2.Name = "panel2";
             panel2.Size = new Size(784, 490);
             panel2.TabIndex = 5;
-            // 
-            // button13
-            // 
-            button13.Image = Properties.Resources.undoIconSm;
-            button13.Location = new Point(218, 28);
-            button13.Name = "button13";
-            button13.Size = new Size(131, 23);
-            button13.TabIndex = 16;
-            button13.Text = "Undo All Changes";
-            button13.TextImageRelation = TextImageRelation.ImageBeforeText;
-            button13.UseVisualStyleBackColor = true;
-            // 
-            // button14
-            // 
-            button14.Image = Properties.Resources.saveIconSm;
-            button14.Location = new Point(218, 3);
-            button14.Name = "button14";
-            button14.Size = new Size(131, 23);
-            button14.TabIndex = 15;
-            button14.Text = "Save All Changes";
-            button14.TextImageRelation = TextImageRelation.ImageBeforeText;
-            button14.UseVisualStyleBackColor = true;
-            // 
-            // button1
-            // 
-            button1.Image = Properties.Resources.saveIconSm;
-            button1.Location = new Point(501, 112);
-            button1.Name = "button1";
-            button1.Size = new Size(56, 23);
-            button1.TabIndex = 46;
-            button1.Text = "Save";
-            button1.TextImageRelation = TextImageRelation.ImageBeforeText;
-            button1.UseVisualStyleBackColor = true;
             // 
             // Mainform
             // 
