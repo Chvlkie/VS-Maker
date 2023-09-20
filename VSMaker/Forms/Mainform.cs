@@ -1,12 +1,12 @@
 using Ekona.Images;
 using Images;
+using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Diagnostics;
+using System.Windows.Forms;
 using VSMaker.Data;
 using VSMaker.Forms;
 using VSMaker.ROMFiles;
-using Microsoft.WindowsAPICodePack.Dialogs;
-using System.Diagnostics;
 using static VSMaker.RomInfo;
-using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 using Image = System.Drawing.Image;
 
 namespace VSMaker
@@ -305,6 +305,10 @@ namespace VSMaker
             else if (mainContent.SelectedTab == mainContent_trainer)
             {
                 SetupTrainerEditor();
+            }
+            else if (mainContent.SelectedTab == mainContent_trainerText)
+            {
+                SetupTrainerTextTab();
             }
         }
 
@@ -981,6 +985,42 @@ namespace VSMaker
             string selectedMessageTriggerName = trainer_MessageTrigger_list.SelectedItem.ToString();
             int messageTriggerId = messageTriggers.Find(x => x.MessageTriggerName == selectedMessageTriggerName).MessageTriggerId;
             trainer_Message.Text = selectedTrainer.TrainerMessages.Single(x => x.MessageTriggerId == messageTriggerId).MessageText;
+        }
+
+        private void SetupTrainerTextTab()
+        {
+            if (trainerTextTable_dataGrid.RowCount == 0)
+            {
+                string[] currentTrainers = new string[trainers.Count];
+                string[] currentMessageTriggers = new string[messageTriggers.Count];
+
+                for (int i = 0; i < trainers.Count; i++)
+                {
+                    currentTrainers[i] = $"[{trainers[i].DisplayTrainerId}] - {trainers[i].TrainerName}";
+                }
+
+                for (int i = 0; i < messageTriggers.Count; i++)
+                {
+                    currentMessageTriggers[i] = $"[{messageTriggers[i].MessageTriggerName}";
+                }
+
+                for (int i = 0; i < trainerMessages.Count; i++)
+                {
+                    int trainerIndex = trainerMessages[i].TrainerId;
+                    int messageTriggerIndex = messageTriggers.FindIndex(x => x.MessageTriggerId == trainerMessages[i].MessageTriggerId);
+                    trainerTextTable_dataGrid.Rows.Add(i, null, null, trainerMessages[i].MessageText);
+
+                    DataGridViewComboBoxCell trainerCell =
+    (DataGridViewComboBoxCell)(trainerTextTable_dataGrid.Rows[i].Cells[1]);
+                    trainerCell.DataSource = currentTrainers;
+                    trainerCell.Value = trainerCell.Items[trainerIndex];
+
+                    DataGridViewComboBoxCell triggerCell =
+   (DataGridViewComboBoxCell)(trainerTextTable_dataGrid.Rows[i].Cells[2]);
+                    triggerCell.DataSource = currentMessageTriggers;
+                    triggerCell.Value = triggerCell.Items[messageTriggerIndex];
+                }
+            }
         }
     }
 }

@@ -146,17 +146,6 @@
             label1 = new Label();
             trainers_Player_list = new ListBox();
             mainContent_trainerText = new TabPage();
-            panel17 = new Panel();
-            dataGridView1 = new DataGridView();
-            panel16 = new Panel();
-            toolStrip1 = new ToolStrip();
-            toolStripButton3 = new ToolStripButton();
-            trainreText_Import_btn = new ToolStripButton();
-            trainerText_Export_btn = new ToolStripButton();
-            panel15 = new Panel();
-            trainerText_Search_btn = new Button();
-            label19 = new Label();
-            textBox1 = new TextBox();
             mainContent_trainerTheme = new TabPage();
             panel14 = new Panel();
             button10 = new Button();
@@ -169,6 +158,7 @@
             panel13 = new Panel();
             label15 = new Label();
             listBox1 = new ListBox();
+            trainerMessageBindingSource2 = new BindingSource(components);
             trainerMessageBindingSource = new BindingSource(components);
             quick_toolstrip = new ToolStrip();
             openRom_btn = new ToolStripButton();
@@ -183,6 +173,22 @@
             panel2 = new Panel();
             saveFileDialog1 = new SaveFileDialog();
             trainerMessageBindingSource1 = new BindingSource(components);
+            trainerMessageBindingSource3 = new BindingSource(components);
+            toolStrip1 = new ToolStrip();
+            toolStripButton3 = new ToolStripButton();
+            trainreText_Import_btn = new ToolStripButton();
+            trainerText_Export_btn = new ToolStripButton();
+            trainerTextTable_dataGrid = new DataGridView();
+            Message = new DataGridViewTextBoxColumn();
+            MessageTriggerId = new DataGridViewComboBoxColumn();
+            TrainerId = new DataGridViewComboBoxColumn();
+            MessageId = new DataGridViewTextBoxColumn();
+            panel17 = new Panel();
+            panel16 = new Panel();
+            trainerTextTable_addRow_btn = new ToolStripButton();
+            toolStripSeparator3 = new ToolStripSeparator();
+            trainerTextTable_delRow_btn = new ToolStripButton();
+            toolStripSeparator4 = new ToolStripSeparator();
             main_toolstrip.SuspendLayout();
             statusStrip1.SuspendLayout();
             mainContent.SuspendLayout();
@@ -219,20 +225,21 @@
             ((System.ComponentModel.ISupportInitialize)trainerPicBox).BeginInit();
             panel5.SuspendLayout();
             mainContent_trainerText.SuspendLayout();
-            panel17.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
-            panel16.SuspendLayout();
-            toolStrip1.SuspendLayout();
-            panel15.SuspendLayout();
             mainContent_trainerTheme.SuspendLayout();
             panel14.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             panel13.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)trainerMessageBindingSource2).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trainerMessageBindingSource).BeginInit();
             quick_toolstrip.SuspendLayout();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trainerMessageBindingSource1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)trainerMessageBindingSource3).BeginInit();
+            toolStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)trainerTextTable_dataGrid).BeginInit();
+            panel17.SuspendLayout();
+            panel16.SuspendLayout();
             SuspendLayout();
             // 
             // main_toolstrip
@@ -1491,120 +1498,12 @@
             // mainContent_trainerText
             // 
             mainContent_trainerText.Controls.Add(panel17);
-            mainContent_trainerText.Controls.Add(panel16);
-            mainContent_trainerText.Controls.Add(panel15);
             mainContent_trainerText.Location = new Point(4, 24);
             mainContent_trainerText.Name = "mainContent_trainerText";
             mainContent_trainerText.Size = new Size(776, 462);
             mainContent_trainerText.TabIndex = 2;
             mainContent_trainerText.Text = "Trainer Text Table";
             mainContent_trainerText.UseVisualStyleBackColor = true;
-            // 
-            // panel17
-            // 
-            panel17.Controls.Add(dataGridView1);
-            panel17.Dock = DockStyle.Fill;
-            panel17.Location = new Point(0, 27);
-            panel17.Name = "panel17";
-            panel17.Size = new Size(576, 435);
-            panel17.TabIndex = 2;
-            // 
-            // dataGridView1
-            // 
-            dataGridView1.AllowUserToAddRows = false;
-            dataGridView1.AllowUserToDeleteRows = false;
-            dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Dock = DockStyle.Fill;
-            dataGridView1.Location = new Point(0, 0);
-            dataGridView1.Name = "dataGridView1";
-            dataGridView1.RowTemplate.Height = 25;
-            dataGridView1.Size = new Size(576, 435);
-            dataGridView1.TabIndex = 1;
-            // 
-            // panel16
-            // 
-            panel16.Controls.Add(toolStrip1);
-            panel16.Dock = DockStyle.Top;
-            panel16.Location = new Point(0, 0);
-            panel16.Name = "panel16";
-            panel16.Size = new Size(576, 27);
-            panel16.TabIndex = 1;
-            // 
-            // toolStrip1
-            // 
-            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripButton3, trainreText_Import_btn, trainerText_Export_btn });
-            toolStrip1.Location = new Point(0, 0);
-            toolStrip1.Name = "toolStrip1";
-            toolStrip1.Size = new Size(576, 25);
-            toolStrip1.TabIndex = 0;
-            toolStrip1.Text = "toolStrip1";
-            // 
-            // toolStripButton3
-            // 
-            toolStripButton3.Alignment = ToolStripItemAlignment.Right;
-            toolStripButton3.Image = Properties.Resources.saveIcon;
-            toolStripButton3.ImageTransparentColor = Color.Magenta;
-            toolStripButton3.Name = "toolStripButton3";
-            toolStripButton3.Size = new Size(100, 22);
-            toolStripButton3.Text = "Save Changes";
-            // 
-            // trainreText_Import_btn
-            // 
-            trainreText_Import_btn.Image = Properties.Resources.importIcon;
-            trainreText_Import_btn.ImageTransparentColor = Color.Magenta;
-            trainreText_Import_btn.Name = "trainreText_Import_btn";
-            trainreText_Import_btn.Padding = new Padding(0, 0, 2, 0);
-            trainreText_Import_btn.Size = new Size(132, 22);
-            trainreText_Import_btn.Text = "Import Spreadsheet";
-            // 
-            // trainerText_Export_btn
-            // 
-            trainerText_Export_btn.Image = Properties.Resources.exportIcon;
-            trainerText_Export_btn.ImageTransparentColor = Color.Magenta;
-            trainerText_Export_btn.Name = "trainerText_Export_btn";
-            trainerText_Export_btn.Size = new Size(128, 22);
-            trainerText_Export_btn.Text = "Export Spreadsheet";
-            // 
-            // panel15
-            // 
-            panel15.Controls.Add(trainerText_Search_btn);
-            panel15.Controls.Add(label19);
-            panel15.Controls.Add(textBox1);
-            panel15.Dock = DockStyle.Right;
-            panel15.Location = new Point(576, 0);
-            panel15.Name = "panel15";
-            panel15.Size = new Size(200, 462);
-            panel15.TabIndex = 0;
-            // 
-            // trainerText_Search_btn
-            // 
-            trainerText_Search_btn.BackgroundImage = Properties.Resources.searchIcon;
-            trainerText_Search_btn.BackgroundImageLayout = ImageLayout.Stretch;
-            trainerText_Search_btn.Location = new Point(164, 30);
-            trainerText_Search_btn.Name = "trainerText_Search_btn";
-            trainerText_Search_btn.Size = new Size(24, 24);
-            trainerText_Search_btn.TabIndex = 12;
-            trainerText_Search_btn.TextImageRelation = TextImageRelation.ImageAboveText;
-            trainerText_Search_btn.UseVisualStyleBackColor = true;
-            // 
-            // label19
-            // 
-            label19.AutoSize = true;
-            label19.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label19.ImageAlign = ContentAlignment.MiddleLeft;
-            label19.Location = new Point(6, 12);
-            label19.Name = "label19";
-            label19.Size = new Size(76, 15);
-            label19.TabIndex = 11;
-            label19.Text = "Search Text:";
-            label19.TextAlign = ContentAlignment.MiddleLeft;
-            // 
-            // textBox1
-            // 
-            textBox1.Location = new Point(6, 30);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(152, 23);
-            textBox1.TabIndex = 0;
             // 
             // mainContent_trainerTheme
             // 
@@ -1688,7 +1587,7 @@
             label16.AutoSize = true;
             label16.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label16.ImageAlign = ContentAlignment.MiddleLeft;
-            label16.Location = new Point(5, 12);
+            label16.Location = new Point(5, 6);
             label16.Name = "label16";
             label16.Size = new Size(131, 15);
             label16.TabIndex = 37;
@@ -1699,7 +1598,7 @@
             // 
             pictureBox1.BackColor = Color.White;
             pictureBox1.BorderStyle = BorderStyle.Fixed3D;
-            pictureBox1.Location = new Point(5, 34);
+            pictureBox1.Location = new Point(5, 28);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(339, 192);
             pictureBox1.TabIndex = 34;
@@ -1720,7 +1619,7 @@
             label15.AutoSize = true;
             label15.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label15.ImageAlign = ContentAlignment.MiddleLeft;
-            label15.Location = new Point(5, 12);
+            label15.Location = new Point(5, 6);
             label15.Name = "label15";
             label15.Size = new Size(96, 15);
             label15.TabIndex = 5;
@@ -1732,10 +1631,14 @@
             listBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             listBox1.FormattingEnabled = true;
             listBox1.ItemHeight = 15;
-            listBox1.Location = new Point(5, 34);
+            listBox1.Location = new Point(5, 29);
             listBox1.Name = "listBox1";
             listBox1.Size = new Size(190, 394);
             listBox1.TabIndex = 4;
+            // 
+            // trainerMessageBindingSource2
+            // 
+            trainerMessageBindingSource2.DataSource = typeof(Data.TrainerMessage);
             // 
             // trainerMessageBindingSource
             // 
@@ -1840,6 +1743,136 @@
             // 
             trainerMessageBindingSource1.DataSource = typeof(Data.TrainerMessage);
             // 
+            // trainerMessageBindingSource3
+            // 
+            trainerMessageBindingSource3.DataSource = typeof(Data.TrainerMessage);
+            // 
+            // toolStrip1
+            // 
+            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripButton3, trainreText_Import_btn, trainerText_Export_btn, toolStripSeparator3, trainerTextTable_addRow_btn, trainerTextTable_delRow_btn, toolStripSeparator4 });
+            toolStrip1.Location = new Point(0, 0);
+            toolStrip1.Name = "toolStrip1";
+            toolStrip1.Size = new Size(776, 25);
+            toolStrip1.TabIndex = 13;
+            toolStrip1.Text = "toolStrip1";
+            // 
+            // toolStripButton3
+            // 
+            toolStripButton3.Alignment = ToolStripItemAlignment.Right;
+            toolStripButton3.Image = Properties.Resources.saveIcon;
+            toolStripButton3.ImageTransparentColor = Color.Magenta;
+            toolStripButton3.Name = "toolStripButton3";
+            toolStripButton3.Size = new Size(100, 22);
+            toolStripButton3.Text = "Save Changes";
+            // 
+            // trainreText_Import_btn
+            // 
+            trainreText_Import_btn.Image = Properties.Resources.importIcon;
+            trainreText_Import_btn.ImageTransparentColor = Color.Magenta;
+            trainreText_Import_btn.Name = "trainreText_Import_btn";
+            trainreText_Import_btn.Padding = new Padding(0, 0, 2, 0);
+            trainreText_Import_btn.Size = new Size(132, 22);
+            trainreText_Import_btn.Text = "Import Spreadsheet";
+            // 
+            // trainerText_Export_btn
+            // 
+            trainerText_Export_btn.Image = Properties.Resources.exportIcon;
+            trainerText_Export_btn.ImageTransparentColor = Color.Magenta;
+            trainerText_Export_btn.Name = "trainerText_Export_btn";
+            trainerText_Export_btn.Size = new Size(128, 22);
+            trainerText_Export_btn.Text = "Export Spreadsheet";
+            // 
+            // trainerTextTable_dataGrid
+            // 
+            trainerTextTable_dataGrid.AllowUserToAddRows = false;
+            trainerTextTable_dataGrid.AllowUserToDeleteRows = false;
+            trainerTextTable_dataGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCells;
+            trainerTextTable_dataGrid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            trainerTextTable_dataGrid.Columns.AddRange(new DataGridViewColumn[] { MessageId, TrainerId, MessageTriggerId, Message });
+            trainerTextTable_dataGrid.Dock = DockStyle.Fill;
+            trainerTextTable_dataGrid.Location = new Point(0, 0);
+            trainerTextTable_dataGrid.Name = "trainerTextTable_dataGrid";
+            trainerTextTable_dataGrid.RowTemplate.Height = 25;
+            trainerTextTable_dataGrid.Size = new Size(776, 437);
+            trainerTextTable_dataGrid.TabIndex = 0;
+            // 
+            // Message
+            // 
+            Message.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            Message.HeaderText = "Text";
+            Message.Name = "Message";
+            // 
+            // MessageTriggerId
+            // 
+            MessageTriggerId.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            MessageTriggerId.FillWeight = 75F;
+            MessageTriggerId.HeaderText = "Message Trigger";
+            MessageTriggerId.Name = "MessageTriggerId";
+            MessageTriggerId.Resizable = DataGridViewTriState.True;
+            MessageTriggerId.SortMode = DataGridViewColumnSortMode.Automatic;
+            // 
+            // TrainerId
+            // 
+            TrainerId.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            TrainerId.FillWeight = 50F;
+            TrainerId.HeaderText = "Trainer";
+            TrainerId.Name = "TrainerId";
+            TrainerId.Resizable = DataGridViewTriState.True;
+            TrainerId.SortMode = DataGridViewColumnSortMode.Automatic;
+            // 
+            // MessageId
+            // 
+            MessageId.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            MessageId.FillWeight = 30F;
+            MessageId.HeaderText = "Message #";
+            MessageId.Name = "MessageId";
+            MessageId.ReadOnly = true;
+            // 
+            // panel17
+            // 
+            panel17.Controls.Add(panel16);
+            panel17.Controls.Add(toolStrip1);
+            panel17.Dock = DockStyle.Fill;
+            panel17.Location = new Point(0, 0);
+            panel17.Name = "panel17";
+            panel17.Size = new Size(776, 462);
+            panel17.TabIndex = 2;
+            // 
+            // panel16
+            // 
+            panel16.Controls.Add(trainerTextTable_dataGrid);
+            panel16.Dock = DockStyle.Fill;
+            panel16.Location = new Point(0, 25);
+            panel16.Name = "panel16";
+            panel16.Size = new Size(776, 437);
+            panel16.TabIndex = 15;
+            // 
+            // trainerTextTable_addRow_btn
+            // 
+            trainerTextTable_addRow_btn.Image = (Image)resources.GetObject("trainerTextTable_addRow_btn.Image");
+            trainerTextTable_addRow_btn.ImageTransparentColor = Color.Magenta;
+            trainerTextTable_addRow_btn.Name = "trainerTextTable_addRow_btn";
+            trainerTextTable_addRow_btn.Size = new Size(106, 22);
+            trainerTextTable_addRow_btn.Text = "Add New Entry";
+            // 
+            // toolStripSeparator3
+            // 
+            toolStripSeparator3.Name = "toolStripSeparator3";
+            toolStripSeparator3.Size = new Size(6, 25);
+            // 
+            // trainerTextTable_delRow_btn
+            // 
+            trainerTextTable_delRow_btn.Image = (Image)resources.GetObject("trainerTextTable_delRow_btn.Image");
+            trainerTextTable_delRow_btn.ImageTransparentColor = Color.Magenta;
+            trainerTextTable_delRow_btn.Name = "trainerTextTable_delRow_btn";
+            trainerTextTable_delRow_btn.Size = new Size(90, 22);
+            trainerTextTable_delRow_btn.Text = "Delete Entry";
+            // 
+            // toolStripSeparator4
+            // 
+            toolStripSeparator4.Name = "toolStripSeparator4";
+            toolStripSeparator4.Size = new Size(6, 25);
+            // 
             // Mainform
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -1911,20 +1944,13 @@
             panel5.ResumeLayout(false);
             panel5.PerformLayout();
             mainContent_trainerText.ResumeLayout(false);
-            panel17.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
-            panel16.ResumeLayout(false);
-            panel16.PerformLayout();
-            toolStrip1.ResumeLayout(false);
-            toolStrip1.PerformLayout();
-            panel15.ResumeLayout(false);
-            panel15.PerformLayout();
             mainContent_trainerTheme.ResumeLayout(false);
             panel14.ResumeLayout(false);
             panel14.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             panel13.ResumeLayout(false);
             panel13.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)trainerMessageBindingSource2).EndInit();
             ((System.ComponentModel.ISupportInitialize)trainerMessageBindingSource).EndInit();
             quick_toolstrip.ResumeLayout(false);
             quick_toolstrip.PerformLayout();
@@ -1932,6 +1958,13 @@
             panel1.PerformLayout();
             panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)trainerMessageBindingSource1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)trainerMessageBindingSource3).EndInit();
+            toolStrip1.ResumeLayout(false);
+            toolStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)trainerTextTable_dataGrid).EndInit();
+            panel17.ResumeLayout(false);
+            panel17.PerformLayout();
+            panel16.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -2073,18 +2106,7 @@
         private Label label17;
         private ComboBox comboBox7;
         private Label label18;
-        private Panel panel16;
         private BindingSource trainerMessageBindingSource;
-        private Panel panel15;
-        private Label label19;
-        private TextBox textBox1;
-        private Panel panel17;
-        private DataGridView dataGridView1;
-        private ToolStrip toolStrip1;
-        private ToolStripButton toolStripButton3;
-        private Button trainerText_Search_btn;
-        private ToolStripButton trainreText_Import_btn;
-        private ToolStripButton trainerText_Export_btn;
         private Button button9;
         private Label label21;
         private Label label20;
@@ -2094,5 +2116,22 @@
         private Button button14;
         private Button button1;
         private BindingSource trainerMessageBindingSource1;
+        private BindingSource trainerMessageBindingSource2;
+        private BindingSource trainerMessageBindingSource3;
+        private Panel panel17;
+        private ToolStrip toolStrip1;
+        private ToolStripButton toolStripButton3;
+        private ToolStripButton trainreText_Import_btn;
+        private ToolStripButton trainerText_Export_btn;
+        private DataGridView trainerTextTable_dataGrid;
+        private DataGridViewTextBoxColumn MessageId;
+        private DataGridViewComboBoxColumn TrainerId;
+        private DataGridViewComboBoxColumn MessageTriggerId;
+        private DataGridViewTextBoxColumn Message;
+        private Panel panel16;
+        private ToolStripSeparator toolStripSeparator3;
+        private ToolStripButton trainerTextTable_addRow_btn;
+        private ToolStripButton trainerTextTable_delRow_btn;
+        private ToolStripSeparator toolStripSeparator4;
     }
 }
