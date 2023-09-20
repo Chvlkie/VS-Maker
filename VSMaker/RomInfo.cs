@@ -47,7 +47,6 @@ namespace VSMaker
         public static uint OWTableOffset { get; internal set; }
         public static string OWtablePath { get; private set; }
 
-        public static uint TrainerTableOffset { get; internal set; }
         public static string TrainerTablePath { get; private set; }
 
         public static uint monIconPalTableAddress { get; private set; }
@@ -550,22 +549,23 @@ namespace VSMaker
         }
 
         public static void SetTrainerTable()
-        {
-            switch (gameFamily)
-            {
-                case gFamEnum.DP:
-                    break;
+        { 
+            TrainerTablePath = workDir + "\\unpacked\\trainerTable\\0000";
+            //switch (gameFamily)
+            //{
+            //    case gFamEnum.DP:
+            //        break;
 
-                case gFamEnum.Plat:
-                    break;
+            //    case gFamEnum.Plat:
+            //        break;
 
-                case gFamEnum.HGSS:
-                    TrainerTablePath = workDir + "\\unpacked\\trainerTable\\0000";
-                    break;
+            //    case gFamEnum.HGSS:
+                   
+            //        break;
 
-                default:
-                    break;
-            }
+            //    default:
+            //        break;
+            //}
         }
 
         public static void SetOWtable()
@@ -1056,7 +1056,7 @@ namespace VSMaker
             switch (gameFamily)
             {
                 case gFamEnum.DP:
-                    trainerTextMessageNumber = 559;
+                    trainerTextMessageNumber = 555;
                     if (gameLanguage.Equals(gLangEnum.Japanese))
                     {
                         trainerNamesMessageNumber -= 9;
@@ -1290,7 +1290,9 @@ namespace VSMaker
 
                         [DirNames.monIcons] = @"data\poketool\icongra\poke_icon.narc",
 
-                        [DirNames.encounters] = @"data\fielddata\encountdata\" + char.ToLower(gameVersion.ToString()[0]) + '_' + "enc_data.narc"
+                        [DirNames.encounters] = @"data\fielddata\encountdata\" + char.ToLower(gameVersion.ToString()[0]) + '_' + "enc_data.narc",
+                        [DirNames.trainerTable] = @"data\poketool\trmsg\trtbl.narc",
+
                     };
                     break;
 

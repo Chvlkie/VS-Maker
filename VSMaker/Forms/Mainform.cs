@@ -745,6 +745,10 @@ namespace VSMaker
                 GetMessageTriggerDetails(MessageTriggerEnum.rematch),
                 GetMessageTriggerDetails(MessageTriggerEnum.doubleRematchTrainer1),
                 GetMessageTriggerDetails(MessageTriggerEnum.doubleRematchTrainer2),
+                GetMessageTriggerDetails(MessageTriggerEnum.notUsed0B),
+                GetMessageTriggerDetails(MessageTriggerEnum.notUsed0C),
+                GetMessageTriggerDetails(MessageTriggerEnum.notUsed0D),
+                GetMessageTriggerDetails(MessageTriggerEnum.notUsed0E),
             };
         }
 
@@ -1008,7 +1012,7 @@ namespace VSMaker
 
                 for (int i = 0; i < messageTriggers.Count; i++)
                 {
-                    currentMessageTriggers[i] = $"[{messageTriggers[i].MessageTriggerName}";
+                    currentMessageTriggers[i] = $"{messageTriggers[i].MessageTriggerName}";
                 }
 
                 for (int i = 0; i < trainerMessages.Count; i++)
@@ -1035,7 +1039,7 @@ namespace VSMaker
             if (e.ColumnIndex == 3)
             {
                 int trainerMessageId = e.RowIndex;
-                string messageText = trainerMessages.Find(x => x.MessageId == trainerMessageId + 1).MessageText;
+                string messageText = trainerMessages.Find(x => x.MessageId == trainerMessageId).MessageText;
                 OpenTextEditor(trainerMessageId, messageText);
             }
         }

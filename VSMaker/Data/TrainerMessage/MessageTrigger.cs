@@ -41,13 +41,13 @@ namespace VSMaker.Data
         [Description(MessageTriggers.Descriptions.DoubleOnlyOnePokeTrainer2)]
         doubleOnlyOnePokeTrainer2 = 10,
 
-        [Description("Not in use")]
+        [Description("notUsed0B")]
         notUsed0B = 11,
-        [Description("Not in use")]
+        [Description("notUsed0C")]
         notUsed0C = 12,
-        [Description("Not in use")]
+        [Description("notUsed0D")]
         notUsed0D = 13,
-        [Description("Not in use")]
+        [Description("notUsed0E")]
         notUsed0E = 14,
         [Description("Rematch")]
         rematch = 17,
@@ -77,6 +77,9 @@ namespace VSMaker.Data
             public const string DoublePlayerWinTrainer2 = "DOUBLE Player Wins; Trainer 2";
             public const string DoublePostBattleOwTrainer2 = "DOUBLE Post-Battle OW; Trainer 2";
             public const string DoubleOnlyOnePokeTrainer2 = "DOUBLE Only One Poke; Trainer 2";
+            public const string Rematch = "Rematch";
+            public const string DoubleRematchTrainer1 = "Double Rematch Trainer 1";
+            public const string DoubleRematchTrainer2 = "Double Rematch Trainer 2";
         }      
     }
 }

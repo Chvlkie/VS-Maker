@@ -30,13 +30,13 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TextEditor));
             panel1 = new Panel();
+            label1 = new Label();
             textEditor_Save_btn = new Button();
             textEditor_Message = new RichTextBox();
             toolStrip1 = new ToolStrip();
             toolStripButton3 = new ToolStripButton();
             toolStripButton4 = new ToolStripButton();
             toolStripSeparator2 = new ToolStripSeparator();
-            label1 = new Label();
             panel1.SuspendLayout();
             toolStrip1.SuspendLayout();
             SuspendLayout();
@@ -53,11 +53,22 @@
             panel1.Size = new Size(584, 261);
             panel1.TabIndex = 0;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label1.Location = new Point(12, 34);
+            label1.Name = "label1";
+            label1.Size = new Size(83, 15);
+            label1.TabIndex = 3;
+            label1.Text = "Message Text";
+            // 
             // textEditor_Save_btn
             // 
-            textEditor_Save_btn.Location = new Point(501, 226);
+            textEditor_Save_btn.Image = Properties.Resources.saveIconSm;
+            textEditor_Save_btn.Location = new Point(516, 226);
             textEditor_Save_btn.Name = "textEditor_Save_btn";
-            textEditor_Save_btn.Size = new Size(71, 23);
+            textEditor_Save_btn.Size = new Size(56, 23);
             textEditor_Save_btn.TabIndex = 2;
             textEditor_Save_btn.Text = "Save";
             textEditor_Save_btn.TextImageRelation = TextImageRelation.ImageBeforeText;
@@ -82,7 +93,7 @@
             // 
             // toolStripButton3
             // 
-            toolStripButton3.Image = (Image)resources.GetObject("toolStripButton3.Image");
+            toolStripButton3.Image = Properties.Resources.undoIconSm;
             toolStripButton3.ImageTransparentColor = Color.Magenta;
             toolStripButton3.Name = "toolStripButton3";
             toolStripButton3.Size = new Size(56, 22);
@@ -101,22 +112,14 @@
             toolStripSeparator2.Name = "toolStripSeparator2";
             toolStripSeparator2.Size = new Size(6, 25);
             // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label1.Location = new Point(12, 34);
-            label1.Name = "label1";
-            label1.Size = new Size(83, 15);
-            label1.TabIndex = 3;
-            label1.Text = "Message Text";
-            // 
             // TextEditor
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(584, 261);
             Controls.Add(panel1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            MaximizeBox = false;
             Name = "TextEditor";
             Text = "TextEditor";
             panel1.ResumeLayout(false);
