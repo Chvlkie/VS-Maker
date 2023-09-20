@@ -41,6 +41,7 @@ namespace VSMaker
         #region Forms
 
         private PokemonEditor pokemonEditor;
+        private TextEditor textEditor;
 
         #endregion Forms
 
@@ -876,6 +877,12 @@ namespace VSMaker
             pokemonEditor.Show();
         }
 
+        private void OpenTextEditor(int trainerMessageId, string messageText)
+        {
+            textEditor = new TextEditor(trainerMessageId, messageText);
+            textEditor.Show();
+        }
+
         private void trainerEditor_tab_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (trainerEditor_tab.SelectedTab == trainerEditor_Pokemon)
@@ -1020,6 +1027,16 @@ namespace VSMaker
                     triggerCell.DataSource = currentMessageTriggers;
                     triggerCell.Value = triggerCell.Items[messageTriggerIndex];
                 }
+            }
+        }
+
+        private void trainerTextTable_dataGrid_TextDblClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == 3)
+            {
+                int trainerMessageId = e.RowIndex;
+                string messageText = trainerMessages.Find(x => x.MessageId == trainerMessageId + 1).MessageText;
+                OpenTextEditor(trainerMessageId, messageText);
             }
         }
     }

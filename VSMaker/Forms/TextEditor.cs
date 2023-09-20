@@ -12,9 +12,18 @@ namespace VSMaker.Forms
 {
     public partial class TextEditor : Form
     {
-        public TextEditor()
+        private string messageText;
+        public TextEditor(int trainerMessageId, string messageText)
         {
+            this.messageText = messageText;
             InitializeComponent();
+            SetMessageText();
         }
+
+        public void SetMessageText()
+        {
+            textEditor_Message.Text = messageText;
+        }
+
     }
 }
