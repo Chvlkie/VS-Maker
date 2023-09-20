@@ -145,9 +145,9 @@ namespace Main
             statusLabelMessage("Attempting to unpack NARCs from folder...");
             Update();
             ReadROMInitData();
-            // Setup data lists
-            GetTrainers();
-            GetTrainerClasses();
+
+            // Unpack Narcs
+            UnpackEssentialNarcs();
             // Setup data for initial trainer class tab.
             SetupTrainerClassEditor();
         }
@@ -183,6 +183,8 @@ namespace Main
 
             CheckROMLanguage();
             ReadROMInitData();
+            // Unpack Narcs
+            UnpackEssentialNarcs();
             // Setup data for initial trainer class tab.
             SetupTrainerClassEditor();
         }
@@ -446,8 +448,7 @@ namespace Main
         {
             ClearTrainerClassLists();
             DisableTrainerClassEditor();
-            GetTrainers();
-            GetTrainerClasses();
+            GetData();
             statusLabelMessage("Setting up Trainer Class Editor...");
             Update();
 
@@ -510,8 +511,7 @@ namespace Main
             DisableTrainerClassEditor();
             trainers_Player_list.Items.Clear();
             trainers_list.Items.Clear();
-            GetTrainers();
-            GetTrainerClasses();
+            GetData();
             statusLabelMessage("Setting up Trainer Editor...");
             Update();
 
@@ -538,7 +538,46 @@ namespace Main
 
         #endregion Trainer Editor
 
+        #region Unpack NARCs
+
+        private void UnpackEssentialNarcs()
+        {
+            /* Extract essential NARCs sub-archives*/
+            statusLabelMessage("Unpacking essential NARCs...");
+            Update();
+            DSUtils.TryUnpackNarcs(new List<DirNames> {
+                DirNames.trainerProperties,
+                DirNames.trainerParty,
+                DirNames.trainerGraphics,
+                DirNames.textArchives,
+                DirNames.monIcons,
+                DirNames.speciesData,
+                DirNames.trainerTable
+            });
+
+            SetTrainerTable();
+            try
+            {
+                ReadTrainerTable();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return;
+            }
+        }
+
+        #endregion Unpack NARCs
+
         #region Get
+
+        private void GetData()
+        {
+            GetTrainers();
+            GetTrainerClasses();
+            GetMessageTriggers();
+            GetTrainerMessages();
+        }
 
         /// <summary>
         /// Get a list of TrainerClasses
@@ -548,17 +587,8 @@ namespace Main
             // Clear list data
             trainerClasses = new List<TrainerClass>();
 
-            /* Extract essential NARCs sub-archives*/
             statusLabelMessage("Getting Trainer Classes...");
             Update();
-            DSUtils.TryUnpackNarcs(new List<DirNames> {
-                DirNames.trainerProperties,
-                DirNames.trainerParty,
-                DirNames.trainerGraphics,
-                DirNames.textArchives,
-                DirNames.monIcons,
-                DirNames.speciesData
-            });
 
             string[] classNames = GetTrainerClassNames();
 
@@ -616,6 +646,13 @@ namespace Main
         {
             DisableTrainerClassEditor();
             selectedTrainer = trainers.Single(x => x.TrainerId == trainerId);
+            selectedTrainer.TrainerMessages = new List<TrainerMessage>();
+            foreach (var trainerMessage in trainerMessages.Where(x => x.TrainerId == selectedTrainer.TrainerId))
+            {
+                selectedTrainer.TrainerMessages.Add(trainerMessage);
+            }
+            selectedTrainer.TrainerSpriteFrames = LoadTrainerClassPic(selectedTrainer.TrainerClassId);
+            UpdateTrainerClassPic(trainerPicBox);
 
             trainer_Name.Text = selectedTrainer.TrainerName;
             trainer_Class_comboBox.Items.Clear();
@@ -625,9 +662,14 @@ namespace Main
                 trainer_Class_comboBox.Items.Add($"[{item.DisplayTrainerClassId}] - {item.TrainerClassName}");
             }
 
-            selectedTrainer.TrainerSpriteFrames = LoadTrainerClassPic(selectedTrainer.TrainerClassId);
-            UpdateTrainerClassPic(trainerPicBox);
             trainer_Class_comboBox.SelectedIndex = selectedTrainer.TrainerClassId;
+
+            trainer_MessageTrigger_list.Items.Clear();
+
+            foreach (var item in selectedTrainer.TrainerMessages)
+            {
+                trainer_MessageTrigger_list.Items.Add(item.MessageTriggerText);
+            }
         }
 
         /// <summary>
@@ -638,18 +680,8 @@ namespace Main
             // Clear list data
             trainers = new List<Trainer>();
 
-            /* Extract essential NARCs sub-archives*/
             statusLabelMessage("Getting Trainers...");
             Update();
-            DSUtils.TryUnpackNarcs(new List<DirNames> {
-                DirNames.trainerProperties,
-                DirNames.trainerParty,
-                DirNames.trainerGraphics,
-                DirNames.textArchives,
-                DirNames.monIcons,
-                DirNames.speciesData
-            });
-
             string[] trainerNames = GetSimpleTrainerNames();
 
             //if (classNames.Length > byte.MaxValue + 1)
@@ -671,6 +703,66 @@ namespace Main
                 };
 
                 trainers.Add(item);
+            }
+        }
+
+        private MessageTrigger GetMessageTriggerDetails(MessageTriggerEnum messageTrigger)
+        {
+            return new MessageTrigger
+            {
+                MessageTriggerId = (int)messageTrigger,
+                MessageTriggerName = MessageTriggers.GetDescriptionFromEnum(messageTrigger)
+            };
+        }
+
+        private void GetMessageTriggers()
+        {
+            statusLabelMessage("Getting Messages Triggers...");
+            Update();
+
+            messageTriggers = new List<MessageTrigger>{
+                GetMessageTriggerDetails(MessageTriggerEnum.preBattleOw),
+                GetMessageTriggerDetails(MessageTriggerEnum.playerWins),
+                GetMessageTriggerDetails(MessageTriggerEnum.postBattleOw),
+                GetMessageTriggerDetails(MessageTriggerEnum.playerLost),
+                GetMessageTriggerDetails(MessageTriggerEnum.trainerLastPoke),
+                GetMessageTriggerDetails(MessageTriggerEnum.trainerLastPokeCritical),
+
+                GetMessageTriggerDetails(MessageTriggerEnum.doublePreBattleOwTrainer1),
+                GetMessageTriggerDetails(MessageTriggerEnum.doublePlayerWinTrainer1),
+                GetMessageTriggerDetails(MessageTriggerEnum.doublePostBattleOwTrainer1),
+                GetMessageTriggerDetails(MessageTriggerEnum.doubleOnlyOnePokeTrainer1),
+
+                GetMessageTriggerDetails(MessageTriggerEnum.doublePreBattleOwTrainer2),
+                GetMessageTriggerDetails(MessageTriggerEnum.doublePlayerWinTrainer2),
+                GetMessageTriggerDetails(MessageTriggerEnum.doublePostBattleOwTrainer2),
+                GetMessageTriggerDetails(MessageTriggerEnum.doubleOnlyOnePokeTrainer2),
+                GetMessageTriggerDetails(MessageTriggerEnum.rematch),
+                GetMessageTriggerDetails(MessageTriggerEnum.doubleRematchTrainer1),
+                GetMessageTriggerDetails(MessageTriggerEnum.doubleRematchTrainer2),
+            };
+        }
+
+        private void GetTrainerMessages()
+        {
+            trainerMessages = new List<TrainerMessage>();
+            statusLabelMessage("Getting Trainers Messages...");
+            Update();
+
+            var allTrainerMessages = RomInfo.GetTrainerMessages();
+            for (uint i = 0; i < allTrainerMessages.Length; i++)
+            {
+                var item = new TrainerMessage
+                {
+                    MessageId = (int)i,
+                    MessageTriggerId = (int)TrainerTable[i].messageTriggerId,
+                    MessageText = allTrainerMessages[i],
+                    TrainerId = (int)TrainerTable[i].trainerId
+                };
+                item.TrainerName = trainers[item.TrainerId].TrainerName;
+                item.MessageTriggerText = messageTriggers.Find(x => x.MessageTriggerId == item.MessageTriggerId).MessageTriggerName;
+
+                trainerMessages.Add(item);
             }
         }
 
@@ -882,6 +974,12 @@ namespace Main
                 trainer_NumPoke_num.Maximum = 6;
             }
             EnablePokemon();
+        }
+
+        private void trainer_MessageTrigger_list_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int messageTriggerId = trainer_MessageTrigger_list.SelectedIndex;
+            trainer_Message.Text = selectedTrainer.TrainerMessages.Single(x => x.MessageTriggerId == messageTriggerId).MessageText;
         }
     }
 }

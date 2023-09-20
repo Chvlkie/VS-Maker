@@ -149,10 +149,6 @@
             mainContent_trainerText = new TabPage();
             panel17 = new Panel();
             dataGridView1 = new DataGridView();
-            messageIdDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
-            trainerIdDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
-            messageTriggerIdDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
-            messageTextDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
             trainerMessageBindingSource = new BindingSource(components);
             panel16 = new Panel();
             toolStrip1 = new ToolStrip();
@@ -187,6 +183,7 @@
             panel1 = new Panel();
             panel2 = new Panel();
             saveFileDialog1 = new SaveFileDialog();
+            trainerMessageBindingSource1 = new BindingSource(components);
             main_toolstrip.SuspendLayout();
             statusStrip1.SuspendLayout();
             mainContent.SuspendLayout();
@@ -236,6 +233,7 @@
             quick_toolstrip.SuspendLayout();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)trainerMessageBindingSource1).BeginInit();
             SuspendLayout();
             // 
             // main_toolstrip
@@ -304,6 +302,7 @@
             // 
             // toolStripProgressBar
             // 
+            toolStripProgressBar.AutoSize = false;
             toolStripProgressBar.Name = "toolStripProgressBar";
             toolStripProgressBar.Padding = new Padding(15, 0, 0, 0);
             toolStripProgressBar.RightToLeft = RightToLeft.No;
@@ -872,6 +871,7 @@
             trainer_MessageTrigger_list.Name = "trainer_MessageTrigger_list";
             trainer_MessageTrigger_list.Size = new Size(188, 109);
             trainer_MessageTrigger_list.TabIndex = 12;
+            trainer_MessageTrigger_list.SelectedIndexChanged += trainer_MessageTrigger_list_SelectedIndexChanged;
             // 
             // label6
             // 
@@ -1523,49 +1523,13 @@
             // 
             dataGridView1.AllowUserToAddRows = false;
             dataGridView1.AllowUserToDeleteRows = false;
-            dataGridView1.AutoGenerateColumns = false;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Columns.AddRange(new DataGridViewColumn[] { messageIdDataGridViewTextBoxColumn, trainerIdDataGridViewTextBoxColumn, messageTriggerIdDataGridViewTextBoxColumn, messageTextDataGridViewTextBoxColumn });
-            dataGridView1.DataSource = trainerMessageBindingSource;
             dataGridView1.Dock = DockStyle.Fill;
             dataGridView1.Location = new Point(0, 0);
             dataGridView1.Name = "dataGridView1";
             dataGridView1.RowTemplate.Height = 25;
             dataGridView1.Size = new Size(576, 435);
             dataGridView1.TabIndex = 1;
-            // 
-            // messageIdDataGridViewTextBoxColumn
-            // 
-            messageIdDataGridViewTextBoxColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
-            messageIdDataGridViewTextBoxColumn.DataPropertyName = "MessageId";
-            messageIdDataGridViewTextBoxColumn.FillWeight = 50F;
-            messageIdDataGridViewTextBoxColumn.HeaderText = "Message Id";
-            messageIdDataGridViewTextBoxColumn.Name = "messageIdDataGridViewTextBoxColumn";
-            messageIdDataGridViewTextBoxColumn.Width = 91;
-            // 
-            // trainerIdDataGridViewTextBoxColumn
-            // 
-            trainerIdDataGridViewTextBoxColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
-            trainerIdDataGridViewTextBoxColumn.DataPropertyName = "TrainerId";
-            trainerIdDataGridViewTextBoxColumn.FillWeight = 50F;
-            trainerIdDataGridViewTextBoxColumn.HeaderText = "Trainer Id";
-            trainerIdDataGridViewTextBoxColumn.Name = "trainerIdDataGridViewTextBoxColumn";
-            trainerIdDataGridViewTextBoxColumn.Width = 80;
-            // 
-            // messageTriggerIdDataGridViewTextBoxColumn
-            // 
-            messageTriggerIdDataGridViewTextBoxColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            messageTriggerIdDataGridViewTextBoxColumn.DataPropertyName = "MessageTriggerId";
-            messageTriggerIdDataGridViewTextBoxColumn.FillWeight = 70F;
-            messageTriggerIdDataGridViewTextBoxColumn.HeaderText = "Trigger";
-            messageTriggerIdDataGridViewTextBoxColumn.Name = "messageTriggerIdDataGridViewTextBoxColumn";
-            // 
-            // messageTextDataGridViewTextBoxColumn
-            // 
-            messageTextDataGridViewTextBoxColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            messageTextDataGridViewTextBoxColumn.DataPropertyName = "MessageText";
-            messageTextDataGridViewTextBoxColumn.HeaderText = "Text";
-            messageTextDataGridViewTextBoxColumn.Name = "messageTextDataGridViewTextBoxColumn";
             // 
             // trainerMessageBindingSource
             // 
@@ -1801,6 +1765,7 @@
             // openRom_btn
             // 
             openRom_btn.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            openRom_btn.Font = new Font("Segoe UI", 8F, FontStyle.Regular, GraphicsUnit.Point);
             openRom_btn.Image = Properties.Resources.openRomIcon;
             openRom_btn.ImageTransparentColor = Color.Magenta;
             openRom_btn.Margin = new Padding(5, 1, 0, 2);
@@ -1823,10 +1788,11 @@
             // save_btn
             // 
             save_btn.Enabled = false;
+            save_btn.Font = new Font("Segoe UI", 8F, FontStyle.Regular, GraphicsUnit.Point);
             save_btn.Image = Properties.Resources.saveIcon;
             save_btn.ImageTransparentColor = Color.Magenta;
             save_btn.Name = "save_btn";
-            save_btn.Size = new Size(81, 22);
+            save_btn.Size = new Size(79, 22);
             save_btn.Text = "Save ROM";
             // 
             // toolStripSeparator1
@@ -1880,6 +1846,10 @@
             panel2.Name = "panel2";
             panel2.Size = new Size(784, 490);
             panel2.TabIndex = 5;
+            // 
+            // trainerMessageBindingSource1
+            // 
+            trainerMessageBindingSource1.DataSource = typeof(Data.TrainerMessage);
             // 
             // Mainform
             // 
@@ -1972,6 +1942,7 @@
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
             panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)trainerMessageBindingSource1).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -2121,10 +2092,6 @@
         private TextBox textBox1;
         private Panel panel17;
         private DataGridView dataGridView1;
-        private DataGridViewTextBoxColumn messageIdDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn trainerIdDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn messageTriggerIdDataGridViewTextBoxColumn;
-        private DataGridViewTextBoxColumn messageTextDataGridViewTextBoxColumn;
         private ToolStrip toolStrip1;
         private ToolStripButton toolStripButton3;
         private Button trainerText_Search_btn;
@@ -2138,5 +2105,6 @@
         private Button button13;
         private Button button14;
         private Button button1;
+        private BindingSource trainerMessageBindingSource1;
     }
 }
