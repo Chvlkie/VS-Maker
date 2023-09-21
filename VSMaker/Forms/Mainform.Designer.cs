@@ -1,7 +1,11 @@
-﻿namespace VSMaker
+﻿using System.Drawing.Text;
+using System.Runtime.InteropServices;
+
+namespace VSMaker
 {
     partial class Mainform
     {
+
         /// <summary>
         ///  Required designer variable.
         /// </summary>
@@ -851,7 +855,7 @@
             // trainer_MessageTrigger_list
             // 
             trainer_MessageTrigger_list.FormattingEnabled = true;
-            trainer_MessageTrigger_list.Location = new Point(130, 5);
+            trainer_MessageTrigger_list.Location = new Point(130, 7);
             trainer_MessageTrigger_list.Name = "trainer_MessageTrigger_list";
             trainer_MessageTrigger_list.Size = new Size(239, 23);
             trainer_MessageTrigger_list.TabIndex = 50;
@@ -865,7 +869,7 @@
             panel21.Controls.Add(trainer_Message);
             panel21.Controls.Add(trainer_Message_Back_btn);
             panel21.Controls.Add(trainer_Message_Next_btn);
-            panel21.Location = new Point(13, 33);
+            panel21.Location = new Point(13, 35);
             panel21.Name = "panel21";
             panel21.Size = new Size(448, 84);
             panel21.TabIndex = 49;
@@ -873,13 +877,14 @@
             // trainer_Message
             // 
             trainer_Message.AutoSize = true;
-            trainer_Message.Font = new Font("Pokémon DS Font", 18F, FontStyle.Regular, GraphicsUnit.Point);
+            trainer_Message.Font = new Font("Arial Narrow", 18F, FontStyle.Regular, GraphicsUnit.Point);
             trainer_Message.ImageAlign = ContentAlignment.MiddleLeft;
-            trainer_Message.Location = new Point(24, 16);
+            trainer_Message.Location = new Point(24, 18);
             trainer_Message.Name = "trainer_Message";
-            trainer_Message.Size = new Size(142, 21);
+            trainer_Message.Size = new Size(203, 34);
             trainer_Message.TabIndex = 46;
             trainer_Message.Text = "TRAINER MESSAGE";
+            trainer_Message.UseCompatibleTextRendering = true;
             // 
             // trainer_Message_Back_btn
             // 
@@ -913,7 +918,7 @@
             // 
             trainer_EditMessage_btn.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             trainer_EditMessage_btn.Enabled = false;
-            trainer_EditMessage_btn.Location = new Point(392, 5);
+            trainer_EditMessage_btn.Location = new Point(392, 7);
             trainer_EditMessage_btn.Name = "trainer_EditMessage_btn";
             trainer_EditMessage_btn.Size = new Size(69, 23);
             trainer_EditMessage_btn.TabIndex = 46;
@@ -926,7 +931,7 @@
             label6.AutoSize = true;
             label6.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label6.ImageAlign = ContentAlignment.MiddleLeft;
-            label6.Location = new Point(13, 8);
+            label6.Location = new Point(13, 11);
             label6.Name = "label6";
             label6.Size = new Size(101, 15);
             label6.TabIndex = 11;
