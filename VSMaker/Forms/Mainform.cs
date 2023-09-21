@@ -2,7 +2,6 @@ using Ekona.Images;
 using Images;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Diagnostics;
-using System.Windows.Forms;
 using VSMaker.Data;
 using VSMaker.Forms;
 using VSMaker.ROMFiles;
@@ -22,19 +21,22 @@ namespace VSMaker
 
         #region Editor Data
 
+        private List<MessageTrigger> messageTriggers = new();
+        private List<Move> moves = new();
+        private List<Pokemon> pokemons = new();
         private Trainer selectedTrainer;
         private TrainerClass selectedTrainerClass;
 
         private List<TrainerClass> trainerClasses = new();
-        private List<Trainer> trainers = new();
         private List<TrainerMessage> trainerMessages = new();
-        private List<MessageTrigger> messageTriggers = new();
-        private List<Pokemon> pokemons = new();
-        private List<Move> moves = new();
-
         private PaletteBase trainerPal;
+        private List<Trainer> trainers = new();
         private SpriteBase trainerSprite;
         private ImageBase trainerTile;
+
+        private bool unsavedChanges = false;
+
+        private string[] displayTrainerMessage = new string[0];
 
         #endregion Editor Data
 
@@ -48,6 +50,7 @@ namespace VSMaker
         public Mainform()
         {
             InitializeComponent();
+            trainer_Message.Text = string.Empty;
         }
 
         #region ROM
@@ -377,45 +380,6 @@ namespace VSMaker
             trainerClass_Uses_list.Items.Clear();
         }
 
-        private void DisableTrainerClassEditor()
-        {
-            // Disable fields
-            trainerClassName.Enabled = false;
-            trainerClass_PrizeMoney_num.Enabled = false;
-            trainerClass_Gender_comboBox.Enabled = false;
-            trainerClass_EyeContactMain_comboBox.Enabled = false;
-            trainerClass_EyeContactAlt_comboBox.Enabled = false;
-            trainerClass_frames_num.Enabled = false;
-            trainerClass_Theme_comboBox.Enabled = false;
-            trainerClass_battleMusic.Enabled = false;
-
-            // Disable buttons
-            saveClassName_btn.Enabled = false;
-            saveClassTheme_btn.Enabled = false;
-
-            trainerClass_GoToTrainer_btn.Enabled = false;
-        }
-
-        private void EnableTrainerClassEditor(TrainerClass trainerClass)
-        {
-            // Enable fields
-            if (!string.IsNullOrEmpty(trainerClass.TrainerClassName))
-            {
-                trainerClassName.Enabled = true;
-                saveClassName_btn.Enabled = true;
-            }
-
-            if (trainerClass.InUse)
-            {
-                trainerClass_Uses_list.Enabled = true;
-            }
-
-            if (trainerClass.TrainerSpriteFrames > 0)
-            {
-                trainerClass_frames_num.Enabled = true;
-            }
-        }
-
         private void playerClass_help_btn_Click(object sender, EventArgs e)
         {
             MessageBox.Show("These Trainer Classes are \"Player Classes\".\n\nChanging these can cause errors.", "Player Classes", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -450,14 +414,35 @@ namespace VSMaker
                 trainerClassListBox.SelectedIndex = trainerClass.TrainerClassId - 2;
             }
         }
+        private void DisableTrainerClassEditorInputs()
+        {
+            //Disable Buttons
+            saveClassName_btn.Enabled = false;
+            saveClassTheme_btn.Enabled = false;
+            saveClassProperties_btn.Enabled = false;
+            saveTrainerClassAll_btn.Enabled = false;
+            undoTrainerClass_btn.Enabled = false;
+            trainerClass_GoToTrainer_btn.Enabled = false;
+
+            //Disable Fields
+            trainerClassName.Enabled = false;
+            trainerClass_EyeContactMain_comboBox.Enabled = false;
+            trainerClass_EyeContactAlt_comboBox.Enabled = false;
+            trainerClass_PrizeMoney_num.Enabled = false;
+            trainerClass_Gender_comboBox.Enabled = false;
+            trainerClass_frames_num.Enabled = false;
+            trainerClass_Uses_list.Enabled = false;
+        }
 
         private void SetupTrainerClassEditor()
         {
             ClearTrainerClassLists();
-            DisableTrainerClassEditor();
+            DisableTrainerClassEditorInputs();
             GetData();
             statusLabelMessage("Setting up Trainer Class Editor...");
             Update();
+
+            //Setup Trainer Class List
 
             foreach (var item in trainerClasses)
             {
@@ -470,8 +455,32 @@ namespace VSMaker
                     trainerClassListBox.Items.Add($"[{item.DisplayTrainerClassId}] - {item.TrainerClassName}");
                 }
             }
+            if (trainerClassListBox.Items.Count > 0)
+            {
+                trainerClassListBox.Enabled = true;
+            }
+
             statusLabelMessage();
-            trainerClassListBox.Enabled = true;
+            Update();
+
+            if (selectedTrainerClass != default)
+            {
+                trainerClassListBox.SelectedIndex = selectedTrainerClass.TrainerClassId - 2;
+            }
+        }
+
+        private void SetupTrainerClassEditorInputs(TrainerClass trainerClass)
+        {
+            trainerClassName.Enabled = !string.IsNullOrEmpty(trainerClass.TrainerClassName);
+            trainerClass_Uses_list.Enabled = trainerClass.InUse;
+            trainerClass_frames_num.Enabled = trainerClass.TrainerSpriteFrames > 0;
+        }
+
+        private void TrainerClass_CheckSaveAllButton(bool enableSave, bool enableUndo)
+        {
+            saveTrainerClassAll_btn.Enabled = enableSave;
+            undoTrainerClass_btn.Enabled = enableUndo;
+            unsavedChanges = enableUndo;
         }
 
         private void trainerClass_GoToTrainer_btn_Click(object sender, EventArgs e)
@@ -479,11 +488,9 @@ namespace VSMaker
             int index = trainerClass_Uses_list.SelectedIndex;
             var text = trainerClass_Uses_list.Items[index].ToString();
             int id = int.Parse(text.Remove(0, 1).Remove(3));
-            DisableTrainerClassEditor();
             mainContent.SelectedTab = mainContent_trainer;
             SetupTrainerEditor();
             trainers_list.SelectedIndex = id - 1;
-
             GetTrainerInfo(id);
         }
 
@@ -515,7 +522,6 @@ namespace VSMaker
 
         private void SetupTrainerEditor()
         {
-            DisableTrainerClassEditor();
             trainers_Player_list.Items.Clear();
             trainers_list.Items.Clear();
             GetData();
@@ -534,11 +540,15 @@ namespace VSMaker
                 }
             }
             statusLabelMessage();
+            if (selectedTrainer != default)
+            {
+                trainers_list.SelectedIndex = selectedTrainer.TrainerId - 1;
+            }
         }
 
         private void trainer_Class_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            selectedTrainer.TrainerClassId = trainer_Class_comboBox.SelectedIndex;
+            selectedTrainer.TrainerClassId = trainer_Class_comboBox.SelectedIndex + 2;
             selectedTrainer.TrainerSpriteFrames = LoadTrainerClassPic(selectedTrainer.TrainerClassId);
             UpdateTrainerClassPic(trainerPicBox);
         }
@@ -586,131 +596,6 @@ namespace VSMaker
             GetTrainerMessages();
         }
 
-        /// <summary>
-        /// Get a list of TrainerClasses
-        /// </summary>
-        private void GetTrainerClasses()
-        {
-            // Clear list data
-            trainerClasses = new List<TrainerClass>();
-
-            statusLabelMessage("Getting Trainer Classes...");
-            Update();
-
-            string[] classNames = GetTrainerClassNames();
-
-            if (classNames.Length > byte.MaxValue + 1)
-            {
-                MessageBox.Show("There can't be more than 256 trainer classes! [Found " + classNames.Length + "].\nAborting.",
-                    "Too many trainer classes", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            for (int i = 0; i < classNames.Length; i++)
-            {
-                var item = new TrainerClass
-                {
-                    TrainerClassId = i,
-                    TrainerClassName = classNames[i],
-                    UsedByTrainers = new List<Trainer>(),
-                    TrainerSpriteFrames = 0
-                };
-                item.UsedByTrainers.AddRange(trainers.Where(x => x.TrainerClassId == item.TrainerClassId));
-                trainerClasses.Add(item);
-            }
-        }
-
-        /// <summary>
-        /// Get Trainer Class Info for given trainerClassId.
-        /// </summary>
-        /// <param name="trainerClassId"></param>
-        private void GetTrainerClassInfo(int trainerClassId)
-        {
-            DisableTrainerClassEditor();
-            selectedTrainerClass = trainerClasses.Single(x => x.TrainerClassId == trainerClassId);
-
-            trainerClassName.Text = selectedTrainerClass.TrainerClassName;
-            trainerClass_Uses_list.Items.Clear();
-
-            if (selectedTrainerClass.InUse)
-            {
-                foreach (var item in selectedTrainerClass.UsedByTrainers)
-                {
-                    trainerClass_Uses_list.Items.Add($"[{item.DisplayTrainerId}] - {item.TrainerName}");
-                }
-            }
-            selectedTrainerClass.TrainerSpriteFrames = LoadTrainerClassPic(trainerClassId);
-            UpdateTrainerClassPic(trainerClassPicBox);
-
-            EnableTrainerClassEditor(selectedTrainerClass);
-        }
-
-        /// <summary>
-        /// Get Trainer Info for given trainerId.
-        /// </summary>
-        /// <param name="trainerId"></param>
-        private void GetTrainerInfo(int trainerId)
-        {
-            DisableTrainerClassEditor();
-            trainer_Message.Text = string.Empty;
-
-            selectedTrainer = trainers.Single(x => x.TrainerId == trainerId);
-            selectedTrainer.TrainerMessages = trainerMessages.Where(x => x.TrainerId == selectedTrainer.TrainerId).OrderBy(x => x.MessageTriggerId).ToList();
-            selectedTrainer.TrainerSpriteFrames = LoadTrainerClassPic(selectedTrainer.TrainerClassId);
-            UpdateTrainerClassPic(trainerPicBox);
-
-            trainer_Name.Text = selectedTrainer.TrainerName;
-            trainer_Class_comboBox.Items.Clear();
-
-            foreach (var item in trainerClasses)
-            {
-                trainer_Class_comboBox.Items.Add($"[{item.DisplayTrainerClassId}] - {item.TrainerClassName}");
-            }
-
-            trainer_Class_comboBox.SelectedIndex = selectedTrainer.TrainerClassId;
-
-            trainer_MessageTrigger_list.Items.Clear();
-
-            foreach (var item in selectedTrainer.TrainerMessages)
-            {
-                trainer_MessageTrigger_list.Items.Add(item.MessageTriggerText);
-            }
-        }
-
-        /// <summary>
-        /// Get a list of Trainers.
-        /// </summary>
-        private void GetTrainers()
-        {
-            // Clear list data
-            trainers = new List<Trainer>();
-
-            statusLabelMessage("Getting Trainers...");
-            Update();
-            string[] trainerNames = GetSimpleTrainerNames();
-
-            //if (classNames.Length > byte.MaxValue + 1)
-            //{
-            //    MessageBox.Show("There can't be more than 256 trainer classes! [Found " + classNames.Length + "].\nAborting.",
-            //        "Too many trainer classes", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //    return;
-            //}
-
-            for (int i = 0; i < trainerNames.Length; i++)
-            {
-                string suffix = "\\" + i.ToString("D4");
-                var trainerProperties = new TrainerProperties((ushort)i, new FileStream(gameDirs[DirNames.trainerProperties].unpackedDir + suffix, FileMode.Open));
-                var item = new Trainer
-                {
-                    TrainerId = i,
-                    TrainerName = trainerNames[i],
-                    TrainerClassId = trainerProperties.trainerClass
-                };
-
-                trainers.Add(item);
-            }
-        }
-
         private MessageTrigger GetMessageTriggerDetails(MessageTriggerEnum messageTrigger)
         {
             return new MessageTrigger
@@ -752,6 +637,115 @@ namespace VSMaker
             };
         }
 
+        /// <summary>
+        /// Get a list of TrainerClasses
+        /// </summary>
+        private void GetTrainerClasses()
+        {
+            // Clear list data
+            trainerClasses = new List<TrainerClass>();
+
+            statusLabelMessage("Getting Trainer Classes...");
+            Update();
+
+            string[] classNames = GetTrainerClassNames();
+
+            if (classNames.Length > byte.MaxValue + 1)
+            {
+                MessageBox.Show("There can't be more than 256 trainer classes! [Found " + classNames.Length + "].\nAborting.",
+                    "Too many trainer classes", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            for (int i = 0; i < classNames.Length; i++)
+            {
+                var item = new TrainerClass
+                {
+                    TrainerClassId = i,
+                    TrainerClassName = classNames[i],
+                    UsedByTrainers = new List<Trainer>(),
+                    TrainerSpriteFrames = 0
+                };
+                item.UsedByTrainers.AddRange(trainers.Where(x => x.TrainerClassId == item.TrainerClassId));
+                trainerClasses.Add(item);
+            }
+        }
+
+        /// <summary>
+        /// Get Trainer Class Info for given trainerClassId.
+        /// </summary>
+        /// <param name="trainerClassId"></param>
+        private void GetTrainerClassInfo(int trainerClassId)
+        {
+            selectedTrainerClass = trainerClasses.Single(x => x.TrainerClassId == trainerClassId);
+
+            trainerClassName.Text = selectedTrainerClass.TrainerClassName;
+            trainerClass_Uses_list.Items.Clear();
+
+            if (selectedTrainerClass.InUse)
+            {
+                foreach (var item in selectedTrainerClass.UsedByTrainers)
+                {
+                    trainerClass_Uses_list.Items.Add($"[{item.DisplayTrainerId}] - {item.TrainerName}");
+                }
+            }
+            selectedTrainerClass.TrainerSpriteFrames = LoadTrainerClassPic(trainerClassId);
+            UpdateTrainerClassPic(trainerClassPicBox);
+            SetupTrainerClassEditorInputs(selectedTrainerClass);
+            TrainerClass_CheckSaveAllButton(false, false);
+        }
+
+        /// <summary>
+        /// Get Trainer Info for given trainerId.
+        /// </summary>
+        /// <param name="trainerId"></param>
+        private void GetTrainerInfo(int trainerId)
+        {
+            trainer_Message.Text = string.Empty;
+            trainer_Class_comboBox.Items.Clear();
+            trainer_MessageTrigger_list.Items.Clear();
+            selectedTrainer = trainers.Single(x => x.TrainerId == trainerId);
+            selectedTrainer.TrainerMessages = trainerMessages.Where(x => x.TrainerId == selectedTrainer.TrainerId).OrderBy(x => x.MessageTriggerId).ToList();
+            selectedTrainer.TrainerSpriteFrames = LoadTrainerClassPic(selectedTrainer.TrainerClassId);
+
+            //Setup Trainer Name
+            trainer_Name.Text = selectedTrainer.TrainerName;
+
+            //Setup Trainer Class
+
+            foreach (var item in trainerClasses.Where(x => !x.IsPlayerClass))
+            {
+                trainer_Class_comboBox.Items.Add($"[{item.DisplayTrainerClassId}] - {item.TrainerClassName}");
+            }
+
+            if (trainer_Class_comboBox.Items.Count > 0)
+            {
+                trainer_Class_comboBox.Enabled = true;
+                trainer_Class_comboBox.SelectedIndex = selectedTrainer.TrainerClassId - 2;
+            }
+
+            //Setup Trainer Class Pic
+            UpdateTrainerClassPic(trainerPicBox);
+
+            //Setup Trainer Messages
+            displayTrainerMessage = Array.Empty<string>();
+
+            foreach (var item in selectedTrainer.TrainerMessages)
+            {
+                trainer_MessageTrigger_list.Items.Add(item.MessageTriggerText);
+            }
+
+            if (trainer_MessageTrigger_list.Items.Count > 0)
+            {
+                trainer_MessageTrigger_list.Enabled = true;
+                trainer_MessageTrigger_list.SelectedIndex = 0;
+            }
+            else
+            {
+                trainer_MessageTrigger_list.Enabled = false;
+            }
+        }
+
         private void GetTrainerMessages()
         {
             trainerMessages = new List<TrainerMessage>();
@@ -772,6 +766,40 @@ namespace VSMaker
                 item.MessageTriggerText = messageTriggers.Find(x => x.MessageTriggerId == item.MessageTriggerId).MessageTriggerName;
 
                 trainerMessages.Add(item);
+            }
+        }
+
+        /// <summary>
+        /// Get a list of Trainers.
+        /// </summary>
+        private void GetTrainers()
+        {
+            // Clear list data
+            trainers = new List<Trainer>();
+
+            statusLabelMessage("Getting Trainers...");
+            Update();
+            string[] trainerNames = GetSimpleTrainerNames();
+
+            //if (classNames.Length > byte.MaxValue + 1)
+            //{
+            //    MessageBox.Show("There can't be more than 256 trainer classes! [Found " + classNames.Length + "].\nAborting.",
+            //        "Too many trainer classes", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //    return;
+            //}
+
+            for (int i = 0; i < trainerNames.Length; i++)
+            {
+                string suffix = "\\" + i.ToString("D4");
+                var trainerProperties = new TrainerProperties((ushort)i, new FileStream(gameDirs[DirNames.trainerProperties].unpackedDir + suffix, FileMode.Open));
+                var item = new Trainer
+                {
+                    TrainerId = i,
+                    TrainerName = trainerNames[i],
+                    TrainerClassId = trainerProperties.trainerClass
+                };
+
+                trainers.Add(item);
             }
         }
 
@@ -824,55 +852,73 @@ namespace VSMaker
 
         #endregion TrainerSprite
 
-        private void trainer_GoToClass_btn_Click(object sender, EventArgs e)
+        private void EnablePokemon()
         {
-            int index = trainer_Class_comboBox.SelectedIndex;
-            var text = trainer_Class_comboBox.Items[index].ToString();
-            int id = int.Parse(text.Remove(0, 1).Remove(3));
-            DisableTrainerClassEditor();
-            mainContent.SelectedTab = mainContent_trainerClass;
-            SetupTrainerClassEditor();
-            if (id == 0 || id == 1)
-            {
-                player_trainer_class.SelectedIndex = id;
-                trainerClassListBox.SelectedIndex = -1;
-            }
-            else
-            {
-                player_trainer_class.SelectedIndex = -1;
-                trainerClassListBox.SelectedIndex = id - 2;
-            }
+            //switch (trainer_NumPoke_num.Value)
+            //{
+            //    case 1:
+            //        trainer_Pokemon1_panel.Enabled = true;
+            //        trainer_Pokemon2_panel.Enabled = false;
+            //        trainer_Pokemon3_panel.Enabled = false;
+            //        trainer_Pokemon4_panel.Enabled = false;
+            //        trainer_Pokemon5_panel.Enabled = false;
+            //        trainer_Pokemon6_panel.Enabled = false;
+            //        break;
 
-            GetTrainerClassInfo(id);
-        }
+            //    case 2:
+            //        trainer_Pokemon1_panel.Enabled = true;
+            //        trainer_Pokemon2_panel.Enabled = true;
+            //        trainer_Pokemon3_panel.Enabled = false;
+            //        trainer_Pokemon4_panel.Enabled = false;
+            //        trainer_Pokemon5_panel.Enabled = false;
+            //        trainer_Pokemon6_panel.Enabled = false;
+            //        break;
 
-        private void trainers_list_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            int index = trainers_list.SelectedIndex;
-            var text = trainers_list.Items[index].ToString();
-            int trainerId = int.Parse(text.Remove(0, 1).Remove(3));
-            GetTrainerInfo(trainerId);
-        }
+            //    case 3:
+            //        trainer_Pokemon1_panel.Enabled = true;
+            //        trainer_Pokemon2_panel.Enabled = true;
+            //        trainer_Pokemon3_panel.Enabled = true;
+            //        trainer_Pokemon4_panel.Enabled = false;
+            //        trainer_Pokemon5_panel.Enabled = false;
+            //        trainer_Pokemon6_panel.Enabled = false;
+            //        break;
 
-        private void trainers_Player_list_SelectedIndexChanged(object sender, EventArgs e)
-        {
-        }
+            //    case 4:
+            //        trainer_Pokemon1_panel.Enabled = true;
+            //        trainer_Pokemon2_panel.Enabled = true;
+            //        trainer_Pokemon3_panel.Enabled = true;
+            //        trainer_Pokemon4_panel.Enabled = true;
+            //        trainer_Pokemon5_panel.Enabled = false;
+            //        trainer_Pokemon6_panel.Enabled = false;
+            //        break;
 
-        private void player_trainer_class_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            int index = player_trainer_class.SelectedIndex;
-            if (index > -1)
-            {
-                trainerClassListBox.SelectedIndex = -1;
-                var text = player_trainer_class.Items[index].ToString();
-                int trainerClassId = int.Parse(text.Remove(0, 1).Remove(3));
-                GetTrainerClassInfo(trainerClassId);
-            }
-        }
+            //    case 5:
+            //        trainer_Pokemon1_panel.Enabled = true;
+            //        trainer_Pokemon2_panel.Enabled = true;
+            //        trainer_Pokemon3_panel.Enabled = true;
+            //        trainer_Pokemon4_panel.Enabled = true;
+            //        trainer_Pokemon5_panel.Enabled = true;
+            //        trainer_Pokemon6_panel.Enabled = false;
+            //        break;
 
-        private void button3_Click(object sender, EventArgs e)
-        {
-            OpenPokemonEditor(1);
+            //    case 6:
+            //        trainer_Pokemon1_panel.Enabled = true;
+            //        trainer_Pokemon2_panel.Enabled = true;
+            //        trainer_Pokemon3_panel.Enabled = true;
+            //        trainer_Pokemon4_panel.Enabled = true;
+            //        trainer_Pokemon5_panel.Enabled = true;
+            //        trainer_Pokemon6_panel.Enabled = true;
+            //        break;
+
+            //    default:
+            //        trainer_Pokemon1_panel.Enabled = false;
+            //        trainer_Pokemon2_panel.Enabled = false;
+            //        trainer_Pokemon3_panel.Enabled = false;
+            //        trainer_Pokemon4_panel.Enabled = false;
+            //        trainer_Pokemon5_panel.Enabled = false;
+            //        trainer_Pokemon6_panel.Enabled = false;
+            //        break;
+            //}
         }
 
         private void OpenPokemonEditor(int pokemonId)
@@ -887,115 +933,9 @@ namespace VSMaker
             textEditor.Show();
         }
 
-        private void trainerEditor_tab_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (trainerEditor_tab.SelectedTab == trainerEditor_Pokemon)
-            {
-                SetupPokemonTab();
-            }
-        }
-
         private void SetupPokemonTab()
         {
             EnablePokemon();
-        }
-
-        private void trainer_NumPoke_num_ValueChanged(object sender, EventArgs e)
-        {
-            EnablePokemon();
-        }
-
-        private void EnablePokemon()
-        {
-            switch (trainer_NumPoke_num.Value)
-            {
-                case 1:
-                    trainer_Pokemon1_panel.Enabled = true;
-                    trainer_Pokemon2_panel.Enabled = false;
-                    trainer_Pokemon3_panel.Enabled = false;
-                    trainer_Pokemon4_panel.Enabled = false;
-                    trainer_Pokemon5_panel.Enabled = false;
-                    trainer_Pokemon6_panel.Enabled = false;
-                    break;
-
-                case 2:
-                    trainer_Pokemon1_panel.Enabled = true;
-                    trainer_Pokemon2_panel.Enabled = true;
-                    trainer_Pokemon3_panel.Enabled = false;
-                    trainer_Pokemon4_panel.Enabled = false;
-                    trainer_Pokemon5_panel.Enabled = false;
-                    trainer_Pokemon6_panel.Enabled = false;
-                    break;
-
-                case 3:
-                    trainer_Pokemon1_panel.Enabled = true;
-                    trainer_Pokemon2_panel.Enabled = true;
-                    trainer_Pokemon3_panel.Enabled = true;
-                    trainer_Pokemon4_panel.Enabled = false;
-                    trainer_Pokemon5_panel.Enabled = false;
-                    trainer_Pokemon6_panel.Enabled = false;
-                    break;
-
-                case 4:
-                    trainer_Pokemon1_panel.Enabled = true;
-                    trainer_Pokemon2_panel.Enabled = true;
-                    trainer_Pokemon3_panel.Enabled = true;
-                    trainer_Pokemon4_panel.Enabled = true;
-                    trainer_Pokemon5_panel.Enabled = false;
-                    trainer_Pokemon6_panel.Enabled = false;
-                    break;
-
-                case 5:
-                    trainer_Pokemon1_panel.Enabled = true;
-                    trainer_Pokemon2_panel.Enabled = true;
-                    trainer_Pokemon3_panel.Enabled = true;
-                    trainer_Pokemon4_panel.Enabled = true;
-                    trainer_Pokemon5_panel.Enabled = true;
-                    trainer_Pokemon6_panel.Enabled = false;
-                    break;
-
-                case 6:
-                    trainer_Pokemon1_panel.Enabled = true;
-                    trainer_Pokemon2_panel.Enabled = true;
-                    trainer_Pokemon3_panel.Enabled = true;
-                    trainer_Pokemon4_panel.Enabled = true;
-                    trainer_Pokemon5_panel.Enabled = true;
-                    trainer_Pokemon6_panel.Enabled = true;
-                    break;
-
-                default:
-                    trainer_Pokemon1_panel.Enabled = false;
-                    trainer_Pokemon2_panel.Enabled = false;
-                    trainer_Pokemon3_panel.Enabled = false;
-                    trainer_Pokemon4_panel.Enabled = false;
-                    trainer_Pokemon5_panel.Enabled = false;
-                    trainer_Pokemon6_panel.Enabled = false;
-                    break;
-            }
-        }
-
-        private void trainer_Double_checkBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (trainer_Double_checkBox.Checked)
-            {
-                trainer_NumPoke_num.Maximum = 3;
-                if (trainer_NumPoke_num.Value > 3)
-                {
-                    trainer_NumPoke_num.Value = 3;
-                }
-            }
-            else
-            {
-                trainer_NumPoke_num.Maximum = 6;
-            }
-            EnablePokemon();
-        }
-
-        private void trainer_MessageTrigger_list_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            string selectedMessageTriggerName = trainer_MessageTrigger_list.SelectedItem.ToString();
-            int messageTriggerId = messageTriggers.Find(x => x.MessageTriggerName == selectedMessageTriggerName).MessageTriggerId;
-            trainer_Message.Text = selectedTrainer.TrainerMessages.Single(x => x.MessageTriggerId == messageTriggerId).MessageText;
         }
 
         private void SetupTrainerTextTab()
@@ -1034,6 +974,92 @@ namespace VSMaker
             }
         }
 
+        private void trainer_Double_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (trainer_Double_checkBox.Checked)
+            {
+                trainer_NumPoke_num.Maximum = 3;
+                if (trainer_NumPoke_num.Value > 3)
+                {
+                    trainer_NumPoke_num.Value = 3;
+                }
+            }
+            else
+            {
+                trainer_NumPoke_num.Maximum = 6;
+            }
+            EnablePokemon();
+        }
+
+        private void trainer_GoToClass_btn_Click(object sender, EventArgs e)
+        {
+            int index = trainer_Class_comboBox.SelectedIndex;
+            var text = trainer_Class_comboBox.Items[index].ToString();
+            int id = int.Parse(text.Remove(0, 1).Remove(3));
+            mainContent.SelectedTab = mainContent_trainerClass;
+            SetupTrainerClassEditor();
+            if (id > 1)
+            {
+                trainerClassListBox.SelectedIndex = id - 2;
+            }
+            GetTrainerClassInfo(id);
+        }
+
+        private void trainer_Message_TextChanged(object sender, EventArgs e)
+        {
+        }
+
+        private void trainer_MessageTrigger_list_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (trainer_MessageTrigger_list.SelectedIndex > -1)
+            {
+                trainer_EditMessage_btn.Enabled = true;
+                const string seperator1 = @"\r";
+                const string seperator2 = @"\f";
+                string selectedMessageTriggerName = trainer_MessageTrigger_list.SelectedItem.ToString();
+                int messageTriggerId = messageTriggers.Find(x => x.MessageTriggerName == selectedMessageTriggerName).MessageTriggerId;
+                string trainerText = selectedTrainer.TrainerMessages.Single(x => x.MessageTriggerId == messageTriggerId).MessageText;
+
+                trainerText = trainerText.Replace("\\n", Environment.NewLine);
+                displayTrainerMessage = trainerText.Split(new string[] { seperator1, seperator2 }, StringSplitOptions.None);
+                trainer_Message.Text = displayTrainerMessage[0];
+            }
+            else
+            {
+                trainer_EditMessage_btn.Enabled = false;
+                trainer_MessageTrigger_list.Enabled = false;
+            }
+        }
+
+        private void trainer_NumPoke_num_ValueChanged(object sender, EventArgs e)
+        {
+            EnablePokemon();
+        }
+
+        private void trainerClassName_TextChanged(object sender, EventArgs e)
+        {
+            bool enableSave = selectedTrainerClass.TrainerClassName != trainerClassName.Text && !string.IsNullOrEmpty(trainerClassName.Text);
+            saveClassName_btn.Enabled = enableSave;
+            TrainerClass_CheckSaveAllButton(enableSave, true);
+        }
+
+        private void trainerEditor_tab_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (trainerEditor_tab.SelectedTab == trainerEditor_Pokemon)
+            {
+                SetupPokemonTab();
+            }
+        }
+
+        private void trainers_list_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int index = trainers_list.SelectedIndex;
+            var text = trainers_list.Items[index].ToString();
+            int trainerId = int.Parse(text.Remove(0, 1).Remove(3));
+            trainer_MessageTrigger_list.SelectedIndex = -1;
+            GetTrainerInfo(trainerId);
+        }
+
         private void trainerTextTable_dataGrid_TextDblClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.ColumnIndex == 3)
@@ -1041,6 +1067,22 @@ namespace VSMaker
                 int trainerMessageId = e.RowIndex;
                 string messageText = trainerMessages.Find(x => x.MessageId == trainerMessageId).MessageText;
                 OpenTextEditor(trainerMessageId, messageText);
+            }
+        }
+
+        private void mainContent_Selecting(object sender, TabControlCancelEventArgs e)
+        {
+            if (unsavedChanges)
+            {
+                var choice = MessageBox.Show("You have unsaved changes.\nDo you wish to discard these changes?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (choice == DialogResult.Yes)
+                {
+                    unsavedChanges = false;
+                }
+                else
+                {
+                    e.Cancel = true;
+                }
             }
         }
     }

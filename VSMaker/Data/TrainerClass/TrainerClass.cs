@@ -14,6 +14,7 @@ namespace VSMaker.Data
         public string TrainerClassName { get; set; }
         public int TrainerSpriteFrames { get; set; }
         public bool IsPlayerClass => TrainerClassId == 0 || TrainerClassId == 1;
+        public int Gender { get; set; }
 
         #endregion TrainerClassInfo
 

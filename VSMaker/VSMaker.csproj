@@ -11,6 +11,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Fonts\pokemon-ds-font.ttf" />
+    <None Remove="Resources\Graphics\Icons\exportIcon.png" />
+    <None Remove="Resources\Graphics\Icons\importIcon.png" />
+    <None Remove="Resources\Graphics\Icons\openFolderIcon.png" />
+    <None Remove="Resources\Graphics\Icons\openRomIcon.png" />
+    <None Remove="Resources\Graphics\Icons\saveIcon.png" />
+    <None Remove="Resources\Graphics\Icons\saveIconSm.png" />
+    <None Remove="Resources\Graphics\Icons\searchIcon.png" />
+    <None Remove="Resources\Graphics\Icons\undoIconSm.png" />
+    <None Remove="Resources\Graphics\TextEditor\MessageBox.png" />
     <None Remove="Tools\apicula.exe" />
     <None Remove="Tools\blz.exe" />
     <None Remove="Tools\ndstool.exe" />
@@ -50,6 +60,19 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Fonts\pokemon-ds-font.ttf" />
+    <Content Include="Resources\Graphics\Icons\exportIcon.png" />
+    <Content Include="Resources\Graphics\Icons\importIcon.png" />
+    <Content Include="Resources\Graphics\Icons\openFolderIcon.png" />
+    <Content Include="Resources\Graphics\Icons\openRomIcon.png" />
+    <Content Include="Resources\Graphics\Icons\saveIcon.png" />
+    <Content Include="Resources\Graphics\Icons\saveIconSm.png" />
+    <Content Include="Resources\Graphics\Icons\searchIcon.png" />
+    <Content Include="Resources\Graphics\Icons\undoIconSm.png" />
+    <Content Include="Resources\Graphics\TextEditor\MessageBox.png" />
   </ItemGroup>
 
   <ItemGroup>
