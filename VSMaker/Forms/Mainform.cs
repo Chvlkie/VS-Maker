@@ -774,6 +774,10 @@ namespace VSMaker
                 trainer_NumPoke_num.Minimum = 0;
                 MessageBox.Show("Trainer has no Pokemon set.\nYou must select at least one.", "No Pokemon", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 trainerEditor_tab.SelectedTab = trainerEditor_Pokemon;
+                unsavedChanges = true;
+                saveTrainerPoke_btn.Enabled = true;
+                saveTrainerAll_btn.Enabled = true;
+                undoTrainer_btn.Enabled = true;
             }
             trainer_NumPoke_num.Value = selectedTrainer.Pokemon.Count();
             EnablePokemon();
@@ -1023,8 +1027,12 @@ namespace VSMaker
 
         private void SetupTrainerTextTab()
         {
+            statusLabelMessage("Setting up Trainer Text Table Editor...");
+            Update();
             if (trainerTextTable_dataGrid.RowCount == 0)
             {
+                statusLabelMessage("Reading Trainer Text Table");
+                Update();
                 string[] currentTrainers = new string[trainers.Count];
                 string[] currentMessageTriggers = new string[messageTriggers.Count];
 
@@ -1055,6 +1063,8 @@ namespace VSMaker
                     triggerCell.Value = triggerCell.Items[messageTriggerIndex];
                 }
             }
+            statusLabelMessage();
+            Update();
         }
 
         private void trainer_Double_checkBox_CheckedChanged(object sender, EventArgs e)

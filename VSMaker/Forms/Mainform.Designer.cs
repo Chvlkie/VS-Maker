@@ -123,7 +123,7 @@ namespace VSMaker
             trainer_Poke2_btn = new Button();
             label13 = new Label();
             panel11 = new Panel();
-            button8 = new Button();
+            saveTrainerPoke_btn = new Button();
             trainer_Double_checkBox = new CheckBox();
             label7 = new Label();
             trainer_NumPoke_num = new NumericUpDown();
@@ -151,6 +151,7 @@ namespace VSMaker
             panel17 = new Panel();
             panel16 = new Panel();
             panel15 = new Panel();
+            trainerTextTable_help_label = new Label();
             trainerTextTable_dataGrid = new DataGridView();
             MessageId = new DataGridViewTextBoxColumn();
             TrainerId = new DataGridViewComboBoxColumn();
@@ -192,7 +193,6 @@ namespace VSMaker
             saveFileDialog1 = new SaveFileDialog();
             trainerMessageBindingSource1 = new BindingSource(components);
             trainerMessageBindingSource3 = new BindingSource(components);
-            trainerTextTable_help_label = new Label();
             main_toolstrip.SuspendLayout();
             statusStrip1.SuspendLayout();
             mainContent.SuspendLayout();
@@ -1250,7 +1250,7 @@ namespace VSMaker
             // 
             // panel11
             // 
-            panel11.Controls.Add(button8);
+            panel11.Controls.Add(saveTrainerPoke_btn);
             panel11.Controls.Add(trainer_Double_checkBox);
             panel11.Controls.Add(label7);
             panel11.Controls.Add(trainer_NumPoke_num);
@@ -1260,17 +1260,17 @@ namespace VSMaker
             panel11.Size = new Size(355, 35);
             panel11.TabIndex = 47;
             // 
-            // button8
+            // saveTrainerPoke_btn
             // 
-            button8.Enabled = false;
-            button8.Image = Properties.Resources.saveIconSm;
-            button8.Location = new Point(289, 5);
-            button8.Name = "button8";
-            button8.Size = new Size(56, 23);
-            button8.TabIndex = 47;
-            button8.Text = "Save";
-            button8.TextImageRelation = TextImageRelation.ImageBeforeText;
-            button8.UseVisualStyleBackColor = true;
+            saveTrainerPoke_btn.Enabled = false;
+            saveTrainerPoke_btn.Image = Properties.Resources.saveIconSm;
+            saveTrainerPoke_btn.Location = new Point(289, 5);
+            saveTrainerPoke_btn.Name = "saveTrainerPoke_btn";
+            saveTrainerPoke_btn.Size = new Size(56, 23);
+            saveTrainerPoke_btn.TabIndex = 47;
+            saveTrainerPoke_btn.Text = "Save";
+            saveTrainerPoke_btn.TextImageRelation = TextImageRelation.ImageBeforeText;
+            saveTrainerPoke_btn.UseVisualStyleBackColor = true;
             // 
             // trainer_Double_checkBox
             // 
@@ -1581,6 +1581,15 @@ namespace VSMaker
             panel15.Name = "panel15";
             panel15.Size = new Size(776, 25);
             panel15.TabIndex = 1;
+            // 
+            // trainerTextTable_help_label
+            // 
+            trainerTextTable_help_label.AutoSize = true;
+            trainerTextTable_help_label.Location = new Point(3, 5);
+            trainerTextTable_help_label.Name = "trainerTextTable_help_label";
+            trainerTextTable_help_label.Size = new Size(135, 15);
+            trainerTextTable_help_label.TabIndex = 0;
+            trainerTextTable_help_label.Text = "Double click to edjt text.";
             // 
             // trainerTextTable_dataGrid
             // 
@@ -1928,15 +1937,6 @@ namespace VSMaker
             panel2.Size = new Size(784, 490);
             panel2.TabIndex = 5;
             // 
-            // trainerTextTable_help_label
-            // 
-            trainerTextTable_help_label.AutoSize = true;
-            trainerTextTable_help_label.Location = new Point(3, 5);
-            trainerTextTable_help_label.Name = "trainerTextTable_help_label";
-            trainerTextTable_help_label.Size = new Size(135, 15);
-            trainerTextTable_help_label.TabIndex = 0;
-            trainerTextTable_help_label.Text = "Double click to edjt text.";
-            // 
             // Mainform
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -2183,7 +2183,7 @@ namespace VSMaker
         private ComboBox trainer_Poke5_comboBox;
         private Button trainer_Poke5_btn;
         private Label label14;
-        private Button button8;
+        private Button saveTrainerPoke_btn;
         private Button trainer_Message_Next_btn;
         private Button trainer_Message_Back_btn;
         private Panel panel21;
