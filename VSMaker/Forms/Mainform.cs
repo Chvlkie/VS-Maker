@@ -14,7 +14,6 @@ namespace VSMaker
 {
     public partial class Mainform : Form
     {
-        public PrivateFontCollection Fonts;
         #region ROM Info
 
         public Dictionary<ushort, ushort> eventToHeader = new();
@@ -55,6 +54,7 @@ namespace VSMaker
             InitializeComponent();
             InitializePokemonDsFont();
             trainer_Message.Text = string.Empty;
+            trainerTextTable_help_label.Text = "";
         }
 
         #region ROM
@@ -303,6 +303,7 @@ namespace VSMaker
         #endregion ROM
 
         #region Fonts
+        public PrivateFontCollection Fonts;
         private void InitializePokemonDsFont()
         {
             //Create your private font collection object.
@@ -516,10 +517,9 @@ namespace VSMaker
             int index = trainerClass_Uses_list.SelectedIndex;
             var text = trainerClass_Uses_list.Items[index].ToString();
             int id = int.Parse(text.Remove(0, 1).Remove(3));
+            selectedTrainer = trainers.SingleOrDefault(id);
             mainContent.SelectedTab = mainContent_trainer;
-            SetupTrainerEditor();
-            trainers_list.SelectedIndex = id - 1;
-            GetTrainerInfo(id);
+            //GetTrainerInfo(id);
         }
 
         private void trainerClass_PrizeMoney_btn_Click(object sender, EventArgs e)
@@ -749,6 +749,7 @@ namespace VSMaker
             if (trainer_Class_comboBox.Items.Count > 0)
             {
                 trainer_Class_comboBox.Enabled = true;
+                trainer_GoToClass_btn.Enabled = true;
                 trainer_Class_comboBox.SelectedIndex = selectedTrainer.TrainerClassId - 2;
             }
 
@@ -772,6 +773,23 @@ namespace VSMaker
             {
                 trainer_MessageTrigger_list.Enabled = false;
             }
+
+            // Setup Trainer Pokemon
+            trainer_Double_checkBox.Enabled = true;
+            trainer_NumPoke_num.Enabled = true;
+
+            if (selectedTrainer.Pokemon.Count() > 0)
+            {
+                trainer_NumPoke_num.Minimum = 1;
+            }
+            else
+            {
+                trainer_NumPoke_num.Minimum = 0;
+                MessageBox.Show("Trainer has no Pokemon set.\nYou must select at least one.", "No Pokemon", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                trainerEditor_tab.SelectedTab = trainerEditor_Pokemon;
+            }
+            trainer_NumPoke_num.Value = selectedTrainer.Pokemon.Count();
+            EnablePokemon();
         }
 
         private void GetTrainerMessages()
@@ -824,7 +842,8 @@ namespace VSMaker
                 {
                     TrainerId = i,
                     TrainerName = trainerNames[i],
-                    TrainerClassId = trainerProperties.trainerClass
+                    TrainerClassId = trainerProperties.trainerClass,
+                    Pokemon = new List<Pokemon>()
                 };
 
                 trainers.Add(item);
@@ -882,71 +901,120 @@ namespace VSMaker
 
         private void EnablePokemon()
         {
-            //switch (trainer_NumPoke_num.Value)
-            //{
-            //    case 1:
-            //        trainer_Pokemon1_panel.Enabled = true;
-            //        trainer_Pokemon2_panel.Enabled = false;
-            //        trainer_Pokemon3_panel.Enabled = false;
-            //        trainer_Pokemon4_panel.Enabled = false;
-            //        trainer_Pokemon5_panel.Enabled = false;
-            //        trainer_Pokemon6_panel.Enabled = false;
-            //        break;
+            switch (trainer_NumPoke_num.Value)
+            {
+                case 1:
+                    trainer_Poke1_comboBox.Enabled = true;
+                    trainer_Poke2_comboBox.Enabled = false;
+                    trainer_Poke3_comboBox.Enabled = false;
+                    trainer_Poke4_comboBox.Enabled = false;
+                    trainer_Poke5_comboBox.Enabled = false;
+                    trainer_Poke6_comboBox.Enabled = false;
 
-            //    case 2:
-            //        trainer_Pokemon1_panel.Enabled = true;
-            //        trainer_Pokemon2_panel.Enabled = true;
-            //        trainer_Pokemon3_panel.Enabled = false;
-            //        trainer_Pokemon4_panel.Enabled = false;
-            //        trainer_Pokemon5_panel.Enabled = false;
-            //        trainer_Pokemon6_panel.Enabled = false;
-            //        break;
+                    trainer_Poke1_btn.Enabled = true;
+                    trainer_Poke2_btn.Enabled = false;
+                    trainer_Poke3_btn.Enabled = false;
+                    trainer_Poke4_btn.Enabled = false;
+                    trainer_Poke5_btn.Enabled = false;
+                    trainer_Poke6_btn.Enabled = false;
+                    break;
 
-            //    case 3:
-            //        trainer_Pokemon1_panel.Enabled = true;
-            //        trainer_Pokemon2_panel.Enabled = true;
-            //        trainer_Pokemon3_panel.Enabled = true;
-            //        trainer_Pokemon4_panel.Enabled = false;
-            //        trainer_Pokemon5_panel.Enabled = false;
-            //        trainer_Pokemon6_panel.Enabled = false;
-            //        break;
+                case 2:
+                    trainer_Poke1_comboBox.Enabled = true;
+                    trainer_Poke2_comboBox.Enabled = true;
+                    trainer_Poke3_comboBox.Enabled = false;
+                    trainer_Poke4_comboBox.Enabled = false;
+                    trainer_Poke5_comboBox.Enabled = false;
+                    trainer_Poke6_comboBox.Enabled = false;
 
-            //    case 4:
-            //        trainer_Pokemon1_panel.Enabled = true;
-            //        trainer_Pokemon2_panel.Enabled = true;
-            //        trainer_Pokemon3_panel.Enabled = true;
-            //        trainer_Pokemon4_panel.Enabled = true;
-            //        trainer_Pokemon5_panel.Enabled = false;
-            //        trainer_Pokemon6_panel.Enabled = false;
-            //        break;
+                    trainer_Poke1_btn.Enabled = true;
+                    trainer_Poke2_btn.Enabled = true;
+                    trainer_Poke3_btn.Enabled = false;
+                    trainer_Poke4_btn.Enabled = false;
+                    trainer_Poke5_btn.Enabled = false;
+                    trainer_Poke6_btn.Enabled = false;
+                    break;
 
-            //    case 5:
-            //        trainer_Pokemon1_panel.Enabled = true;
-            //        trainer_Pokemon2_panel.Enabled = true;
-            //        trainer_Pokemon3_panel.Enabled = true;
-            //        trainer_Pokemon4_panel.Enabled = true;
-            //        trainer_Pokemon5_panel.Enabled = true;
-            //        trainer_Pokemon6_panel.Enabled = false;
-            //        break;
+                case 3:
+                    trainer_Poke1_comboBox.Enabled = true;
+                    trainer_Poke2_comboBox.Enabled = true;
+                    trainer_Poke3_comboBox.Enabled = true;
+                    trainer_Poke4_comboBox.Enabled = false;
+                    trainer_Poke5_comboBox.Enabled = false;
+                    trainer_Poke6_comboBox.Enabled = false;
 
-            //    case 6:
-            //        trainer_Pokemon1_panel.Enabled = true;
-            //        trainer_Pokemon2_panel.Enabled = true;
-            //        trainer_Pokemon3_panel.Enabled = true;
-            //        trainer_Pokemon4_panel.Enabled = true;
-            //        trainer_Pokemon5_panel.Enabled = true;
-            //        trainer_Pokemon6_panel.Enabled = true;
-            //        break;
+                    trainer_Poke1_btn.Enabled = true;
+                    trainer_Poke2_btn.Enabled = true;
+                    trainer_Poke3_btn.Enabled = true;
+                    trainer_Poke4_btn.Enabled = false;
+                    trainer_Poke5_btn.Enabled = false;
+                    trainer_Poke6_btn.Enabled = false;
+                    break;
 
-            //    default:
-            //        trainer_Pokemon1_panel.Enabled = false;
-            //        trainer_Pokemon2_panel.Enabled = false;
-            //        trainer_Pokemon3_panel.Enabled = false;
-            //        trainer_Pokemon4_panel.Enabled = false;
-            //        trainer_Pokemon5_panel.Enabled = false;
-            //        trainer_Pokemon6_panel.Enabled = false;
-            //        break;
-            //}
+                case 4:
+                    trainer_Poke1_comboBox.Enabled = true;
+                    trainer_Poke2_comboBox.Enabled = true;
+                    trainer_Poke3_comboBox.Enabled = true;
+                    trainer_Poke4_comboBox.Enabled = true;
+                    trainer_Poke5_comboBox.Enabled = false;
+                    trainer_Poke6_comboBox.Enabled = false;
+
+                    trainer_Poke1_btn.Enabled = true;
+                    trainer_Poke2_btn.Enabled = true;
+                    trainer_Poke3_btn.Enabled = true;
+                    trainer_Poke4_btn.Enabled = true;
+                    trainer_Poke5_btn.Enabled = false;
+                    trainer_Poke6_btn.Enabled = false;
+                    break;
+
+                case 5:
+                    trainer_Poke1_comboBox.Enabled = true;
+                    trainer_Poke2_comboBox.Enabled = true;
+                    trainer_Poke3_comboBox.Enabled = true;
+                    trainer_Poke4_comboBox.Enabled = true;
+                    trainer_Poke5_comboBox.Enabled = true;
+                    trainer_Poke6_comboBox.Enabled = false;
+
+                    trainer_Poke1_btn.Enabled = true;
+                    trainer_Poke2_btn.Enabled = true;
+                    trainer_Poke3_btn.Enabled = true;
+                    trainer_Poke4_btn.Enabled = true;
+                    trainer_Poke5_btn.Enabled = true;
+                    trainer_Poke6_btn.Enabled = false;
+                    break;
+
+                case 6:
+                    trainer_Poke1_comboBox.Enabled = true;
+                    trainer_Poke2_comboBox.Enabled = true;
+                    trainer_Poke3_comboBox.Enabled = true;
+                    trainer_Poke4_comboBox.Enabled = true;
+                    trainer_Poke5_comboBox.Enabled = true;
+                    trainer_Poke6_comboBox.Enabled = true;
+
+                    trainer_Poke1_btn.Enabled = true;
+                    trainer_Poke2_btn.Enabled = true;
+                    trainer_Poke3_btn.Enabled = true;
+                    trainer_Poke4_btn.Enabled = true;
+                    trainer_Poke5_btn.Enabled = true;
+                    trainer_Poke6_btn.Enabled = true;
+                    break;
+
+                default:
+                    trainer_Poke1_comboBox.Enabled = false;
+                    trainer_Poke2_comboBox.Enabled = false;
+                    trainer_Poke3_comboBox.Enabled = false;
+                    trainer_Poke4_comboBox.Enabled = false;
+                    trainer_Poke5_comboBox.Enabled = false;
+                    trainer_Poke6_comboBox.Enabled = false;
+
+                    trainer_Poke1_btn.Enabled = false;
+                    trainer_Poke2_btn.Enabled = false;
+                    trainer_Poke3_btn.Enabled = false;
+                    trainer_Poke4_btn.Enabled = false;
+                    trainer_Poke5_btn.Enabled = false;
+                    trainer_Poke6_btn.Enabled = false;
+                    break;
+            }
         }
 
         private void OpenPokemonEditor(int pokemonId)
@@ -1030,7 +1098,7 @@ namespace VSMaker
             {
                 trainerClassListBox.SelectedIndex = id - 2;
             }
-            GetTrainerClassInfo(id);
+           // GetTrainerClassInfo(id);
         }
 
         private void trainer_Message_TextChanged(object sender, EventArgs e)
@@ -1062,6 +1130,7 @@ namespace VSMaker
 
         private void trainer_NumPoke_num_ValueChanged(object sender, EventArgs e)
         {
+            trainer_NumPoke_num.Minimum = 1;
             EnablePokemon();
         }
 
@@ -1112,6 +1181,48 @@ namespace VSMaker
                 {
                     e.Cancel = true;
                 }
+            }
+        }
+
+        private void trainer_Poke1_btn_Click(object sender, EventArgs e)
+        {
+            OpenPokemonEditor(trainer_Poke1_comboBox.SelectedIndex);
+        }
+
+        private void trainer_Poke2_btn_Click(object sender, EventArgs e)
+        {
+            OpenPokemonEditor(trainer_Poke2_comboBox.SelectedIndex);
+        }
+
+        private void trainer_Poke3_btn_Click(object sender, EventArgs e)
+        {
+            OpenPokemonEditor(trainer_Poke3_comboBox.SelectedIndex);
+        }
+
+        private void trainer_Poke4_btn_Click(object sender, EventArgs e)
+        {
+            OpenPokemonEditor(trainer_Poke4_comboBox.SelectedIndex);
+        }
+
+        private void trainer_Poke5_btn_Click(object sender, EventArgs e)
+        {
+            OpenPokemonEditor(trainer_Poke5_comboBox.SelectedIndex);
+        }
+
+        private void trainer_Poke6_btn_Click(object sender, EventArgs e)
+        {
+            OpenPokemonEditor(trainer_Poke6_comboBox.SelectedIndex);
+        }
+
+        private void trainerTextTable_dataGrid_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == 3)
+            {
+                trainerTextTable_help_label.Text = "Double click to open text editor.";
+            }
+            else
+            {
+                trainerTextTable_help_label.Text = "";
             }
         }
     }

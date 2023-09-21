@@ -37,12 +37,18 @@
             toolStripButton3 = new ToolStripButton();
             toolStripButton4 = new ToolStripButton();
             toolStripSeparator2 = new ToolStripSeparator();
+            panel21 = new Panel();
+            trainer_Message = new Label();
+            trainer_Message_Back_btn = new Button();
+            trainer_Message_Next_btn = new Button();
             panel1.SuspendLayout();
             toolStrip1.SuspendLayout();
+            panel21.SuspendLayout();
             SuspendLayout();
             // 
             // panel1
             // 
+            panel1.Controls.Add(panel21);
             panel1.Controls.Add(label1);
             panel1.Controls.Add(textEditor_Save_btn);
             panel1.Controls.Add(textEditor_Message);
@@ -78,7 +84,7 @@
             // 
             textEditor_Message.Location = new Point(12, 60);
             textEditor_Message.Name = "textEditor_Message";
-            textEditor_Message.Size = new Size(560, 160);
+            textEditor_Message.Size = new Size(560, 84);
             textEditor_Message.TabIndex = 1;
             textEditor_Message.Text = "";
             // 
@@ -112,6 +118,59 @@
             toolStripSeparator2.Name = "toolStripSeparator2";
             toolStripSeparator2.Size = new Size(6, 25);
             // 
+            // panel21
+            // 
+            panel21.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            panel21.BackgroundImage = Properties.Resources.MessageBox;
+            panel21.BackgroundImageLayout = ImageLayout.Stretch;
+            panel21.Controls.Add(trainer_Message);
+            panel21.Controls.Add(trainer_Message_Back_btn);
+            panel21.Controls.Add(trainer_Message_Next_btn);
+            panel21.Location = new Point(12, 165);
+            panel21.Name = "panel21";
+            panel21.Size = new Size(448, 84);
+            panel21.TabIndex = 50;
+            // 
+            // trainer_Message
+            // 
+            trainer_Message.AutoSize = true;
+            trainer_Message.Font = new Font("Arial Narrow", 18F, FontStyle.Regular, GraphicsUnit.Point);
+            trainer_Message.ImageAlign = ContentAlignment.MiddleLeft;
+            trainer_Message.Location = new Point(24, 18);
+            trainer_Message.Name = "trainer_Message";
+            trainer_Message.Size = new Size(203, 34);
+            trainer_Message.TabIndex = 46;
+            trainer_Message.Text = "TRAINER MESSAGE";
+            trainer_Message.UseCompatibleTextRendering = true;
+            // 
+            // trainer_Message_Back_btn
+            // 
+            trainer_Message_Back_btn.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            trainer_Message_Back_btn.BackColor = Color.White;
+            trainer_Message_Back_btn.Enabled = false;
+            trainer_Message_Back_btn.Font = new Font("Segoe UI", 7F, FontStyle.Bold, GraphicsUnit.Point);
+            trainer_Message_Back_btn.ForeColor = SystemColors.ControlText;
+            trainer_Message_Back_btn.Location = new Point(379, 14);
+            trainer_Message_Back_btn.Name = "trainer_Message_Back_btn";
+            trainer_Message_Back_btn.Size = new Size(23, 23);
+            trainer_Message_Back_btn.TabIndex = 47;
+            trainer_Message_Back_btn.Text = "▲";
+            trainer_Message_Back_btn.UseVisualStyleBackColor = false;
+            // 
+            // trainer_Message_Next_btn
+            // 
+            trainer_Message_Next_btn.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            trainer_Message_Next_btn.BackColor = Color.White;
+            trainer_Message_Next_btn.Enabled = false;
+            trainer_Message_Next_btn.Font = new Font("Segoe UI", 7F, FontStyle.Bold, GraphicsUnit.Point);
+            trainer_Message_Next_btn.ForeColor = Color.IndianRed;
+            trainer_Message_Next_btn.Location = new Point(379, 43);
+            trainer_Message_Next_btn.Name = "trainer_Message_Next_btn";
+            trainer_Message_Next_btn.Size = new Size(23, 23);
+            trainer_Message_Next_btn.TabIndex = 48;
+            trainer_Message_Next_btn.Text = "▼";
+            trainer_Message_Next_btn.UseVisualStyleBackColor = false;
+            // 
             // TextEditor
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -126,6 +185,8 @@
             panel1.PerformLayout();
             toolStrip1.ResumeLayout(false);
             toolStrip1.PerformLayout();
+            panel21.ResumeLayout(false);
+            panel21.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -139,5 +200,9 @@
         private ToolStripButton toolStripButton4;
         private ToolStripSeparator toolStripSeparator2;
         private Label label1;
+        private Panel panel21;
+        private Label trainer_Message;
+        private Button trainer_Message_Back_btn;
+        private Button trainer_Message_Next_btn;
     }
 }
