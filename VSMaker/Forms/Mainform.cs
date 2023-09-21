@@ -427,22 +427,9 @@ namespace VSMaker
                 MessageBox.Show("Trainer Class name updated!", "Success!");
                 ClearTrainerClassLists();
                 SetupTrainerClassEditor();
-                SetSelectedTrainerClass(selectedTrainerClass);
-                GetTrainerClassInfo(selectedTrainerClass.TrainerClassId);
             }
         }
 
-        private void SetSelectedTrainerClass(TrainerClass trainerClass)
-        {
-            if (trainerClass.IsPlayerClass)
-            {
-                player_trainer_class.SelectedIndex = trainerClass.TrainerClassId;
-            }
-            else
-            {
-                trainerClassListBox.SelectedIndex = trainerClass.TrainerClassId - 2;
-            }
-        }
         private void DisableTrainerClassEditorInputs()
         {
             //Disable Buttons
@@ -517,7 +504,7 @@ namespace VSMaker
             int index = trainerClass_Uses_list.SelectedIndex;
             var text = trainerClass_Uses_list.Items[index].ToString();
             int id = int.Parse(text.Remove(0, 1).Remove(3));
-            selectedTrainer = trainers.SingleOrDefault(id);
+            selectedTrainer = trainers.SingleOrDefault(x => x.TrainerId == id);
             mainContent.SelectedTab = mainContent_trainer;
             //GetTrainerInfo(id);
         }
@@ -1092,13 +1079,8 @@ namespace VSMaker
             int index = trainer_Class_comboBox.SelectedIndex;
             var text = trainer_Class_comboBox.Items[index].ToString();
             int id = int.Parse(text.Remove(0, 1).Remove(3));
+            selectedTrainerClass = trainerClasses.SingleOrDefault(x => x.TrainerClassId == id);
             mainContent.SelectedTab = mainContent_trainerClass;
-            SetupTrainerClassEditor();
-            if (id > 1)
-            {
-                trainerClassListBox.SelectedIndex = id - 2;
-            }
-           // GetTrainerClassInfo(id);
         }
 
         private void trainer_Message_TextChanged(object sender, EventArgs e)
