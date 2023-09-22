@@ -10,7 +10,7 @@ namespace VSMaker.Data
     {
         public int PokemonId { get; set; }
         public string? PokemonName { get; set; }
-
+        public short Level { get; set; }
         public int DV { get; set; }
         public int Gender { get; set; }
         public bool IsShiny { get; set; }
@@ -20,6 +20,6 @@ namespace VSMaker.Data
         public int Move3Id { get; set; }
         public int Move4Id { get; set; }
         public int NatureId { get; set; }
-        public int PokemonForm { get; set; }
+        public int FormId { get; set; }
     }
 }

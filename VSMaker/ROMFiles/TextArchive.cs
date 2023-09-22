@@ -6,9 +6,11 @@ using System.Resources;
 using System.Reflection;
 using System.Windows.Forms;
 using VSMaker.Resources;
-using static VSMaker.RomInfo;
+using static VSMaker.CommonFunctions.RomInfo;
+using VSMaker.CommonFunctions;
 
-namespace VSMaker.ROMFiles {
+namespace VSMaker.ROMFiles
+{
     /// <summary>
     /// Class to store message data from DS Pokémon games
     /// </summary>

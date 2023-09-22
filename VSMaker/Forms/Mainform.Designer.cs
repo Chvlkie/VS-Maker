@@ -97,9 +97,6 @@ namespace VSMaker
             label6 = new Label();
             panel8 = new Panel();
             trainerEditor_tab = new TabControl();
-            trainerEditor_trnProperties = new TabPage();
-            panel12 = new Panel();
-            panel18 = new Panel();
             trainerEditor_Pokemon = new TabPage();
             panel10 = new Panel();
             panel19 = new Panel();
@@ -127,6 +124,9 @@ namespace VSMaker
             trainer_Double_checkBox = new CheckBox();
             label7 = new Label();
             trainer_NumPoke_num = new NumericUpDown();
+            trainerEditor_trnProperties = new TabPage();
+            panel12 = new Panel();
+            panel18 = new Panel();
             panel7 = new Panel();
             undoTrainer_btn = new Button();
             saveTrainerAll_btn = new Button();
@@ -138,7 +138,7 @@ namespace VSMaker
             save_TrainerClass_btn = new Button();
             label5 = new Label();
             trainer_Class_comboBox = new ComboBox();
-            numericUpDown1 = new NumericUpDown();
+            trainer_frames_num = new NumericUpDown();
             label3 = new Label();
             trainerPicBox = new PictureBox();
             label4 = new Label();
@@ -212,17 +212,17 @@ namespace VSMaker
             panel21.SuspendLayout();
             panel8.SuspendLayout();
             trainerEditor_tab.SuspendLayout();
-            trainerEditor_trnProperties.SuspendLayout();
-            panel12.SuspendLayout();
             trainerEditor_Pokemon.SuspendLayout();
             panel10.SuspendLayout();
             panel19.SuspendLayout();
             panel20.SuspendLayout();
             panel11.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trainer_NumPoke_num).BeginInit();
+            trainerEditor_trnProperties.SuspendLayout();
+            panel12.SuspendLayout();
             panel7.SuspendLayout();
             panel6.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)trainer_frames_num).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trainerPicBox).BeginInit();
             panel5.SuspendLayout();
             mainContent_trainerText.SuspendLayout();
@@ -394,7 +394,6 @@ namespace VSMaker
             // 
             // saveClassProperties_btn
             // 
-            saveClassProperties_btn.Enabled = false;
             saveClassProperties_btn.Image = Properties.Resources.saveIconSm;
             saveClassProperties_btn.Location = new Point(218, 8);
             saveClassProperties_btn.Name = "saveClassProperties_btn";
@@ -534,7 +533,6 @@ namespace VSMaker
             // 
             // saveClassTheme_btn
             // 
-            saveClassTheme_btn.Enabled = false;
             saveClassTheme_btn.Image = Properties.Resources.saveIconSm;
             saveClassTheme_btn.Location = new Point(288, 255);
             saveClassTheme_btn.Name = "saveClassTheme_btn";
@@ -608,6 +606,7 @@ namespace VSMaker
             trainerClass_Uses_list.Size = new Size(190, 244);
             trainerClass_Uses_list.TabIndex = 27;
             trainerClass_Uses_list.SelectedIndexChanged += trainerClass_Uses_list_SelectedIndexChanged;
+            trainerClass_Uses_list.DoubleClick += trainerClass_Uses_list_DoubleClick;
             // 
             // trainerClassUse_label
             // 
@@ -645,10 +644,10 @@ namespace VSMaker
             undoTrainerClass_btn.Text = "Undo All Changes";
             undoTrainerClass_btn.TextImageRelation = TextImageRelation.ImageBeforeText;
             undoTrainerClass_btn.UseVisualStyleBackColor = true;
+            undoTrainerClass_btn.Click += undoTrainerClass_btn_Click;
             // 
             // saveTrainerClassAll_btn
             // 
-            saveTrainerClassAll_btn.Enabled = false;
             saveTrainerClassAll_btn.Image = Properties.Resources.saveIconSm;
             saveTrainerClassAll_btn.Location = new Point(218, 3);
             saveTrainerClassAll_btn.Name = "saveTrainerClassAll_btn";
@@ -661,7 +660,6 @@ namespace VSMaker
             // saveClassName_btn
             // 
             saveClassName_btn.BackgroundImageLayout = ImageLayout.Stretch;
-            saveClassName_btn.Enabled = false;
             saveClassName_btn.Image = Properties.Resources.saveIconSm;
             saveClassName_btn.Location = new Point(144, 28);
             saveClassName_btn.Name = "saveClassName_btn";
@@ -712,6 +710,7 @@ namespace VSMaker
             trainerClass_frames_num.Name = "trainerClass_frames_num";
             trainerClass_frames_num.Size = new Size(53, 23);
             trainerClass_frames_num.TabIndex = 38;
+            trainerClass_frames_num.ValueChanged += trainerClass_frames_num_ValueChanged;
             // 
             // trainerClass_frames_label
             // 
@@ -943,8 +942,8 @@ namespace VSMaker
             // 
             // trainerEditor_tab
             // 
-            trainerEditor_tab.Controls.Add(trainerEditor_trnProperties);
             trainerEditor_tab.Controls.Add(trainerEditor_Pokemon);
+            trainerEditor_tab.Controls.Add(trainerEditor_trnProperties);
             trainerEditor_tab.Dock = DockStyle.Fill;
             trainerEditor_tab.Location = new Point(0, 0);
             trainerEditor_tab.Name = "trainerEditor_tab";
@@ -952,34 +951,6 @@ namespace VSMaker
             trainerEditor_tab.Size = new Size(363, 263);
             trainerEditor_tab.TabIndex = 0;
             trainerEditor_tab.SelectedIndexChanged += trainerEditor_tab_SelectedIndexChanged;
-            // 
-            // trainerEditor_trnProperties
-            // 
-            trainerEditor_trnProperties.Controls.Add(panel12);
-            trainerEditor_trnProperties.Location = new Point(4, 24);
-            trainerEditor_trnProperties.Name = "trainerEditor_trnProperties";
-            trainerEditor_trnProperties.Padding = new Padding(3);
-            trainerEditor_trnProperties.Size = new Size(355, 235);
-            trainerEditor_trnProperties.TabIndex = 2;
-            trainerEditor_trnProperties.Text = "Trainer Properties";
-            trainerEditor_trnProperties.UseVisualStyleBackColor = true;
-            // 
-            // panel12
-            // 
-            panel12.Controls.Add(panel18);
-            panel12.Dock = DockStyle.Fill;
-            panel12.Location = new Point(3, 3);
-            panel12.Name = "panel12";
-            panel12.Size = new Size(349, 229);
-            panel12.TabIndex = 0;
-            // 
-            // panel18
-            // 
-            panel18.Dock = DockStyle.Fill;
-            panel18.Location = new Point(0, 0);
-            panel18.Name = "panel18";
-            panel18.Size = new Size(349, 229);
-            panel18.TabIndex = 0;
             // 
             // trainerEditor_Pokemon
             // 
@@ -1051,6 +1022,8 @@ namespace VSMaker
             // trainer_Poke4_comboBox
             // 
             trainer_Poke4_comboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            trainer_Poke4_comboBox.AutoCompleteMode = AutoCompleteMode.Append;
+            trainer_Poke4_comboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
             trainer_Poke4_comboBox.Enabled = false;
             trainer_Poke4_comboBox.FormattingEnabled = true;
             trainer_Poke4_comboBox.ImeMode = ImeMode.Off;
@@ -1100,6 +1073,8 @@ namespace VSMaker
             // trainer_Poke6_comboBox
             // 
             trainer_Poke6_comboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            trainer_Poke6_comboBox.AutoCompleteMode = AutoCompleteMode.Append;
+            trainer_Poke6_comboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
             trainer_Poke6_comboBox.Enabled = false;
             trainer_Poke6_comboBox.FormattingEnabled = true;
             trainer_Poke6_comboBox.Location = new Point(35, 167);
@@ -1110,6 +1085,8 @@ namespace VSMaker
             // trainer_Poke5_comboBox
             // 
             trainer_Poke5_comboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            trainer_Poke5_comboBox.AutoCompleteMode = AutoCompleteMode.Append;
+            trainer_Poke5_comboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
             trainer_Poke5_comboBox.Enabled = false;
             trainer_Poke5_comboBox.FormattingEnabled = true;
             trainer_Poke5_comboBox.Location = new Point(35, 136);
@@ -1157,6 +1134,8 @@ namespace VSMaker
             // trainer_Poke1_comboBox
             // 
             trainer_Poke1_comboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            trainer_Poke1_comboBox.AutoCompleteMode = AutoCompleteMode.Append;
+            trainer_Poke1_comboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
             trainer_Poke1_comboBox.Enabled = false;
             trainer_Poke1_comboBox.FormattingEnabled = true;
             trainer_Poke1_comboBox.ImeMode = ImeMode.Off;
@@ -1206,6 +1185,8 @@ namespace VSMaker
             // trainer_Poke3_comboBox
             // 
             trainer_Poke3_comboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            trainer_Poke3_comboBox.AutoCompleteMode = AutoCompleteMode.Append;
+            trainer_Poke3_comboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
             trainer_Poke3_comboBox.Enabled = false;
             trainer_Poke3_comboBox.FormattingEnabled = true;
             trainer_Poke3_comboBox.Location = new Point(35, 74);
@@ -1216,6 +1197,8 @@ namespace VSMaker
             // trainer_Poke2_comboBox
             // 
             trainer_Poke2_comboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            trainer_Poke2_comboBox.AutoCompleteMode = AutoCompleteMode.Append;
+            trainer_Poke2_comboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
             trainer_Poke2_comboBox.Enabled = false;
             trainer_Poke2_comboBox.FormattingEnabled = true;
             trainer_Poke2_comboBox.Location = new Point(35, 43);
@@ -1262,7 +1245,6 @@ namespace VSMaker
             // 
             // saveTrainerPoke_btn
             // 
-            saveTrainerPoke_btn.Enabled = false;
             saveTrainerPoke_btn.Image = Properties.Resources.saveIconSm;
             saveTrainerPoke_btn.Location = new Point(289, 5);
             saveTrainerPoke_btn.Name = "saveTrainerPoke_btn";
@@ -1311,6 +1293,34 @@ namespace VSMaker
             trainer_NumPoke_num.Value = new decimal(new int[] { 1, 0, 0, 0 });
             trainer_NumPoke_num.ValueChanged += trainer_NumPoke_num_ValueChanged;
             // 
+            // trainerEditor_trnProperties
+            // 
+            trainerEditor_trnProperties.Controls.Add(panel12);
+            trainerEditor_trnProperties.Location = new Point(4, 24);
+            trainerEditor_trnProperties.Name = "trainerEditor_trnProperties";
+            trainerEditor_trnProperties.Padding = new Padding(3);
+            trainerEditor_trnProperties.Size = new Size(355, 235);
+            trainerEditor_trnProperties.TabIndex = 2;
+            trainerEditor_trnProperties.Text = "Trainer Properties";
+            trainerEditor_trnProperties.UseVisualStyleBackColor = true;
+            // 
+            // panel12
+            // 
+            panel12.Controls.Add(panel18);
+            panel12.Dock = DockStyle.Fill;
+            panel12.Location = new Point(3, 3);
+            panel12.Name = "panel12";
+            panel12.Size = new Size(349, 229);
+            panel12.TabIndex = 0;
+            // 
+            // panel18
+            // 
+            panel18.Dock = DockStyle.Fill;
+            panel18.Location = new Point(0, 0);
+            panel18.Name = "panel18";
+            panel18.Size = new Size(349, 229);
+            panel18.TabIndex = 0;
+            // 
             // panel7
             // 
             panel7.Controls.Add(undoTrainer_btn);
@@ -1339,7 +1349,6 @@ namespace VSMaker
             // saveTrainerAll_btn
             // 
             saveTrainerAll_btn.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            saveTrainerAll_btn.Enabled = false;
             saveTrainerAll_btn.Image = Properties.Resources.saveIconSm;
             saveTrainerAll_btn.Location = new Point(218, 3);
             saveTrainerAll_btn.Name = "saveTrainerAll_btn";
@@ -1351,7 +1360,6 @@ namespace VSMaker
             // 
             // save_TrainerName_btn
             // 
-            save_TrainerName_btn.Enabled = false;
             save_TrainerName_btn.Image = Properties.Resources.saveIconSm;
             save_TrainerName_btn.Location = new Point(144, 28);
             save_TrainerName_btn.Name = "save_TrainerName_btn";
@@ -1388,7 +1396,7 @@ namespace VSMaker
             panel6.Controls.Add(save_TrainerClass_btn);
             panel6.Controls.Add(label5);
             panel6.Controls.Add(trainer_Class_comboBox);
-            panel6.Controls.Add(numericUpDown1);
+            panel6.Controls.Add(trainer_frames_num);
             panel6.Controls.Add(label3);
             panel6.Controls.Add(trainerPicBox);
             panel6.Controls.Add(label4);
@@ -1410,7 +1418,6 @@ namespace VSMaker
             // 
             // save_TrainerClass_btn
             // 
-            save_TrainerClass_btn.Enabled = false;
             save_TrainerClass_btn.Image = Properties.Resources.saveIconSm;
             save_TrainerClass_btn.Location = new Point(137, 193);
             save_TrainerClass_btn.Name = "save_TrainerClass_btn";
@@ -1443,13 +1450,14 @@ namespace VSMaker
             trainer_Class_comboBox.TabIndex = 39;
             trainer_Class_comboBox.SelectedIndexChanged += trainer_Class_comboBox_SelectedIndexChanged;
             // 
-            // numericUpDown1
+            // trainer_frames_num
             // 
-            numericUpDown1.Enabled = false;
-            numericUpDown1.Location = new Point(140, 142);
-            numericUpDown1.Name = "numericUpDown1";
-            numericUpDown1.Size = new Size(53, 23);
-            numericUpDown1.TabIndex = 38;
+            trainer_frames_num.Enabled = false;
+            trainer_frames_num.Location = new Point(140, 142);
+            trainer_frames_num.Name = "trainer_frames_num";
+            trainer_frames_num.Size = new Size(53, 23);
+            trainer_frames_num.TabIndex = 38;
+            trainer_frames_num.ValueChanged += trainer_frames_num_ValueChanged;
             // 
             // label3
             // 
@@ -1736,7 +1744,6 @@ namespace VSMaker
             // 
             // button10
             // 
-            button10.Enabled = false;
             button10.Image = Properties.Resources.saveIconSm;
             button10.Location = new Point(288, 259);
             button10.Name = "button10";
@@ -1980,8 +1987,6 @@ namespace VSMaker
             panel21.PerformLayout();
             panel8.ResumeLayout(false);
             trainerEditor_tab.ResumeLayout(false);
-            trainerEditor_trnProperties.ResumeLayout(false);
-            panel12.ResumeLayout(false);
             trainerEditor_Pokemon.ResumeLayout(false);
             panel10.ResumeLayout(false);
             panel19.ResumeLayout(false);
@@ -1990,11 +1995,13 @@ namespace VSMaker
             panel11.ResumeLayout(false);
             panel11.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)trainer_NumPoke_num).EndInit();
+            trainerEditor_trnProperties.ResumeLayout(false);
+            panel12.ResumeLayout(false);
             panel7.ResumeLayout(false);
             panel7.PerformLayout();
             panel6.ResumeLayout(false);
             panel6.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)trainer_frames_num).EndInit();
             ((System.ComponentModel.ISupportInitialize)trainerPicBox).EndInit();
             panel5.ResumeLayout(false);
             panel5.PerformLayout();
@@ -2101,7 +2108,7 @@ namespace VSMaker
         private Button save_TrainerClass_btn;
         private Label label5;
         private ComboBox trainer_Class_comboBox;
-        private NumericUpDown numericUpDown1;
+        private NumericUpDown trainer_frames_num;
         private Label label3;
         private PictureBox trainerPicBox;
         private Label label4;

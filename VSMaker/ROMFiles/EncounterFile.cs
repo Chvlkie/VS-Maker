@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
-using static VSMaker.RomInfo;
+using VSMaker.CommonFunctions;
+using static VSMaker.CommonFunctions.RomInfo;
 
-namespace VSMaker.ROMFiles {
+namespace VSMaker.ROMFiles
+{
     /* ---------------------- WILD POKÉMON DATA STRUCTURE (DPPt):----------------------------
         
        0x0  //  byte:       Walking encounter rate

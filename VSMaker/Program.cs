@@ -1,3 +1,5 @@
+using VSMaker.Fonts;
+
 namespace VSMaker
 {
     internal static class Program
@@ -11,7 +13,7 @@ namespace VSMaker
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
-            Application.Run(new Mainform());
+            Application.Run(new Mainform(new VsMakerFont()));
         }
     }
 }

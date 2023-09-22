@@ -1,9 +1,10 @@
 ﻿using VSMaker.ROMFiles;
 using System.Collections.Generic;
 using System.Drawing;
-using static VSMaker.RomInfo;
+using static VSMaker.CommonFunctions.RomInfo;
 
-namespace VSMaker.Resources {
+namespace VSMaker.Resources
+{
     public static class PokeDatabase {
         public static class Area {
             public static string[] PtAreaIconValues = new string[] {

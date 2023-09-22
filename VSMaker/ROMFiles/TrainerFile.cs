@@ -3,9 +3,11 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Windows.Forms;
+using VSMaker.CommonFunctions;
 using static VSMaker.ROMFiles.PartyPokemon;
 
-namespace VSMaker.ROMFiles {
+namespace VSMaker.ROMFiles
+{
     public class PartyPokemon : RomFile {
         public const int MON_NUMBER_BITSIZE = 10;
         public const int MON_NUMBER_BITMASK = (1 << MON_NUMBER_BITSIZE) - 1;
@@ -131,22 +133,22 @@ namespace VSMaker.ROMFiles {
         }
         public TrainerProperties(ushort ID, Stream trainerPropertiesStream) {
             trainerID = ID;
-            using (BinaryReader reader = new BinaryReader(trainerPropertiesStream)) {
-                byte flags = reader.ReadByte();
-                chooseMoves = (flags & 1) != 0;
-                chooseItems = (flags & 2) != 0;
+            using BinaryReader reader = new(trainerPropertiesStream);
+            byte flags = reader.ReadByte();
+            chooseMoves = (flags & 1) != 0;
+            chooseItems = (flags & 2) != 0;
 
-                trainerClass = reader.ReadByte();
-                trDataUnknown = reader.ReadByte();
-                partyCount = reader.ReadByte();
+            trainerClass = reader.ReadByte();
+            trDataUnknown = reader.ReadByte();
+            partyCount = reader.ReadByte();
 
-                for (int i = 0; i < trainerItems.Length; i++) {
-                    trainerItems[i] = reader.ReadUInt16();
-                }
-
-                AI = new BitArray( BitConverter.GetBytes(reader.ReadUInt32()) );
-                doubleBattle = reader.ReadUInt32() == 2;
+            for (int i = 0; i < trainerItems.Length; i++)
+            {
+                trainerItems[i] = reader.ReadUInt16();
             }
+
+            AI = new BitArray(BitConverter.GetBytes(reader.ReadUInt32()));
+            doubleBattle = reader.ReadUInt32() == 2;
         }
         #endregion
 
@@ -345,6 +347,10 @@ namespace VSMaker.ROMFiles {
             this.name = name;
             this.trp = trp;
             party = new Party(readFirstByte: false, POKE_IN_PARTY, partyData, this.trp);
+        }
+
+        public TrainerFile()
+        {
         }
         #endregion
 

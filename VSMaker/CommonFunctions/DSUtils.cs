@@ -1,6 +1,5 @@
 ﻿using LibNDSFormats.NSBMD;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using NarcAPI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,9 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static VSMaker.RomInfo;
+using static VSMaker.CommonFunctions.RomInfo;
 
-namespace VSMaker
+namespace VSMaker.CommonFunctions
 {
     public static class DSUtils
     {
@@ -20,18 +19,18 @@ namespace VSMaker
         {
             public EasyReader(string path, long pos = 0) : base(File.OpenRead(path))
             {
-                this.BaseStream.Position = pos;
+                BaseStream.Position = pos;
             }
         }
         public class EasyWriter : BinaryWriter
         {
             public EasyWriter(string path, long pos = 0, FileMode fmode = FileMode.OpenOrCreate) : base(new FileStream(path, fmode, FileAccess.Write, FileShare.None))
             {
-                this.BaseStream.Position = pos;
+                BaseStream.Position = pos;
             }
             public void EditSize(int increment)
             {
-                this.BaseStream.SetLength(this.BaseStream.Length + increment);
+                BaseStream.SetLength(BaseStream.Length + increment);
             }
         }
         public static class ARM9
@@ -41,14 +40,14 @@ namespace VSMaker
             {
                 public Reader(long pos = 0) : base(arm9Path, pos)
                 {
-                    this.BaseStream.Position = pos;
+                    BaseStream.Position = pos;
                 }
             }
             public class Writer : EasyWriter
             {
                 public Writer(long pos = 0) : base(arm9Path, pos)
                 {
-                    this.BaseStream.Position = pos;
+                    BaseStream.Position = pos;
                 }
             }
             public static void EditSize(int increment)
@@ -68,7 +67,7 @@ namespace VSMaker
                 decompress.Start();
                 decompress.WaitForExit();
 
-                return new FileInfo(RomInfo.arm9Path).Length > 0xBC000;
+                return new FileInfo(arm9Path).Length > 0xBC000;
             }
             public static bool Compress(string path)
             {
@@ -80,27 +79,27 @@ namespace VSMaker
                 compress.Start();
                 compress.WaitForExit();
 
-                return new FileInfo(RomInfo.arm9Path).Length <= 0xBC000;
+                return new FileInfo(arm9Path).Length <= 0xBC000;
             }
             public static bool CheckCompressionMark()
             {
-                return BitConverter.ToInt32(DSUtils.ARM9.ReadBytes((uint)(RomInfo.gameFamily == gFamEnum.DP ? 0xB7C : 0xBB4), 4), 0) != 0;
+                return BitConverter.ToInt32(ReadBytes((uint)(gameFamily == gFamEnum.DP ? 0xB7C : 0xBB4), 4), 0) != 0;
             }
             public static byte[] ReadBytes(uint startOffset, long numberOfBytes = 0)
             {
-                return ReadFromFile(RomInfo.arm9Path, startOffset, numberOfBytes);
+                return ReadFromFile(arm9Path, startOffset, numberOfBytes);
             }
             public static void WriteBytes(byte[] bytesToWrite, uint destOffset, int indexFirstByteToWrite = 0, int? indexLastByteToWrite = null)
             {
-                WriteToFile(RomInfo.arm9Path, bytesToWrite, destOffset, indexFirstByteToWrite, indexLastByteToWrite);
+                WriteToFile(arm9Path, bytesToWrite, destOffset, indexFirstByteToWrite, indexLastByteToWrite);
             }
             public static byte ReadByte(uint startOffset)
             {
-                return ReadFromFile(RomInfo.arm9Path, startOffset, 1)[0];
+                return ReadFromFile(arm9Path, startOffset, 1)[0];
             }
             public static void WriteByte(byte value, uint destOffset)
             {
-                WriteToFile(RomInfo.arm9Path, BitConverter.GetBytes(value), destOffset, 0);
+                WriteToFile(arm9Path, BitConverter.GetBytes(value), destOffset, 0);
             }
         }
 
@@ -171,7 +170,7 @@ namespace VSMaker
 
             if (textureData != null && textureData.Length > 0)
             {
-                modelData = DSUtils.BuildNSBMDwithTextures(modelData, textureData);
+                modelData = BuildNSBMDwithTextures(modelData, textureData);
             }
 
             File.WriteAllBytes(tempNSBMDPath, modelData);
@@ -255,7 +254,7 @@ namespace VSMaker
 
             if (textureData != null && textureData.Length > 0)
             {
-                modelData = DSUtils.BuildNSBMDwithTextures(modelData, textureData);
+                modelData = BuildNSBMDwithTextures(modelData, textureData);
             }
 
             File.WriteAllBytes(tempNSBMDPath, modelData);
@@ -372,7 +371,7 @@ namespace VSMaker
 
             Process unpack = new Process();
             unpack.StartInfo.FileName = @"Tools\blz.exe";
-            String arguments = "-d " + '"' + overlayFilePath + '"';
+            string arguments = "-d " + '"' + overlayFilePath + '"';
             unpack.StartInfo.Arguments = arguments;
             Application.DoEvents();
             unpack.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
@@ -404,11 +403,11 @@ namespace VSMaker
         }
         public static string GetOverlayPath(int overlayNumber)
         {
-            return RomInfo.workDir + "overlay" + "\\" + "overlay_" + overlayNumber.ToString("D4") + ".bin";
+            return workDir + "overlay" + "\\" + "overlay_" + overlayNumber.ToString("D4") + ".bin";
         }
         public static void RestoreOverlayFromCompressedBackup(int overlayNumber, bool eventEditorIsReady)
         {
-            String overlayFilePath = GetOverlayPath(overlayNumber);
+            string overlayFilePath = GetOverlayPath(overlayNumber);
 
             if (File.Exists(overlayFilePath + backupSuffix))
             {
@@ -440,7 +439,7 @@ namespace VSMaker
          **/
         public static bool CheckOverlayHasCompressionFlag(int ovNumber)
         {
-            using (BinaryReader f = new BinaryReader(File.OpenRead(RomInfo.overlayTablePath)))
+            using (BinaryReader f = new BinaryReader(File.OpenRead(overlayTablePath)))
             {
                 f.BaseStream.Position = ovNumber * 32 + 31; //overlayNumber * size of entry + offset
                 return f.ReadByte() % 2 != 0;
@@ -452,11 +451,11 @@ namespace VSMaker
          **/
         public static bool OverlayIsCompressed(int ovNumber)
         {
-            return (new FileInfo(GetOverlayPath(ovNumber)).Length < GetOverlayUncompressedSize(ovNumber));
+            return new FileInfo(GetOverlayPath(ovNumber)).Length < GetOverlayUncompressedSize(ovNumber);
         }
         public static uint GetOverlayUncompressedSize(int ovNumber)
         {
-            using (BinaryReader f = new BinaryReader(File.OpenRead(RomInfo.overlayTablePath)))
+            using (BinaryReader f = new BinaryReader(File.OpenRead(overlayTablePath)))
             {
                 f.BaseStream.Position = ovNumber * 32 + 8; //overlayNumber * size of entry + offset
                 return f.ReadUInt32();
@@ -464,7 +463,7 @@ namespace VSMaker
         }
         public static uint GetOverlayRAMAddress(int ovNumber)
         {
-            using (BinaryReader f = new BinaryReader(File.OpenRead(RomInfo.overlayTablePath)))
+            using (BinaryReader f = new BinaryReader(File.OpenRead(overlayTablePath)))
             {
                 f.BaseStream.Position = ovNumber * 32 + 4; //overlayNumber * size of entry + offset
                 return f.ReadUInt32();
@@ -477,7 +476,7 @@ namespace VSMaker
                 Console.WriteLine("Compression status " + compressStatus + " is invalid. No operation performed.");
                 return;
             }
-            using (BinaryWriter f = new BinaryWriter(File.OpenWrite(RomInfo.overlayTablePath)))
+            using (BinaryWriter f = new BinaryWriter(File.OpenWrite(overlayTablePath)))
             {
                 f.BaseStream.Position = ovNumber * 32 + 31; //overlayNumber * size of entry + offset
                 f.Write(compressStatus);
@@ -488,14 +487,14 @@ namespace VSMaker
             Process repack = new Process();
             repack.StartInfo.FileName = @"Tools\ndstool.exe";
             repack.StartInfo.Arguments = "-c " + '"' + ndsFileName + '"'
-                + " -9 " + '"' + RomInfo.arm9Path + '"'
-                + " -7 " + '"' + RomInfo.workDir + "arm7.bin" + '"'
-                + " -y9 " + '"' + RomInfo.workDir + "y9.bin" + '"'
-                + " -y7 " + '"' + RomInfo.workDir + "y7.bin" + '"'
-                + " -d " + '"' + RomInfo.workDir + "data" + '"'
-                + " -y " + '"' + RomInfo.workDir + "overlay" + '"'
-                + " -t " + '"' + RomInfo.workDir + "banner.bin" + '"'
-                + " -h " + '"' + RomInfo.workDir + "header.bin" + '"';
+                + " -9 " + '"' + arm9Path + '"'
+                + " -7 " + '"' + workDir + "arm7.bin" + '"'
+                + " -y9 " + '"' + workDir + "y9.bin" + '"'
+                + " -y7 " + '"' + workDir + "y7.bin" + '"'
+                + " -d " + '"' + workDir + "data" + '"'
+                + " -y " + '"' + workDir + "overlay" + '"'
+                + " -t " + '"' + workDir + "banner.bin" + '"'
+                + " -h " + '"' + workDir + "header.bin" + '"';
 
             Application.DoEvents();
             repack.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
@@ -504,7 +503,7 @@ namespace VSMaker
             repack.WaitForExit();
         }
 
-        public static byte[] StringToByteArray(String hex)
+        public static byte[] StringToByteArray(string hex)
         {
             //Ummm what?
             int NumberChars = hex.Length;
@@ -650,8 +649,8 @@ namespace VSMaker
                 byteArrReader.BaseStream.Position = texAbsoluteOffset + 4;
                 uint textureSize = byteArrReader.ReadUInt32();
 
-                byte[] nsbtxHeader = DSUtils.BuildNSBTXHeader(20 + textureSize);
-                byte[] texData = DSUtils.ReadFromByteArray(modelFile, readFrom: texAbsoluteOffset);
+                byte[] nsbtxHeader = BuildNSBTXHeader(20 + textureSize);
+                byte[] texData = ReadFromByteArray(modelFile, readFrom: texAbsoluteOffset);
 
                 byte[] output = new byte[nsbtxHeader.Length + texData.Length];
                 Buffer.BlockCopy(nsbtxHeader, 0, output, 0, nsbtxHeader.Length);

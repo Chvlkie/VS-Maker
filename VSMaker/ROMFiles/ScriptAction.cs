@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
+using VSMaker.CommonFunctions;
 
-namespace VSMaker.ROMFiles {
+namespace VSMaker.ROMFiles
+{
     public class ActionContainer {
         public List<ScriptAction> actionCommandsList;
         public uint manualUserID;

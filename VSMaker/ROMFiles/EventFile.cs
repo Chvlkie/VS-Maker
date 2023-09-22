@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using static VSMaker.RomInfo;
+using static VSMaker.CommonFunctions.RomInfo;
+using VSMaker.CommonFunctions;
 
-namespace VSMaker.ROMFiles {
+namespace VSMaker.ROMFiles
+{
     /// <summary>
     /// Classes to store event data in Pokémon NDS games
     /// </summary>

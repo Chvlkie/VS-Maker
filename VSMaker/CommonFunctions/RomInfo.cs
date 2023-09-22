@@ -2,7 +2,7 @@
 using VSMaker.Resources.ROMToolboxDB;
 using VSMaker.ROMFiles;
 
-namespace VSMaker
+namespace VSMaker.CommonFunctions
 {
     /// <summary>
     /// Class to store ROM data from GEN IV Pokémon games
@@ -549,7 +549,7 @@ namespace VSMaker
         }
 
         public static void SetTrainerTable()
-        { 
+        {
             TrainerTablePath = workDir + "\\unpacked\\trainerTable\\0000";
             //switch (gameFamily)
             //{
@@ -560,7 +560,7 @@ namespace VSMaker
             //        break;
 
             //    case gFamEnum.HGSS:
-                   
+
             //        break;
 
             //    default:
@@ -661,7 +661,7 @@ namespace VSMaker
                     using (DSUtils.EasyReader bReader = new DSUtils.EasyReader(ov1Path, ramAddrOfPointer - ov1Address))
                     { // read the pointer at the specified ram address and adjust accordingly below
                         uint ramAddressOfTable = bReader.ReadUInt32();
-                        if ((ramAddressOfTable >> 0x18) != 0x02)
+                        if (ramAddressOfTable >> 0x18 != 0x02)
                         {
                             MessageBox.Show("Something went wrong reading the Overworld configuration table.\nOverworld sprites in the Event Editor will be " +
                                 "displayed incorrectly or not displayed at all.", "Decompression error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -675,10 +675,10 @@ namespace VSMaker
                             OWTableOffset = ramAddressOfTable - DSUtils.GetOverlayRAMAddress(131);
                             OWtablePath = ov131path;
                         }
-                        else if (ramAddressOfTable >= RomInfo.synthOverlayLoadAddress)
+                        else if (ramAddressOfTable >= synthOverlayLoadAddress)
                         {
                             // if the pointer shows the table was moved to the synthetic overlay
-                            OWTableOffset = ramAddressOfTable - RomInfo.synthOverlayLoadAddress;
+                            OWTableOffset = ramAddressOfTable - synthOverlayLoadAddress;
                             OWtablePath = gameDirs[DirNames.synthOverlay].unpackedDir + "\\" + ToolboxDB.syntheticOverlayFileNumbersDB[gameFamily].ToString("D4");
                         }
                         else
@@ -840,7 +840,7 @@ namespace VSMaker
 
         public static void SetMonIconsPalTableAddress()
         {
-            switch (RomInfo.gameFamily)
+            switch (gameFamily)
             {
                 case gFamEnum.DP:
                     switch (gameLanguage)
@@ -953,7 +953,7 @@ namespace VSMaker
                     break;
 
                 case gFamEnum.HGSS:
-                    nullEncounterID = Byte.MaxValue;
+                    nullEncounterID = byte.MaxValue;
                     break;
             }
         }
@@ -1177,7 +1177,7 @@ namespace VSMaker
 
         public int GetBuildingCount(bool interior) => Directory.GetFiles(GetBuildingModelsDirPath(interior)).Length;
 
-        public static int GetEventFileCount() => Directory.GetFiles(RomInfo.gameDirs[DirNames.eventFiles].unpackedDir).Length;
+        public static int GetEventFileCount() => Directory.GetFiles(gameDirs[DirNames.eventFiles].unpackedDir).Length;
 
         #endregion Methods (22)
 

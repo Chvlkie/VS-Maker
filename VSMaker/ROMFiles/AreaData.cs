@@ -1,7 +1,9 @@
 using System.IO;
-using static VSMaker.RomInfo;
+using VSMaker.CommonFunctions;
+using static VSMaker.CommonFunctions.RomInfo;
 
-namespace VSMaker.ROMFiles {
+namespace VSMaker.ROMFiles
+{
     /// <summary>
     /// Class to store area data in Pokémon NDS games
     /// </summary>

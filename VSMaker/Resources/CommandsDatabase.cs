@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using VSMaker.CommonFunctions;
 
-namespace VSMaker.Resources {
+namespace VSMaker.Resources
+{
     public partial class CommandsDatabase : Form {
         private DataGridViewRow currentrow;
         private Dictionary<ushort, string> namesDict;

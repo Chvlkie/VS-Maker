@@ -1,7 +1,7 @@
-﻿using VSMaker;
-using VSMaker.ROMFiles;
+﻿using VSMaker.ROMFiles;
 using System.Text;
-using static VSMaker.RomInfo;
+using static VSMaker.CommonFunctions.RomInfo;
+using VSMaker.CommonFunctions;
 
 internal static class RomFileSystem
 {

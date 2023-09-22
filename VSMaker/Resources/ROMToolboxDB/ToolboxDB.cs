@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Resources;
-using static VSMaker.RomInfo;
+using VSMaker.CommonFunctions;
+using static VSMaker.CommonFunctions.RomInfo;
 
-namespace VSMaker.Resources.ROMToolboxDB {
+namespace VSMaker.Resources.ROMToolboxDB
+{
     public class ToolboxDB {
         internal class ARM9PatchData {
             internal string initString;

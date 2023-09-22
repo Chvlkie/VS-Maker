@@ -1,9 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
-using static VSMaker.RomInfo;
+using VSMaker.CommonFunctions;
+using static VSMaker.CommonFunctions.RomInfo;
 
-namespace VSMaker.ROMFiles {
+namespace VSMaker.ROMFiles
+{
     public abstract class RomFile {
         public abstract byte[] ToByteArray();
         public bool SaveToFile(string path, bool showSuccessMessage = true) {

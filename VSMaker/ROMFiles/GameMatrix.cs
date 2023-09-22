@@ -2,22 +2,24 @@ using System;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
-using static VSMaker.RomInfo;
+using VSMaker.CommonFunctions;
+using static VSMaker.CommonFunctions.RomInfo;
 
-namespace VSMaker.ROMFiles {
-   /* ---------------------- MATRIX DATA STRUCTURE (DPPtHGSS):-----------------------------
+namespace VSMaker.ROMFiles
+{
+    /* ---------------------- MATRIX DATA STRUCTURE (DPPtHGSS):-----------------------------
 
-   0x0  //  byte:       Matrix width (a.k.a row length) (x)
-   0x1  //  byte:       Matrix height (a.k.a number of rows per section) (y)
-   0x2  //  byte:       Headers section boolean (0 = not present, 1 = present)
-   0x3  //  byte:       Altitudes section flag (0 = not present, 1 = present)
-   0x4  //  byte:       Length of matrix name string
-   0x5  //  string:     Matrix name string (UTF-8 Encoded)
-   --   //              [Header section if applicable: y blocks of length x]
-   --   //              [Altitudes section if applicable: y blocks of length x]
-   --   //              [Map files section: y blocks of length x]
+    0x0  //  byte:       Matrix width (a.k.a row length) (x)
+    0x1  //  byte:       Matrix height (a.k.a number of rows per section) (y)
+    0x2  //  byte:       Headers section boolean (0 = not present, 1 = present)
+    0x3  //  byte:       Altitudes section flag (0 = not present, 1 = present)
+    0x4  //  byte:       Length of matrix name string
+    0x5  //  string:     Matrix name string (UTF-8 Encoded)
+    --   //              [Header section if applicable: y blocks of length x]
+    --   //              [Altitudes section if applicable: y blocks of length x]
+    --   //              [Map files section: y blocks of length x]
 
-   -------------------------------------------------------------------------------------- */
+    -------------------------------------------------------------------------------------- */
 
     /// <summary>
     /// Class to store map matrix data from Pokémon NDS games

@@ -2,11 +2,13 @@ using System.IO;
 using System.Collections.Generic;
 using LibNDSFormats.NSBMD;
 using System.Windows.Forms;
-using static VSMaker.RomInfo;
+using static VSMaker.CommonFunctions.RomInfo;
 using System;
 using System.Drawing;
+using VSMaker.CommonFunctions;
 
-namespace VSMaker.ROMFiles {
+namespace VSMaker.ROMFiles
+{
     /* ----------------------- MAP FILE DATA STRUCTURE (DPPtHGSS):--------------------------
 
     0x0  //  uint:       Length of permissions section (always 2048)

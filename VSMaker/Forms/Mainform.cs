@@ -2,18 +2,20 @@ using Ekona.Images;
 using Images;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Diagnostics;
-using System.Drawing.Text;
-using System.Runtime.InteropServices;
+using VSMaker.CommonFunctions;
 using VSMaker.Data;
+using VSMaker.Fonts;
 using VSMaker.Forms;
 using VSMaker.ROMFiles;
-using static VSMaker.RomInfo;
+using static VSMaker.CommonFunctions.RomInfo;
 using Image = System.Drawing.Image;
 
 namespace VSMaker
 {
     public partial class Mainform : Form
     {
+        private VsMakerFont vsMakerFont;
+
         #region ROM Info
 
         public Dictionary<ushort, ushort> eventToHeader = new();
@@ -29,6 +31,15 @@ namespace VSMaker
         private Trainer selectedTrainer;
         private TrainerClass selectedTrainerClass;
 
+        private TrainerFile trainerFile;
+        private SpeciesFile[] pokemonSpecies;
+
+        private string[] itemNames = Array.Empty<string>();
+        private string[] pokeNames = Array.Empty<string>();
+        private string[] moveNames = Array.Empty<string>();
+        private string[] abilityNames = Array.Empty<string>();
+
+        private (int abi1, int abi2)[] pokemonSpeciesAbilities;
         private List<TrainerClass> trainerClasses = new();
         private List<TrainerMessage> trainerMessages = new();
         private PaletteBase trainerPal;
@@ -36,9 +47,11 @@ namespace VSMaker
         private SpriteBase trainerSprite;
         private ImageBase trainerTile;
 
-        private bool unsavedChanges = false;
+        private bool unsavedChanges;
 
-        private string[] displayTrainerMessage = new string[0];
+        private string[] displayTrainerMessage = Array.Empty<string>();
+
+        private int selectedTrainerClassIndex = -1;
 
         #endregion Editor Data
 
@@ -49,10 +62,11 @@ namespace VSMaker
 
         #endregion Forms
 
-        public Mainform()
+        public Mainform(VsMakerFont vsMakerFont)
         {
+            this.vsMakerFont = vsMakerFont;
             InitializeComponent();
-            InitializePokemonDsFont();
+            vsMakerFont.InitializePokemonDsFont();
             trainer_Message.Text = string.Empty;
             trainerTextTable_help_label.Text = "";
         }
@@ -302,31 +316,6 @@ namespace VSMaker
 
         #endregion ROM
 
-        #region Fonts
-        public PrivateFontCollection Fonts;
-        private void InitializePokemonDsFont()
-        {
-            //Create your private font collection object.
-            Fonts = new PrivateFontCollection();
-
-            //Select your font from the resources.
-            //My font here is "Digireu.ttf"
-            int fontLength = Properties.Resources.pokemon_ds_font.Length;
-
-            // create a buffer to read in to
-            byte[] fontdata = Properties.Resources.pokemon_ds_font;
-
-            // create an unsafe memory block for the font data
-            System.IntPtr data = Marshal.AllocCoTaskMem(fontLength);
-
-            // copy the bytes to the unsafe memory block
-            Marshal.Copy(fontdata, 0, data, fontLength);
-
-            // pass the font to the font collection
-            Fonts.AddMemoryFont(data, fontLength);
-        }
-        #endregion Fonts
-
         #region Main Editor
 
         private void mainContent_SelectedIndexChanged(object sender, EventArgs e)
@@ -419,7 +408,6 @@ namespace VSMaker
             if (trainerClassName.Text.Length > TrainerFile.maxClassNameLen)
             {
                 MessageBox.Show($"Trainer Class name cannot exceed {TrainerFile.maxClassNameLen} characters.", "Trainer Class Name Length", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
             }
             else if (GetSingleTrainerClassName(selectedTrainerClass.TrainerClassId) != trainerClassName.Text)
             {
@@ -452,6 +440,7 @@ namespace VSMaker
 
         private void SetupTrainerClassEditor()
         {
+            selectedTrainerClassIndex = -1;
             ClearTrainerClassLists();
             DisableTrainerClassEditorInputs();
             GetData();
@@ -490,23 +479,26 @@ namespace VSMaker
             trainerClassName.Enabled = !string.IsNullOrEmpty(trainerClass.TrainerClassName);
             trainerClass_Uses_list.Enabled = trainerClass.InUse;
             trainerClass_frames_num.Enabled = trainerClass.TrainerSpriteFrames > 0;
-        }
-
-        private void TrainerClass_CheckSaveAllButton(bool enableSave, bool enableUndo)
-        {
-            saveTrainerClassAll_btn.Enabled = enableSave;
-            undoTrainerClass_btn.Enabled = enableUndo;
-            unsavedChanges = enableUndo;
+            trainerClass_frames_num.Maximum = trainerClass.TrainerSpriteFrames;
         }
 
         private void trainerClass_GoToTrainer_btn_Click(object sender, EventArgs e)
+        {
+            GoToTrainer();
+        }
+
+        private void trainerClass_Uses_list_DoubleClick(object sender, EventArgs e)
+        {
+            GoToTrainer();
+        }
+
+        private void GoToTrainer()
         {
             int index = trainerClass_Uses_list.SelectedIndex;
             var text = trainerClass_Uses_list.Items[index].ToString();
             int id = int.Parse(text.Remove(0, 1).Remove(3));
             selectedTrainer = trainers.SingleOrDefault(x => x.TrainerId == id);
             mainContent.SelectedTab = mainContent_trainer;
-            //GetTrainerInfo(id);
         }
 
         private void trainerClass_PrizeMoney_btn_Click(object sender, EventArgs e)
@@ -522,9 +514,38 @@ namespace VSMaker
         private void trainerClassListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             int index = trainerClassListBox.SelectedIndex;
-            if (index > -1)
+
+            if (selectedTrainerClassIndex == -1)
             {
-                player_trainer_class.SelectedIndex = -1;
+                ChangeTrainerClass();
+            }
+
+            if (selectedTrainerClassIndex > -1 && selectedTrainerClassIndex != index)
+            {
+                if (unsavedChanges)
+                {
+                    var choice = MessageBox.Show("You have unsaved changes.\nDo you wish to discard these changes?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (choice == DialogResult.Yes)
+                    {
+                        ChangeTrainerClass();
+                    }
+                    else
+                    {
+                        trainerClassListBox.SelectedIndexChanged -= trainerClassListBox_SelectedIndexChanged;
+                        trainerClassListBox.SelectedIndex = selectedTrainerClassIndex;
+                        trainerClassListBox.SelectedIndexChanged += trainerClassListBox_SelectedIndexChanged;
+                    }
+                }
+                else
+                {
+                    ChangeTrainerClass();
+                }
+            }
+
+            void ChangeTrainerClass()
+            {
+                selectedTrainerClassIndex = index;
+                SetUnsavedChanges(false);
                 var text = trainerClassListBox.Items[index].ToString();
                 int trainerClassId = int.Parse(text.Remove(0, 1).Remove(3));
                 GetTrainerClassInfo(trainerClassId);
@@ -609,6 +630,10 @@ namespace VSMaker
             GetTrainerClasses();
             GetMessageTriggers();
             GetTrainerMessages();
+            GetItems();
+            GetMoves();
+            GetAbilities();
+            GetPokemon();
         }
 
         private MessageTrigger GetMessageTriggerDetails(MessageTriggerEnum messageTrigger)
@@ -692,6 +717,8 @@ namespace VSMaker
         /// <param name="trainerClassId"></param>
         private void GetTrainerClassInfo(int trainerClassId)
         {
+            SetUnsavedChanges(false);
+            undoTrainerClass_btn.Enabled = false;
             selectedTrainerClass = trainerClasses.Single(x => x.TrainerClassId == trainerClassId);
 
             trainerClassName.Text = selectedTrainerClass.TrainerClassName;
@@ -707,7 +734,8 @@ namespace VSMaker
             selectedTrainerClass.TrainerSpriteFrames = LoadTrainerClassPic(trainerClassId);
             UpdateTrainerClassPic(trainerClassPicBox);
             SetupTrainerClassEditorInputs(selectedTrainerClass);
-            TrainerClass_CheckSaveAllButton(false, false);
+            saveTrainerClassAll_btn.Enabled = true;
+            saveClassName_btn.Enabled = true;
         }
 
         /// <summary>
@@ -716,12 +744,42 @@ namespace VSMaker
         /// <param name="trainerId"></param>
         private void GetTrainerInfo(int trainerId)
         {
+            SetUnsavedChanges(false);
+            undoTrainer_btn.Enabled = false;
             trainer_Message.Text = string.Empty;
             trainer_Class_comboBox.Items.Clear();
             trainer_MessageTrigger_list.Items.Clear();
+            var comboBoxes = new List<ComboBox>
+            {
+                trainer_Poke1_comboBox,
+                trainer_Poke2_comboBox,
+                trainer_Poke3_comboBox,
+                trainer_Poke4_comboBox,
+                trainer_Poke5_comboBox,
+                trainer_Poke6_comboBox
+            };
+
+            foreach (var item in comboBoxes)
+            {
+                item.Items.Clear();
+                item.SelectedIndex = -1;
+            }
+
             selectedTrainer = trainers.Single(x => x.TrainerId == trainerId);
             selectedTrainer.TrainerMessages = trainerMessages.Where(x => x.TrainerId == selectedTrainer.TrainerId).OrderBy(x => x.MessageTriggerId).ToList();
-            selectedTrainer.TrainerSpriteFrames = LoadTrainerClassPic(selectedTrainer.TrainerClassId);
+            selectedTrainer.Pokemon = new List<Pokemon>();
+
+            int currentIndex = trainerId;
+            string suffix = "\\" + currentIndex.ToString("D4");
+
+            trainerFile = new TrainerFile(
+                new TrainerProperties(
+                    (ushort)currentIndex,
+                    new FileStream(gameDirs[DirNames.trainerProperties].unpackedDir + suffix, FileMode.Open)
+                ),
+                new FileStream(gameDirs[DirNames.trainerParty].unpackedDir + suffix, FileMode.Open),
+                selectedTrainer.TrainerName
+            );
 
             //Setup Trainer Name
             trainer_Name.Text = selectedTrainer.TrainerName;
@@ -741,6 +799,9 @@ namespace VSMaker
             }
 
             //Setup Trainer Class Pic
+            selectedTrainer.TrainerSpriteFrames = LoadTrainerClassPic(selectedTrainer.TrainerClassId);
+            trainer_frames_num.Enabled = selectedTrainer.TrainerSpriteFrames > 0;
+            trainer_frames_num.Maximum = selectedTrainer.TrainerSpriteFrames;
             UpdateTrainerClassPic(trainerPicBox);
 
             //Setup Trainer Messages
@@ -764,8 +825,32 @@ namespace VSMaker
             // Setup Trainer Pokemon
             trainer_Double_checkBox.Enabled = true;
             trainer_NumPoke_num.Enabled = true;
+            pokemons.ForEach(x => trainer_Poke1_comboBox.Items.Add(x.PokemonName));
+            pokemons.ForEach(x => trainer_Poke2_comboBox.Items.Add(x.PokemonName));
+            pokemons.ForEach(x => trainer_Poke3_comboBox.Items.Add(x.PokemonName));
+            pokemons.ForEach(x => trainer_Poke4_comboBox.Items.Add(x.PokemonName));
+            pokemons.ForEach(x => trainer_Poke5_comboBox.Items.Add(x.PokemonName));
+            pokemons.ForEach(x => trainer_Poke6_comboBox.Items.Add(x.PokemonName));
 
-            if (selectedTrainer.Pokemon.Count() > 0)
+            for (int i = 0; i < 6; i++)
+            {
+                var partyPokemon = trainerFile.party[i];
+                comboBoxes[i].SelectedIndex = partyPokemon.pokeID ?? 0;
+                if (partyPokemon?.pokeID.HasValue == true)
+                {
+                    var pokemon = new Pokemon
+                    {
+                        PokemonId = partyPokemon.pokeID.Value,
+                        FormId = partyPokemon.formID,
+                        PokemonName = pokeNames[partyPokemon.pokeID.Value],
+                        DV = partyPokemon.difficulty,
+                        Level = (short)partyPokemon.level,
+                    };
+                    selectedTrainer.Pokemon.Add(pokemon);
+                }
+            }
+
+            if (selectedTrainer.Pokemon.Count is > 0)
             {
                 trainer_NumPoke_num.Minimum = 1;
             }
@@ -774,19 +859,77 @@ namespace VSMaker
                 trainer_NumPoke_num.Minimum = 0;
                 MessageBox.Show("Trainer has no Pokemon set.\nYou must select at least one.", "No Pokemon", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 trainerEditor_tab.SelectedTab = trainerEditor_Pokemon;
-                unsavedChanges = true;
-                saveTrainerPoke_btn.Enabled = true;
-                saveTrainerAll_btn.Enabled = true;
+                SetUnsavedChanges(true);
                 undoTrainer_btn.Enabled = true;
             }
-            trainer_NumPoke_num.Value = selectedTrainer.Pokemon.Count();
-            EnablePokemon();
+            trainer_NumPoke_num.Value = selectedTrainer.Pokemon.Count;
+        }
+
+        private void GetItems()
+        {
+            statusLabelMessage("Getting Item Names...");
+            Update(); itemNames = GetItemNames();
+        }
+
+        private void GetMoves()
+        {
+            statusLabelMessage("Getting Moves...");
+            Update(); moveNames = GetAttackNames();
+        }
+
+        private void GetAbilities()
+        {
+            statusLabelMessage("Getting Pokemon Abilities...");
+            Update(); abilityNames = GetAbilityNames();
+        }
+
+        private void GetPokemon()
+        {
+            statusLabelMessage("Getting Pokemon...");
+            Update();
+            pokemons = new List<Pokemon>();
+
+            int numberOfPokemon = Directory.GetFiles(gameDirs[DirNames.speciesData].unpackedDir, "*").Length;
+            pokemonSpecies = new SpeciesFile[numberOfPokemon];
+
+            for (int i = 0; i < numberOfPokemon; i++)
+            {
+                pokemonSpecies[i] = new SpeciesFile(new FileStream(gameDirs[DirNames.speciesData].unpackedDir + "\\" + i.ToString("D4"), FileMode.Open));
+            }
+
+            pokeNames = GetPokemonNames();
+            pokemonSpeciesAbilities = GetPokemonAbilities(numberOfPokemon);
+
+            for (int i = 0; i < pokeNames.Length; i++)
+            {
+                var pokemon = new Pokemon
+                {
+                    PokemonId = i,
+                    PokemonName = pokeNames[i]
+                };
+
+                pokemons.Add(pokemon);
+            }
+        }
+
+        private (int abi1, int abi2)[] GetPokemonAbilities(int numberOfPokemon)
+        {
+            statusLabelMessage("Getting Trainer's Pokemon Abilities...");
+            Update();
+            var pokemonSpeciesAbilities = new (int abi1, int abi2)[numberOfPokemon];
+
+            for (int i = 0; i < numberOfPokemon; i++)
+            {
+                pokemonSpeciesAbilities[i] = (pokemonSpecies[i].Ability1, pokemonSpecies[i].Ability2);
+            }
+
+            return pokemonSpeciesAbilities;
         }
 
         private void GetTrainerMessages()
         {
             trainerMessages = new List<TrainerMessage>();
-            statusLabelMessage("Getting Trainers Messages...");
+            statusLabelMessage("Getting Trainer's Messages...");
             Update();
 
             var allTrainerMessages = RomInfo.GetTrainerMessages();
@@ -1110,7 +1253,7 @@ namespace VSMaker
 
                 trainerText = trainerText.Replace("\\n", Environment.NewLine);
                 displayTrainerMessage = trainerText.Split(new string[] { seperator1, seperator2 }, StringSplitOptions.None);
-                trainer_Message.Font = new Font(Fonts.Families[0], trainer_Message.Font.Size);
+                trainer_Message.Font = new Font(vsMakerFont.VsMakerFontCollection.Families[0], trainer_Message.Font.Size);
                 trainer_Message.Text = displayTrainerMessage[0];
             }
             else
@@ -1128,9 +1271,11 @@ namespace VSMaker
 
         private void trainerClassName_TextChanged(object sender, EventArgs e)
         {
-            bool enableSave = selectedTrainerClass.TrainerClassName != trainerClassName.Text && !string.IsNullOrEmpty(trainerClassName.Text);
-            saveClassName_btn.Enabled = enableSave;
-            TrainerClass_CheckSaveAllButton(enableSave, true);
+            if (!unsavedChanges)
+            {
+                undoTrainerClass_btn.Enabled = selectedTrainerClass.TrainerClassName != trainerClassName.Text;
+            }
+            SetUnsavedChanges(undoTrainerClass_btn.Enabled);
         }
 
         private void trainerEditor_tab_SelectedIndexChanged(object sender, EventArgs e)
@@ -1160,6 +1305,11 @@ namespace VSMaker
             }
         }
 
+        private void SetUnsavedChanges(bool unsaved)
+        {
+            unsavedChanges = unsaved;
+        }
+
         private void mainContent_Selecting(object sender, TabControlCancelEventArgs e)
         {
             if (unsavedChanges)
@@ -1167,7 +1317,7 @@ namespace VSMaker
                 var choice = MessageBox.Show("You have unsaved changes.\nDo you wish to discard these changes?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (choice == DialogResult.Yes)
                 {
-                    unsavedChanges = false;
+                    SetUnsavedChanges(false);
                 }
                 else
                 {
@@ -1216,6 +1366,22 @@ namespace VSMaker
             {
                 trainerTextTable_help_label.Text = "";
             }
+        }
+
+        private void undoTrainerClass_btn_Click(object sender, EventArgs e)
+        {
+            SetUnsavedChanges(false);
+            GetTrainerClassInfo(selectedTrainerClass.TrainerClassId);
+        }
+
+        private void trainerClass_frames_num_ValueChanged(object sender, EventArgs e)
+        {
+            UpdateTrainerClassPic(trainerClassPicBox, (int)((NumericUpDown)sender).Value);
+        }
+
+        private void trainer_frames_num_ValueChanged(object sender, EventArgs e)
+        {
+            UpdateTrainerClassPic(trainerPicBox, (int)((NumericUpDown)sender).Value);
         }
     }
 }
