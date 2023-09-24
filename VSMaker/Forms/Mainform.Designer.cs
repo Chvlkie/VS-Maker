@@ -892,6 +892,7 @@ namespace VSMaker
             trainer_Message_Back_btn.TabIndex = 47;
             trainer_Message_Back_btn.Text = "▲";
             trainer_Message_Back_btn.UseVisualStyleBackColor = false;
+            trainer_Message_Back_btn.Click += trainer_Message_Back_btn_Click;
             // 
             // trainer_Message_Next_btn
             // 
@@ -906,6 +907,7 @@ namespace VSMaker
             trainer_Message_Next_btn.TabIndex = 48;
             trainer_Message_Next_btn.Text = "▼";
             trainer_Message_Next_btn.UseVisualStyleBackColor = false;
+            trainer_Message_Next_btn.Click += trainer_Message_Next_btn_Click;
             // 
             // trainer_EditMessage_btn
             // 

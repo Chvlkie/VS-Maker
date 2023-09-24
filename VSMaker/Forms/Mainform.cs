@@ -49,8 +49,8 @@ namespace VSMaker
 
         private bool unsavedChanges;
 
-        private string[] displayTrainerMessage = Array.Empty<string>();
-
+        private List<string> displayTrainerMessage = new();
+        private int currentTrainerMessageIndex = 0;
         private int selectedTrainerClassIndex = -1;
 
         #endregion Editor Data
@@ -584,9 +584,11 @@ namespace VSMaker
 
         private void trainer_Class_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            selectedTrainer.TrainerClassId = trainer_Class_comboBox.SelectedIndex + 2;
-            selectedTrainer.TrainerSpriteFrames = LoadTrainerClassPic(selectedTrainer.TrainerClassId);
+            int trainerId = trainer_Class_comboBox.SelectedIndex + 2;
+            selectedTrainer.TrainerSpriteFrames = LoadTrainerClassPic(trainerId);
             UpdateTrainerClassPic(trainerPicBox);
+            trainer_frames_num.Maximum = selectedTrainer.TrainerSpriteFrames;
+            trainer_frames_num.Enabled = selectedTrainer.TrainerSpriteFrames > 0;
         }
 
         #endregion Trainer Editor
@@ -749,6 +751,7 @@ namespace VSMaker
             trainer_Message.Text = string.Empty;
             trainer_Class_comboBox.Items.Clear();
             trainer_MessageTrigger_list.Items.Clear();
+
             var comboBoxes = new List<ComboBox>
             {
                 trainer_Poke1_comboBox,
@@ -759,14 +762,12 @@ namespace VSMaker
                 trainer_Poke6_comboBox
             };
 
-            foreach (var item in comboBoxes)
-            {
-                item.Items.Clear();
-                item.SelectedIndex = -1;
-            }
-
             selectedTrainer = trainers.Single(x => x.TrainerId == trainerId);
-            selectedTrainer.TrainerMessages = trainerMessages.Where(x => x.TrainerId == selectedTrainer.TrainerId).OrderBy(x => x.MessageTriggerId).ToList();
+            //Setup Trainer Class Pic
+            selectedTrainer.TrainerSpriteFrames = LoadTrainerClassPic(selectedTrainer.TrainerClassId);
+            UpdateTrainerClassPic(trainerPicBox);
+            trainer_frames_num.Maximum = selectedTrainer.TrainerSpriteFrames;
+            trainer_frames_num.Enabled = selectedTrainer.TrainerSpriteFrames > 0; selectedTrainer.TrainerMessages = trainerMessages.Where(x => x.TrainerId == selectedTrainer.TrainerId).OrderBy(x => x.MessageTriggerId).ToList();
             selectedTrainer.Pokemon = new List<Pokemon>();
 
             int currentIndex = trainerId;
@@ -798,14 +799,8 @@ namespace VSMaker
                 trainer_Class_comboBox.SelectedIndex = selectedTrainer.TrainerClassId - 2;
             }
 
-            //Setup Trainer Class Pic
-            selectedTrainer.TrainerSpriteFrames = LoadTrainerClassPic(selectedTrainer.TrainerClassId);
-            trainer_frames_num.Enabled = selectedTrainer.TrainerSpriteFrames > 0;
-            trainer_frames_num.Maximum = selectedTrainer.TrainerSpriteFrames;
-            UpdateTrainerClassPic(trainerPicBox);
-
             //Setup Trainer Messages
-            displayTrainerMessage = Array.Empty<string>();
+            displayTrainerMessage = new List<string>();
 
             foreach (var item in selectedTrainer.TrainerMessages)
             {
@@ -821,16 +816,12 @@ namespace VSMaker
             {
                 trainer_MessageTrigger_list.Enabled = false;
             }
+            currentTrainerMessageIndex = 0;
+            trainer_Message_Next_btn.Enabled = displayTrainerMessage.Count > 1;
 
             // Setup Trainer Pokemon
             trainer_Double_checkBox.Enabled = true;
             trainer_NumPoke_num.Enabled = true;
-            pokemons.ForEach(x => trainer_Poke1_comboBox.Items.Add(x.PokemonName));
-            pokemons.ForEach(x => trainer_Poke2_comboBox.Items.Add(x.PokemonName));
-            pokemons.ForEach(x => trainer_Poke3_comboBox.Items.Add(x.PokemonName));
-            pokemons.ForEach(x => trainer_Poke4_comboBox.Items.Add(x.PokemonName));
-            pokemons.ForEach(x => trainer_Poke5_comboBox.Items.Add(x.PokemonName));
-            pokemons.ForEach(x => trainer_Poke6_comboBox.Items.Add(x.PokemonName));
 
             for (int i = 0; i < 6; i++)
             {
@@ -850,7 +841,7 @@ namespace VSMaker
                 }
             }
 
-            if (selectedTrainer.Pokemon.Count is > 0)
+            if (selectedTrainer.Pokemon.Count() > 0)
             {
                 trainer_NumPoke_num.Minimum = 1;
             }
@@ -863,6 +854,7 @@ namespace VSMaker
                 undoTrainer_btn.Enabled = true;
             }
             trainer_NumPoke_num.Value = selectedTrainer.Pokemon.Count;
+            EnablePokemon();
         }
 
         private void GetItems()
@@ -910,6 +902,28 @@ namespace VSMaker
 
                 pokemons.Add(pokemon);
             }
+
+            var comboBoxes = new List<ComboBox>
+            {
+                trainer_Poke1_comboBox,
+                trainer_Poke2_comboBox,
+                trainer_Poke3_comboBox,
+                trainer_Poke4_comboBox,
+                trainer_Poke5_comboBox,
+                trainer_Poke6_comboBox
+            };
+
+            foreach (var item in comboBoxes)
+            {
+                item.Items.Clear();
+            }
+
+            pokemons.ForEach(x => trainer_Poke1_comboBox.Items.Add(x.PokemonName));
+            pokemons.ForEach(x => trainer_Poke2_comboBox.Items.Add(x.PokemonName));
+            pokemons.ForEach(x => trainer_Poke3_comboBox.Items.Add(x.PokemonName));
+            pokemons.ForEach(x => trainer_Poke4_comboBox.Items.Add(x.PokemonName));
+            pokemons.ForEach(x => trainer_Poke5_comboBox.Items.Add(x.PokemonName));
+            pokemons.ForEach(x => trainer_Poke6_comboBox.Items.Add(x.PokemonName));
         }
 
         private (int abi1, int abi2)[] GetPokemonAbilities(int numberOfPokemon)
@@ -1159,7 +1173,7 @@ namespace VSMaker
 
         private void OpenTextEditor(int trainerMessageId, string messageText)
         {
-            textEditor = new TextEditor(trainerMessageId, messageText);
+            textEditor = new TextEditor(trainerMessageId, messageText, vsMakerFont);
             textEditor.Show();
         }
 
@@ -1242,6 +1256,8 @@ namespace VSMaker
 
         private void trainer_MessageTrigger_list_SelectedIndexChanged(object sender, EventArgs e)
         {
+            currentTrainerMessageIndex = 0;
+            displayTrainerMessage = new List<string>();
             if (trainer_MessageTrigger_list.SelectedIndex > -1)
             {
                 trainer_EditMessage_btn.Enabled = true;
@@ -1252,9 +1268,20 @@ namespace VSMaker
                 string trainerText = selectedTrainer.TrainerMessages.Single(x => x.MessageTriggerId == messageTriggerId).MessageText;
 
                 trainerText = trainerText.Replace("\\n", Environment.NewLine);
-                displayTrainerMessage = trainerText.Split(new string[] { seperator1, seperator2 }, StringSplitOptions.None);
+                var messageArray = trainerText.Split(new string[] { seperator1, seperator2 }, StringSplitOptions.None);
+                foreach (var item in messageArray)
+                {
+                    displayTrainerMessage.Add(item);
+                }
+                // Remove last item if blank line - is the case as trainer text formatted as ending with \n.
+                if (string.IsNullOrEmpty(displayTrainerMessage.Last()))
+                {
+                    displayTrainerMessage.Remove(displayTrainerMessage.Last());
+                }
                 trainer_Message.Font = new Font(vsMakerFont.VsMakerFontCollection.Families[0], trainer_Message.Font.Size);
                 trainer_Message.Text = displayTrainerMessage[0];
+                trainer_Message_Next_btn.Enabled = displayTrainerMessage.Count() > 1;
+                trainer_Message_Back_btn.Enabled = false;
             }
             else
             {
@@ -1382,6 +1409,39 @@ namespace VSMaker
         private void trainer_frames_num_ValueChanged(object sender, EventArgs e)
         {
             UpdateTrainerClassPic(trainerPicBox, (int)((NumericUpDown)sender).Value);
+        }
+
+        private void trainer_Message_Next_btn_Click(object sender, EventArgs e)
+        {
+            currentTrainerMessageIndex++;
+            trainer_Message_Back_btn.Enabled = currentTrainerMessageIndex > 0;
+            trainer_Message_Next_btn.Enabled = currentTrainerMessageIndex < displayTrainerMessage.Count() - 1;
+
+            if (currentTrainerMessageIndex < displayTrainerMessage.Count())
+            {
+                trainer_Message.Text = displayTrainerMessage[currentTrainerMessageIndex];
+
+            }
+            else
+            {
+                currentTrainerMessageIndex--;
+            }
+        }
+
+        private void trainer_Message_Back_btn_Click(object sender, EventArgs e)
+        {
+            currentTrainerMessageIndex--;
+            trainer_Message_Back_btn.Enabled = currentTrainerMessageIndex > 0;
+            trainer_Message_Next_btn.Enabled = currentTrainerMessageIndex >= 0;
+
+            if (currentTrainerMessageIndex >= 0)
+            {
+                trainer_Message.Text = displayTrainerMessage[currentTrainerMessageIndex];
+            }
+            else
+            {
+                currentTrainerMessageIndex++;
+            }
         }
     }
 }
