@@ -2,7 +2,6 @@ using Ekona.Images;
 using Images;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Diagnostics;
-using System.Windows.Interop;
 using VSMaker.CommonFunctions;
 using VSMaker.Data;
 using VSMaker.Fonts;
@@ -736,23 +735,13 @@ namespace VSMaker
 
             statusLabelMessage("Getting Trainer Classes...");
             Update();
-            StartPopulateTrainerClasses();
-        }
-
-        private async void StartPopulateTrainerClasses()
-        {
-            await Task.Run(() => PopulateTrainerClasses());
-        }
-
-        private Task PopulateTrainerClasses()
-        {
             string[] classNames = GetTrainerClassNames();
 
             if (classNames.Length > byte.MaxValue + 1)
             {
                 MessageBox.Show("There can't be more than 256 trainer classes! [Found " + classNames.Length + "].\nAborting.",
                     "Too many trainer classes", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return Task.CompletedTask;
+                return;
             }
 
             for (int i = 0; i < classNames.Length; i++)
@@ -767,9 +756,8 @@ namespace VSMaker
                 item.UsedByTrainers.AddRange(trainers.Where(x => x.TrainerClassId == item.TrainerClassId));
                 trainerClasses.Add(item);
             }
-
-            return Task.CompletedTask;
         }
+
         /// <summary>
         /// Get Trainer Class Info for given trainerClassId.
         /// </summary>
@@ -938,7 +926,27 @@ namespace VSMaker
             Update();
             pokemons = new List<Pokemon>();
 
-            StartGetPokemonData();
+            int numberOfPokemon = Directory.GetFiles(gameDirs[DirNames.speciesData].unpackedDir, "*").Length;
+            pokemonSpecies = new SpeciesFile[numberOfPokemon];
+
+            for (int i = 0; i < numberOfPokemon; i++)
+            {
+                pokemonSpecies[i] = new SpeciesFile(new FileStream(gameDirs[DirNames.speciesData].unpackedDir + "\\" + i.ToString("D4"), FileMode.Open));
+            }
+
+            pokeNames = GetPokemonNames();
+            pokemonSpeciesAbilities = GetPokemonAbilities(numberOfPokemon);
+
+            for (int i = 0; i < pokeNames.Length; i++)
+            {
+                var pokemon = new Pokemon
+                {
+                    PokemonId = i,
+                    PokemonName = pokeNames[i]
+                };
+
+                pokemons.Add(pokemon);
+            }
 
             var comboBoxes = new List<ComboBox>
             {
@@ -962,36 +970,8 @@ namespace VSMaker
             pokemons.ForEach(x => trainer_Poke5_comboBox.Items.Add(x.PokemonName));
             pokemons.ForEach(x => trainer_Poke6_comboBox.Items.Add(x.PokemonName));
         }
-        private async void StartGetPokemonData()
-        {
-            await Task.Run(() => PopulatePokemonData());
-        }
 
-        private Task PopulatePokemonData()
-        {
-            int numberOfPokemon = Directory.GetFiles(gameDirs[DirNames.speciesData].unpackedDir, "*").Length;
-            pokemonSpecies = new SpeciesFile[numberOfPokemon];
 
-            for (int i = 0; i < numberOfPokemon; i++)
-            {
-                pokemonSpecies[i] = new SpeciesFile(new FileStream(gameDirs[DirNames.speciesData].unpackedDir + "\\" + i.ToString("D4"), FileMode.Open));
-            }
-
-            pokeNames = GetPokemonNames();
-            pokemonSpeciesAbilities = GetPokemonAbilities(numberOfPokemon);
-
-            for (int i = 0; i < pokeNames.Length; i++)
-            {
-                var pokemon = new Pokemon
-                {
-                    PokemonId = i,
-                    PokemonName = pokeNames[i]
-                };
-
-                pokemons.Add(pokemon);
-            }
-            return Task.CompletedTask;
-        }
 
         private (int abi1, int abi2)[] GetPokemonAbilities(int numberOfPokemon)
         {
@@ -1012,7 +992,6 @@ namespace VSMaker
             trainerMessages = new List<TrainerMessage>();
             statusLabelMessage("Getting Trainer's Messages...");
             Update();
-
             var allTrainerMessages = RomInfo.GetTrainerMessages();
             for (uint i = 0; i < allTrainerMessages.Length; i++)
             {
@@ -1064,7 +1043,6 @@ namespace VSMaker
                 trainers.Add(item);
             }
         }
-
         #endregion Get
 
         #region TrainerSprite
