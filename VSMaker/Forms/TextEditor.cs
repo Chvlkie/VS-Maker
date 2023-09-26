@@ -41,7 +41,7 @@ namespace VSMaker.Forms
         {
             foreach (var item in displayTrainerMessage)
             {
-                textEditor_pages.Tab
+                
             }
         }
 

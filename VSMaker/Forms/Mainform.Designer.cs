@@ -34,6 +34,7 @@ namespace VSMaker
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Mainform));
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             main_toolstrip = new MenuStrip();
             mainToolStrip_file = new ToolStripMenuItem();
             openRom_toolstrip = new ToolStripMenuItem();
@@ -153,10 +154,6 @@ namespace VSMaker
             panel15 = new Panel();
             trainerTextTable_help_label = new Label();
             trainerTextTable_dataGrid = new DataGridView();
-            MessageId = new DataGridViewTextBoxColumn();
-            TrainerId = new DataGridViewComboBoxColumn();
-            MessageTriggerId = new DataGridViewComboBoxColumn();
-            Message = new DataGridViewTextBoxColumn();
             toolStrip1 = new ToolStrip();
             toolStripButton3 = new ToolStripButton();
             trainreText_Import_btn = new ToolStripButton();
@@ -193,6 +190,10 @@ namespace VSMaker
             saveFileDialog1 = new SaveFileDialog();
             trainerMessageBindingSource1 = new BindingSource(components);
             trainerMessageBindingSource3 = new BindingSource(components);
+            MessageId = new DataGridViewTextBoxColumn();
+            TrainerId = new DataGridViewComboBoxColumn();
+            MessageTriggerId = new DataGridViewComboBoxColumn();
+            Message = new DataGridViewTextBoxColumn();
             main_toolstrip.SuspendLayout();
             statusStrip1.SuspendLayout();
             mainContent.SuspendLayout();
@@ -870,11 +871,11 @@ namespace VSMaker
             // trainer_Message
             // 
             trainer_Message.AutoSize = true;
-            trainer_Message.Font = new Font("Arial Narrow", 18F, FontStyle.Regular, GraphicsUnit.Point);
+            trainer_Message.Font = new Font("Microsoft Sans Serif", 18F, FontStyle.Regular, GraphicsUnit.Point);
             trainer_Message.ImageAlign = ContentAlignment.MiddleLeft;
             trainer_Message.Location = new Point(24, 18);
             trainer_Message.Name = "trainer_Message";
-            trainer_Message.Size = new Size(203, 34);
+            trainer_Message.Size = new Size(246, 34);
             trainer_Message.TabIndex = 46;
             trainer_Message.Text = "TRAINER MESSAGE";
             trainer_Message.UseCompatibleTextRendering = true;
@@ -1617,46 +1618,6 @@ namespace VSMaker
             trainerTextTable_dataGrid.CellClick += trainerTextTable_dataGrid_CellClick;
             trainerTextTable_dataGrid.CellContentDoubleClick += trainerTextTable_dataGrid_TextDblClick;
             // 
-            // MessageId
-            // 
-            MessageId.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            MessageId.FillWeight = 30F;
-            MessageId.Frozen = true;
-            MessageId.HeaderText = "Message #";
-            MessageId.Name = "MessageId";
-            MessageId.ReadOnly = true;
-            MessageId.Width = 86;
-            // 
-            // TrainerId
-            // 
-            TrainerId.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            TrainerId.FillWeight = 50F;
-            TrainerId.Frozen = true;
-            TrainerId.HeaderText = "Trainer";
-            TrainerId.Name = "TrainerId";
-            TrainerId.Resizable = DataGridViewTriState.True;
-            TrainerId.SortMode = DataGridViewColumnSortMode.Automatic;
-            TrainerId.Width = 144;
-            // 
-            // MessageTriggerId
-            // 
-            MessageTriggerId.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            MessageTriggerId.FillWeight = 60F;
-            MessageTriggerId.Frozen = true;
-            MessageTriggerId.HeaderText = "Message Trigger";
-            MessageTriggerId.Name = "MessageTriggerId";
-            MessageTriggerId.Resizable = DataGridViewTriState.True;
-            MessageTriggerId.SortMode = DataGridViewColumnSortMode.Automatic;
-            MessageTriggerId.Width = 216;
-            // 
-            // Message
-            // 
-            Message.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            Message.HeaderText = "Text";
-            Message.Name = "Message";
-            Message.ReadOnly = true;
-            Message.Width = 287;
-            // 
             // toolStrip1
             // 
             toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripButton3, trainreText_Import_btn, trainerText_Export_btn, toolStripSeparator3, trainerTextTable_addRow_btn, trainerTextTable_delRow_btn, toolStripSeparator4 });
@@ -1946,6 +1907,48 @@ namespace VSMaker
             panel2.Size = new Size(784, 490);
             panel2.TabIndex = 5;
             // 
+            // MessageId
+            // 
+            MessageId.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            MessageId.FillWeight = 30F;
+            MessageId.Frozen = true;
+            MessageId.HeaderText = "Message #";
+            MessageId.Name = "MessageId";
+            MessageId.ReadOnly = true;
+            MessageId.Width = 86;
+            // 
+            // TrainerId
+            // 
+            TrainerId.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            TrainerId.FillWeight = 50F;
+            TrainerId.Frozen = true;
+            TrainerId.HeaderText = "Trainer";
+            TrainerId.Name = "TrainerId";
+            TrainerId.Resizable = DataGridViewTriState.True;
+            TrainerId.SortMode = DataGridViewColumnSortMode.Automatic;
+            TrainerId.Width = 144;
+            // 
+            // MessageTriggerId
+            // 
+            MessageTriggerId.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            MessageTriggerId.FillWeight = 60F;
+            MessageTriggerId.Frozen = true;
+            MessageTriggerId.HeaderText = "Message Trigger";
+            MessageTriggerId.Name = "MessageTriggerId";
+            MessageTriggerId.Resizable = DataGridViewTriState.True;
+            MessageTriggerId.SortMode = DataGridViewColumnSortMode.Automatic;
+            MessageTriggerId.Width = 216;
+            // 
+            // Message
+            // 
+            Message.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+            Message.DefaultCellStyle = dataGridViewCellStyle1;
+            Message.HeaderText = "Text";
+            Message.Name = "Message";
+            Message.ReadOnly = true;
+            Message.Width = 287;
+            // 
             // Mainform
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -2161,10 +2164,6 @@ namespace VSMaker
         private ToolStripButton trainerTextTable_delRow_btn;
         private ToolStripSeparator toolStripSeparator4;
         private Panel panel15;
-        private DataGridViewTextBoxColumn MessageId;
-        private DataGridViewComboBoxColumn TrainerId;
-        private DataGridViewComboBoxColumn MessageTriggerId;
-        private DataGridViewTextBoxColumn Message;
         private Panel panel18;
         private TabPage trainerEditor_Pokemon;
         private Panel panel10;
@@ -2199,5 +2198,9 @@ namespace VSMaker
         private Label trainer_Message;
         private ComboBox trainer_MessageTrigger_list;
         private Label trainerTextTable_help_label;
+        private DataGridViewTextBoxColumn MessageId;
+        private DataGridViewComboBoxColumn TrainerId;
+        private DataGridViewComboBoxColumn MessageTriggerId;
+        private DataGridViewTextBoxColumn Message;
     }
 }

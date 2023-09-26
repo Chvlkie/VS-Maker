@@ -2,6 +2,7 @@ using Ekona.Images;
 using Images;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Diagnostics;
+using System.Windows.Interop;
 using VSMaker.CommonFunctions;
 using VSMaker.Data;
 using VSMaker.Fonts;
@@ -372,6 +373,8 @@ namespace VSMaker
 
         private void statusLabelError(string errorMsg, bool severe = true)
         {
+            SafeWriteLabel(statusLabel, errorMsg, new Font(statusLabel.Font, FontStyle.Bold), severe ? Color.Red : Color.DarkOrange);
+
             statusLabel.Text = errorMsg;
             statusLabel.Font = new Font(statusLabel.Font, FontStyle.Bold);
             statusLabel.ForeColor = severe ? Color.Red : Color.DarkOrange;
@@ -380,10 +383,28 @@ namespace VSMaker
 
         private void statusLabelMessage(string msg = "Ready")
         {
-            statusLabel.Text = msg;
-            statusLabel.Font = new Font(statusLabel.Font, FontStyle.Regular);
-            statusLabel.ForeColor = Color.Black;
-            statusLabel.Invalidate();
+            SafeWriteLabel(statusLabel, msg, new Font(statusLabel.Font, FontStyle.Regular), Color.Black);
+        }
+
+        private void SafeWriteLabel(ToolStripStatusLabel label, string text, Font font, Color color)
+        {
+            if (label.GetCurrentParent().InvokeRequired)
+            {
+                label.GetCurrentParent().Invoke((MethodInvoker)delegate
+                {
+                    label.Text = text;
+                    label.Font = font;
+                    label.ForeColor = color;
+                    label.Invalidate();
+                });
+            }
+            else
+            {
+                label.Text = text;
+                label.Font = font;
+                label.ForeColor = color;
+                label.Invalidate();
+            }
         }
 
         #endregion Main Editor
@@ -628,14 +649,38 @@ namespace VSMaker
 
         private void GetData()
         {
-            GetTrainers();
-            GetTrainerClasses();
-            GetMessageTriggers();
-            GetTrainerMessages();
-            GetItems();
-            GetMoves();
-            GetAbilities();
-            GetPokemon();
+            if (trainers.Count == 0)
+            {
+                GetTrainers();
+            }
+            if (trainerClasses.Count == 0)
+            {
+                GetTrainerClasses();
+            }
+            if (messageTriggers.Count == 0)
+            {
+                GetMessageTriggers();
+            }
+            if (trainerMessages.Count == 0)
+            {
+                GetTrainerMessages();
+            }
+            if (itemNames.Count() == 0)
+            {
+                GetItems();
+            }
+            if (moveNames.Count() == 0)
+            {
+                GetMoves();
+            }
+            if (abilityNames.Count() == 0)
+            {
+                GetAbilities();
+            }
+            if (pokemons.Count() == 0)
+            {
+                GetPokemon();
+            }
         }
 
         private MessageTrigger GetMessageTriggerDetails(MessageTriggerEnum messageTrigger)
@@ -1186,10 +1231,23 @@ namespace VSMaker
         {
             statusLabelMessage("Setting up Trainer Text Table Editor...");
             Update();
-            if (trainerTextTable_dataGrid.RowCount == 0)
+            trainerTextTable_dataGrid.SuspendLayout();
+            StartGetTrainerTextData();
+            trainerTextTable_dataGrid.ResumeLayout();
+        }
+
+        private async void StartGetTrainerTextData()
+        {
+            trainerTextTable_dataGrid.AllowUserToAddRows = true;
+            await Task.Run(() => GetTrainerTextTableData());
+            trainerTextTable_dataGrid.AllowUserToAddRows = false;
+        }
+
+        private Task GetTrainerTextTableData()
+        {
+            if (trainerTextTable_dataGrid.RowCount == 1)
             {
                 statusLabelMessage("Reading Trainer Text Table");
-                Update();
                 string[] currentTrainers = new string[trainers.Count];
                 string[] currentMessageTriggers = new string[messageTriggers.Count];
 
@@ -1207,21 +1265,32 @@ namespace VSMaker
                 {
                     int trainerIndex = trainerMessages[i].TrainerId;
                     int messageTriggerIndex = messageTriggers.FindIndex(x => x.MessageTriggerId == trainerMessages[i].MessageTriggerId);
-                    trainerTextTable_dataGrid.Rows.Add(i, null, null, trainerMessages[i].MessageText);
 
-                    DataGridViewComboBoxCell trainerCell =
-    (DataGridViewComboBoxCell)(trainerTextTable_dataGrid.Rows[i].Cells[1]);
-                    trainerCell.DataSource = currentTrainers;
-                    trainerCell.Value = trainerCell.Items[trainerIndex];
-
-                    DataGridViewComboBoxCell triggerCell =
-   (DataGridViewComboBoxCell)(trainerTextTable_dataGrid.Rows[i].Cells[2]);
-                    triggerCell.DataSource = currentMessageTriggers;
-                    triggerCell.Value = triggerCell.Items[messageTriggerIndex];
+                    DataGridViewRow row = (DataGridViewRow)trainerTextTable_dataGrid.Rows[0].Clone();
+                    row.Cells[0].Value = i;
+                    row.Cells[1] = new DataGridViewComboBoxCell { DataSource = currentTrainers, Value = currentTrainers[trainerIndex] };
+                    row.Cells[2] = new DataGridViewComboBoxCell { DataSource = currentMessageTriggers, Value = currentMessageTriggers[messageTriggerIndex] }; ;
+                    row.Cells[3].Value = trainerMessages[i].MessageText;
+                    ThreadSafeDataTable(row);
                 }
             }
             statusLabelMessage();
-            Update();
+            return Task.CompletedTask;
+        }
+
+        private void ThreadSafeDataTable(DataGridViewRow row)
+        {
+            if (trainerTextTable_dataGrid.InvokeRequired)
+            {
+                trainerTextTable_dataGrid.Invoke((MethodInvoker)delegate
+                {
+                    trainerTextTable_dataGrid.Rows.Add(row);
+                });
+            }
+            else
+            {
+                trainerTextTable_dataGrid.Rows.Add(row);
+            }
         }
 
         private void trainer_Double_checkBox_CheckedChanged(object sender, EventArgs e)
@@ -1420,7 +1489,6 @@ namespace VSMaker
             if (currentTrainerMessageIndex < displayTrainerMessage.Count())
             {
                 trainer_Message.Text = displayTrainerMessage[currentTrainerMessageIndex];
-
             }
             else
             {
