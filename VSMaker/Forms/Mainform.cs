@@ -971,8 +971,6 @@ namespace VSMaker
             pokemons.ForEach(x => trainer_Poke6_comboBox.Items.Add(x.PokemonName));
         }
 
-
-
         private (int abi1, int abi2)[] GetPokemonAbilities(int numberOfPokemon)
         {
             statusLabelMessage("Getting Trainer's Pokemon Abilities...");
@@ -1021,13 +1019,6 @@ namespace VSMaker
             Update();
             string[] trainerNames = GetSimpleTrainerNames();
 
-            //if (classNames.Length > byte.MaxValue + 1)
-            //{
-            //    MessageBox.Show("There can't be more than 256 trainer classes! [Found " + classNames.Length + "].\nAborting.",
-            //        "Too many trainer classes", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //    return;
-            //}
-
             for (int i = 0; i < trainerNames.Length; i++)
             {
                 string suffix = "\\" + i.ToString("D4");
@@ -1043,6 +1034,7 @@ namespace VSMaker
                 trainers.Add(item);
             }
         }
+
         #endregion Get
 
         #region TrainerSprite
@@ -1319,8 +1311,22 @@ namespace VSMaker
             mainContent.SelectedTab = mainContent_trainerClass;
         }
 
-        private void trainer_Message_TextChanged(object sender, EventArgs e)
+        private static string ReadLine(string text, int lineNumber)
         {
+            var reader = new StringReader(text);
+
+            string line;
+            int currentLineNumber = 0;
+
+            do
+            {
+                currentLineNumber += 1;
+                line = reader.ReadLine();
+            }
+            while (line != null && currentLineNumber < lineNumber);
+
+            return (currentLineNumber == lineNumber) ? line :
+                                                       string.Empty;
         }
 
         private void trainer_MessageTrigger_list_SelectedIndexChanged(object sender, EventArgs e)
@@ -1331,16 +1337,29 @@ namespace VSMaker
             {
                 trainer_EditMessage_btn.Enabled = true;
                 const string seperator1 = @"\r";
-                const string seperator2 = @"\f";
                 string selectedMessageTriggerName = trainer_MessageTrigger_list.SelectedItem.ToString();
                 int messageTriggerId = messageTriggers.Find(x => x.MessageTriggerName == selectedMessageTriggerName).MessageTriggerId;
                 string trainerText = selectedTrainer.TrainerMessages.Single(x => x.MessageTriggerId == messageTriggerId).MessageText;
 
+               
                 trainerText = trainerText.Replace("\\n", Environment.NewLine);
-                var messageArray = trainerText.Split(new string[] { seperator1, seperator2 }, StringSplitOptions.None);
+                trainerText = trainerText.Replace("\\f", Environment.NewLine);
+                var messageArray = trainerText.Split(new string[] { seperator1 }, StringSplitOptions.None);
                 foreach (var item in messageArray)
                 {
-                    displayTrainerMessage.Add(item);
+                    int numLines = item.Split('\n').Length;
+                    if (numLines == 3 && !string.IsNullOrEmpty(ReadLine(item, 3)))
+                    {
+                        string text1 = ReadLine(item, 1) + Environment.NewLine + ReadLine(item, 2);
+                        string text2 = ReadLine(item, 2) + Environment.NewLine + ReadLine(item, 3);
+
+                        displayTrainerMessage.Add(text1);
+                        displayTrainerMessage.Add(text2);
+                    }
+                    else
+                    {
+                        displayTrainerMessage.Add(item);
+                    }
                 }
                 // Remove last item if blank line - is the case as trainer text formatted as ending with \n.
                 if (string.IsNullOrEmpty(displayTrainerMessage.Last()))
@@ -1510,6 +1529,14 @@ namespace VSMaker
             {
                 currentTrainerMessageIndex++;
             }
+        }
+
+        private void trainer_EditMessage_btn_Click(object sender, EventArgs e)
+        {
+            string selectedMessageTriggerName = trainer_MessageTrigger_list.SelectedItem.ToString();
+            int messageTriggerId = messageTriggers.Find(x => x.MessageTriggerName == selectedMessageTriggerName).MessageTriggerId;
+            string trainerText = selectedTrainer.TrainerMessages.Single(x => x.MessageTriggerId == messageTriggerId).MessageText;
+            OpenTextEditor(selectedTrainer.TrainerId, trainerText);
         }
     }
 }

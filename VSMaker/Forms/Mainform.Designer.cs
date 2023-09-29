@@ -33,8 +33,8 @@ namespace VSMaker
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Mainform));
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Mainform));
             main_toolstrip = new MenuStrip();
             mainToolStrip_file = new ToolStripMenuItem();
             openRom_toolstrip = new ToolStripMenuItem();
@@ -154,6 +154,10 @@ namespace VSMaker
             panel15 = new Panel();
             trainerTextTable_help_label = new Label();
             trainerTextTable_dataGrid = new DataGridView();
+            MessageId = new DataGridViewTextBoxColumn();
+            TrainerId = new DataGridViewComboBoxColumn();
+            MessageTriggerId = new DataGridViewComboBoxColumn();
+            Message = new DataGridViewTextBoxColumn();
             toolStrip1 = new ToolStrip();
             toolStripButton3 = new ToolStripButton();
             trainreText_Import_btn = new ToolStripButton();
@@ -190,10 +194,7 @@ namespace VSMaker
             saveFileDialog1 = new SaveFileDialog();
             trainerMessageBindingSource1 = new BindingSource(components);
             trainerMessageBindingSource3 = new BindingSource(components);
-            MessageId = new DataGridViewTextBoxColumn();
-            TrainerId = new DataGridViewComboBoxColumn();
-            MessageTriggerId = new DataGridViewComboBoxColumn();
-            Message = new DataGridViewTextBoxColumn();
+            trainerText_sort = new ToolStripButton();
             main_toolstrip.SuspendLayout();
             statusStrip1.SuspendLayout();
             mainContent.SuspendLayout();
@@ -921,6 +922,7 @@ namespace VSMaker
             trainer_EditMessage_btn.Text = "Edit Text";
             trainer_EditMessage_btn.TextImageRelation = TextImageRelation.ImageBeforeText;
             trainer_EditMessage_btn.UseVisualStyleBackColor = true;
+            trainer_EditMessage_btn.Click += trainer_EditMessage_btn_Click;
             // 
             // label6
             // 
@@ -1618,9 +1620,51 @@ namespace VSMaker
             trainerTextTable_dataGrid.CellClick += trainerTextTable_dataGrid_CellClick;
             trainerTextTable_dataGrid.CellContentDoubleClick += trainerTextTable_dataGrid_TextDblClick;
             // 
+            // MessageId
+            // 
+            MessageId.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            MessageId.FillWeight = 30F;
+            MessageId.Frozen = true;
+            MessageId.HeaderText = "Message #";
+            MessageId.Name = "MessageId";
+            MessageId.ReadOnly = true;
+            MessageId.Width = 86;
+            // 
+            // TrainerId
+            // 
+            TrainerId.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            TrainerId.FillWeight = 50F;
+            TrainerId.Frozen = true;
+            TrainerId.HeaderText = "Trainer";
+            TrainerId.Name = "TrainerId";
+            TrainerId.Resizable = DataGridViewTriState.True;
+            TrainerId.SortMode = DataGridViewColumnSortMode.Automatic;
+            TrainerId.Width = 144;
+            // 
+            // MessageTriggerId
+            // 
+            MessageTriggerId.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            MessageTriggerId.FillWeight = 60F;
+            MessageTriggerId.Frozen = true;
+            MessageTriggerId.HeaderText = "Message Trigger";
+            MessageTriggerId.Name = "MessageTriggerId";
+            MessageTriggerId.Resizable = DataGridViewTriState.True;
+            MessageTriggerId.SortMode = DataGridViewColumnSortMode.Automatic;
+            MessageTriggerId.Width = 216;
+            // 
+            // Message
+            // 
+            Message.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+            Message.DefaultCellStyle = dataGridViewCellStyle1;
+            Message.HeaderText = "Text";
+            Message.Name = "Message";
+            Message.ReadOnly = true;
+            Message.Width = 287;
+            // 
             // toolStrip1
             // 
-            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripButton3, trainreText_Import_btn, trainerText_Export_btn, toolStripSeparator3, trainerTextTable_addRow_btn, trainerTextTable_delRow_btn, toolStripSeparator4 });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripButton3, trainreText_Import_btn, trainerText_Export_btn, toolStripSeparator3, trainerTextTable_addRow_btn, trainerTextTable_delRow_btn, toolStripSeparator4, trainerText_sort });
             toolStrip1.Location = new Point(0, 0);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.Size = new Size(776, 25);
@@ -1660,7 +1704,7 @@ namespace VSMaker
             // 
             // trainerTextTable_addRow_btn
             // 
-            trainerTextTable_addRow_btn.Image = (Image)resources.GetObject("trainerTextTable_addRow_btn.Image");
+            trainerTextTable_addRow_btn.Image = Properties.Resources.plusIconSm;
             trainerTextTable_addRow_btn.ImageTransparentColor = Color.Magenta;
             trainerTextTable_addRow_btn.Name = "trainerTextTable_addRow_btn";
             trainerTextTable_addRow_btn.Size = new Size(106, 22);
@@ -1668,7 +1712,7 @@ namespace VSMaker
             // 
             // trainerTextTable_delRow_btn
             // 
-            trainerTextTable_delRow_btn.Image = (Image)resources.GetObject("trainerTextTable_delRow_btn.Image");
+            trainerTextTable_delRow_btn.Image = Properties.Resources.minusIconSm;
             trainerTextTable_delRow_btn.ImageTransparentColor = Color.Magenta;
             trainerTextTable_delRow_btn.Name = "trainerTextTable_delRow_btn";
             trainerTextTable_delRow_btn.Size = new Size(90, 22);
@@ -1907,47 +1951,14 @@ namespace VSMaker
             panel2.Size = new Size(784, 490);
             panel2.TabIndex = 5;
             // 
-            // MessageId
+            // trainerText_sort
             // 
-            MessageId.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            MessageId.FillWeight = 30F;
-            MessageId.Frozen = true;
-            MessageId.HeaderText = "Message #";
-            MessageId.Name = "MessageId";
-            MessageId.ReadOnly = true;
-            MessageId.Width = 86;
-            // 
-            // TrainerId
-            // 
-            TrainerId.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            TrainerId.FillWeight = 50F;
-            TrainerId.Frozen = true;
-            TrainerId.HeaderText = "Trainer";
-            TrainerId.Name = "TrainerId";
-            TrainerId.Resizable = DataGridViewTriState.True;
-            TrainerId.SortMode = DataGridViewColumnSortMode.Automatic;
-            TrainerId.Width = 144;
-            // 
-            // MessageTriggerId
-            // 
-            MessageTriggerId.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            MessageTriggerId.FillWeight = 60F;
-            MessageTriggerId.Frozen = true;
-            MessageTriggerId.HeaderText = "Message Trigger";
-            MessageTriggerId.Name = "MessageTriggerId";
-            MessageTriggerId.Resizable = DataGridViewTriState.True;
-            MessageTriggerId.SortMode = DataGridViewColumnSortMode.Automatic;
-            MessageTriggerId.Width = 216;
-            // 
-            // Message
-            // 
-            Message.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
-            Message.DefaultCellStyle = dataGridViewCellStyle1;
-            Message.HeaderText = "Text";
-            Message.Name = "Message";
-            Message.ReadOnly = true;
-            Message.Width = 287;
+            trainerText_sort.Image = Properties.Resources.sortIconSm;
+            trainerText_sort.ImageTransparentColor = Color.Magenta;
+            trainerText_sort.Name = "trainerText_sort";
+            trainerText_sort.Size = new Size(103, 22);
+            trainerText_sort.Text = "Sort + Repoint";
+            trainerText_sort.ToolTipText = "Arrange messages and repoint lookups";
             // 
             // Mainform
             // 
@@ -2202,5 +2213,6 @@ namespace VSMaker
         private DataGridViewComboBoxColumn TrainerId;
         private DataGridViewComboBoxColumn MessageTriggerId;
         private DataGridViewTextBoxColumn Message;
+        private ToolStripButton trainerText_sort;
     }
 }

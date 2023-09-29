@@ -93,6 +93,16 @@ namespace VSMaker.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap minusIconSm {
+            get {
+                object obj = ResourceManager.GetObject("minusIconSm", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap openFolderIcon {
             get {
                 object obj = ResourceManager.GetObject("openFolderIcon", resourceCulture);
@@ -111,12 +121,32 @@ namespace VSMaker.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap plusIconSm {
+            get {
+                object obj = ResourceManager.GetObject("plusIconSm", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
         internal static byte[] pokemon_ds_font {
             get {
                 object obj = ResourceManager.GetObject("pokemon_ds_font", resourceCulture);
                 return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap redoIconSm {
+            get {
+                object obj = ResourceManager.GetObject("redoIconSm", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
@@ -146,6 +176,16 @@ namespace VSMaker.Properties {
         internal static System.Drawing.Bitmap searchIcon {
             get {
                 object obj = ResourceManager.GetObject("searchIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap sortIconSm {
+            get {
+                object obj = ResourceManager.GetObject("sortIconSm", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

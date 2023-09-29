@@ -30,68 +30,56 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TextEditor));
             panel1 = new Panel();
-            button1 = new Button();
-            addLine_btn = new Button();
+            richTextBox1 = new RichTextBox();
+            label2 = new Label();
             panel21 = new Panel();
             trainer_Message = new Label();
             trainer_Message_Back_btn = new Button();
             trainer_Message_Next_btn = new Button();
             label1 = new Label();
-            textEditor_Save_btn = new Button();
             textEditor_Message = new RichTextBox();
             toolStrip1 = new ToolStrip();
-            toolStripButton3 = new ToolStripButton();
-            toolStripButton4 = new ToolStripButton();
-            toolStripSeparator2 = new ToolStripSeparator();
-            textEditor_editText = new RichTextBox();
-            label2 = new Label();
-            current_Page = new NumericUpDown();
-            label3 = new Label();
-            pages_Max = new Label();
+            trainerText_Undo = new ToolStripButton();
+            trainerText_redo = new ToolStripButton();
+            trainerText_save = new ToolStripButton();
             panel1.SuspendLayout();
             panel21.SuspendLayout();
             toolStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)current_Page).BeginInit();
             SuspendLayout();
             // 
             // panel1
             // 
-            panel1.Controls.Add(pages_Max);
-            panel1.Controls.Add(label3);
-            panel1.Controls.Add(current_Page);
+            panel1.Controls.Add(richTextBox1);
             panel1.Controls.Add(label2);
-            panel1.Controls.Add(textEditor_editText);
-            panel1.Controls.Add(button1);
-            panel1.Controls.Add(addLine_btn);
             panel1.Controls.Add(panel21);
             panel1.Controls.Add(label1);
-            panel1.Controls.Add(textEditor_Save_btn);
             panel1.Controls.Add(textEditor_Message);
             panel1.Controls.Add(toolStrip1);
             panel1.Dock = DockStyle.Fill;
             panel1.Location = new Point(0, 0);
             panel1.Name = "panel1";
-            panel1.Size = new Size(584, 261);
+            panel1.Size = new Size(704, 261);
             panel1.TabIndex = 0;
             // 
-            // button1
+            // richTextBox1
             // 
-            button1.Location = new Point(466, 101);
-            button1.Name = "button1";
-            button1.Size = new Size(106, 23);
-            button1.TabIndex = 55;
-            button1.Text = "Remove Page";
-            button1.UseVisualStyleBackColor = true;
+            richTextBox1.BackColor = SystemColors.Info;
+            richTextBox1.Location = new Point(466, 54);
+            richTextBox1.Name = "richTextBox1";
+            richTextBox1.ReadOnly = true;
+            richTextBox1.Size = new Size(226, 99);
+            richTextBox1.TabIndex = 53;
+            richTextBox1.Text = "Max character per line: 40\n\\n = New Line\n\\f = 3rd line\n\\r = New page\n";
             // 
-            // addLine_btn
+            // label2
             // 
-            addLine_btn.Location = new Point(466, 72);
-            addLine_btn.Name = "addLine_btn";
-            addLine_btn.Size = new Size(106, 23);
-            addLine_btn.TabIndex = 51;
-            addLine_btn.Text = "Insert Page";
-            addLine_btn.UseVisualStyleBackColor = true;
-            addLine_btn.Click += addLine_btn_Click;
+            label2.AutoSize = true;
+            label2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label2.Location = new Point(466, 35);
+            label2.Name = "label2";
+            label2.Size = new Size(36, 15);
+            label2.TabIndex = 52;
+            label2.Text = "Help:";
             // 
             // panel21
             // 
@@ -132,6 +120,7 @@
             trainer_Message_Back_btn.TabIndex = 47;
             trainer_Message_Back_btn.Text = "▲";
             trainer_Message_Back_btn.UseVisualStyleBackColor = false;
+            trainer_Message_Back_btn.Click += trainer_Message_Back_btn_Click;
             // 
             // trainer_Message_Next_btn
             // 
@@ -146,6 +135,7 @@
             trainer_Message_Next_btn.TabIndex = 48;
             trainer_Message_Next_btn.Text = "▼";
             trainer_Message_Next_btn.UseVisualStyleBackColor = false;
+            trainer_Message_Next_btn.Click += trainer_Message_Next_btn_Click;
             // 
             // label1
             // 
@@ -157,109 +147,54 @@
             label1.TabIndex = 3;
             label1.Text = "Message Text";
             // 
-            // textEditor_Save_btn
-            // 
-            textEditor_Save_btn.Image = Properties.Resources.saveIconSm;
-            textEditor_Save_btn.Location = new Point(516, 226);
-            textEditor_Save_btn.Name = "textEditor_Save_btn";
-            textEditor_Save_btn.Size = new Size(56, 23);
-            textEditor_Save_btn.TabIndex = 2;
-            textEditor_Save_btn.Text = "Save";
-            textEditor_Save_btn.TextImageRelation = TextImageRelation.ImageBeforeText;
-            textEditor_Save_btn.UseVisualStyleBackColor = true;
-            // 
             // textEditor_Message
             // 
-            textEditor_Message.Location = new Point(466, 193);
+            textEditor_Message.Location = new Point(12, 53);
             textEditor_Message.Name = "textEditor_Message";
-            textEditor_Message.Size = new Size(100, 27);
+            textEditor_Message.Size = new Size(448, 100);
             textEditor_Message.TabIndex = 1;
             textEditor_Message.Text = "";
-            textEditor_Message.Visible = false;
             textEditor_Message.TextChanged += textEditor_Message_TextChanged;
+            textEditor_Message.KeyDown += textEditor_Message_KeyDown;
             // 
             // toolStrip1
             // 
-            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripButton3, toolStripButton4, toolStripSeparator2 });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { trainerText_Undo, trainerText_redo, trainerText_save });
             toolStrip1.Location = new Point(0, 0);
             toolStrip1.Name = "toolStrip1";
-            toolStrip1.Size = new Size(584, 25);
+            toolStrip1.Size = new Size(704, 25);
             toolStrip1.TabIndex = 0;
             toolStrip1.Text = "toolStrip1";
             // 
-            // toolStripButton3
+            // trainerText_Undo
             // 
-            toolStripButton3.Image = Properties.Resources.undoIconSm;
-            toolStripButton3.ImageTransparentColor = Color.Magenta;
-            toolStripButton3.Name = "toolStripButton3";
-            toolStripButton3.Size = new Size(56, 22);
-            toolStripButton3.Text = "Undo";
+            trainerText_Undo.Image = Properties.Resources.undoIconSm;
+            trainerText_Undo.ImageTransparentColor = Color.Magenta;
+            trainerText_Undo.Name = "trainerText_Undo";
+            trainerText_Undo.Size = new Size(56, 22);
+            trainerText_Undo.Text = "Undo";
             // 
-            // toolStripButton4
+            // trainerText_redo
             // 
-            toolStripButton4.Image = (Image)resources.GetObject("toolStripButton4.Image");
-            toolStripButton4.ImageTransparentColor = Color.Magenta;
-            toolStripButton4.Name = "toolStripButton4";
-            toolStripButton4.Size = new Size(54, 22);
-            toolStripButton4.Text = "Redo";
+            trainerText_redo.Image = Properties.Resources.redoIconSm;
+            trainerText_redo.ImageTransparentColor = Color.Magenta;
+            trainerText_redo.Name = "trainerText_redo";
+            trainerText_redo.Size = new Size(54, 22);
+            trainerText_redo.Text = "Redo";
             // 
-            // toolStripSeparator2
+            // trainerText_save
             // 
-            toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new Size(6, 25);
-            // 
-            // textEditor_editText
-            // 
-            textEditor_editText.Location = new Point(12, 57);
-            textEditor_editText.Name = "textEditor_editText";
-            textEditor_editText.Size = new Size(448, 97);
-            textEditor_editText.TabIndex = 56;
-            textEditor_editText.Text = "";
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label2.Location = new Point(423, 34);
-            label2.Name = "label2";
-            label2.Size = new Size(37, 15);
-            label2.TabIndex = 57;
-            label2.Text = "Page:";
-            // 
-            // current_Page
-            // 
-            current_Page.Location = new Point(466, 32);
-            current_Page.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            current_Page.Name = "current_Page";
-            current_Page.Size = new Size(53, 23);
-            current_Page.TabIndex = 58;
-            current_Page.Value = new decimal(new int[] { 1, 0, 0, 0 });
-            // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label3.Location = new Point(525, 34);
-            label3.Name = "label3";
-            label3.Size = new Size(12, 15);
-            label3.TabIndex = 59;
-            label3.Text = "/";
-            // 
-            // pages_Max
-            // 
-            pages_Max.AutoSize = true;
-            pages_Max.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            pages_Max.Location = new Point(543, 35);
-            pages_Max.Name = "pages_Max";
-            pages_Max.Size = new Size(14, 15);
-            pages_Max.TabIndex = 60;
-            pages_Max.Text = "0";
+            trainerText_save.Image = Properties.Resources.saveIconSm;
+            trainerText_save.ImageTransparentColor = Color.Magenta;
+            trainerText_save.Name = "trainerText_save";
+            trainerText_save.Size = new Size(51, 22);
+            trainerText_save.Text = "Save";
             // 
             // TextEditor
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(584, 261);
+            ClientSize = new Size(704, 261);
             Controls.Add(panel1);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
@@ -271,7 +206,6 @@
             panel21.PerformLayout();
             toolStrip1.ResumeLayout(false);
             toolStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)current_Page).EndInit();
             ResumeLayout(false);
         }
 
@@ -281,20 +215,17 @@
         private Button textEditor_Save_btn;
         private RichTextBox textEditor_Message;
         private ToolStrip toolStrip1;
-        private ToolStripButton toolStripButton3;
-        private ToolStripButton toolStripButton4;
+        private ToolStripButton trainerText_Undo;
         private ToolStripSeparator toolStripSeparator2;
         private Label label1;
         private Panel panel21;
         private Label trainer_Message;
         private Button trainer_Message_Back_btn;
         private Button trainer_Message_Next_btn;
-        private Button addLine_btn;
-        private Button button1;
-        private Label pages_Max;
-        private Label label3;
-        private NumericUpDown current_Page;
+        private RichTextBox richTextBox1;
         private Label label2;
-        private RichTextBox textEditor_editText;
+        private ToolStripButton trainerText_redo;
+        private ToolStripButton toolStripButton1;
+        private ToolStripButton trainerText_save;
     }
 }

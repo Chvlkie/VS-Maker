@@ -27,7 +27,6 @@ namespace VSMaker.Forms
             this.vsMakerFont = vsMakerFont;
             InitializeComponent();
             UpdateMessage(messageText);
-            PopulateMessageEdit(messageText);
 
         }
 
@@ -37,17 +36,27 @@ namespace VSMaker.Forms
             UpdateTextPreview(textEditor_Message.Text);
         }
 
-        private void PopulateMessageEdit(string text)
-        {
-            foreach (var item in displayTrainerMessage)
-            {
-                
-            }
-        }
-
         private void textEditor_Message_TextChanged(object sender, EventArgs e)
         {
             UpdateTextPreview(textEditor_Message.Text);
+        }
+
+        private static string ReadLine(string text, int lineNumber)
+        {
+            var reader = new StringReader(text);
+
+            string line;
+            int currentLineNumber = 0;
+
+            do
+            {
+                currentLineNumber += 1;
+                line = reader.ReadLine();
+            }
+            while (line != null && currentLineNumber < lineNumber);
+
+            return (currentLineNumber == lineNumber) ? line :
+                                                       string.Empty;
         }
 
         private void UpdateTextPreview(string trainerText)
@@ -55,40 +64,74 @@ namespace VSMaker.Forms
             currentTrainerMessageIndex = 0;
             displayTrainerMessage = new List<string>();
             const string seperator1 = @"\r";
-            const string seperator2 = @"\f";
             trainerText = trainerText.Replace("\\n", Environment.NewLine);
-            var messageArray = trainerText.Split(new string[] { seperator1, seperator2 }, StringSplitOptions.None);
+            trainerText = trainerText.Replace("\\f", Environment.NewLine);
+            var messageArray = trainerText.Split(new string[] { seperator1 }, StringSplitOptions.None);
             foreach (var item in messageArray)
             {
-                displayTrainerMessage.Add(item);
+                int numLines = item.Split('\n').Length;
+                if (numLines == 3 && !string.IsNullOrEmpty(ReadLine(item, 3)))
+                {
+                    string text1 = ReadLine(item, 1) + Environment.NewLine + ReadLine(item, 2);
+                    string text2 = ReadLine(item, 2) + Environment.NewLine + ReadLine(item, 3);
+
+                    displayTrainerMessage.Add(text1);
+                    displayTrainerMessage.Add(text2);
+                }
+                else
+                {
+                    displayTrainerMessage.Add(item);
+                }
             }
+
             // Remove last item if blank line - is the case as trainer text formatted as ending with \n.
-            if (displayTrainerMessage.Count() > 1 && string.IsNullOrEmpty(displayTrainerMessage.Last()))
+            if (displayTrainerMessage.Count > 1 && string.IsNullOrEmpty(displayTrainerMessage.Last()))
             {
                 displayTrainerMessage.Remove(displayTrainerMessage.Last());
             }
             trainer_Message.Font = new Font(vsMakerFont.VsMakerFontCollection.Families[0], trainer_Message.Font.Size);
             trainer_Message.Text = displayTrainerMessage[0];
-            trainer_Message_Next_btn.Enabled = displayTrainerMessage.Count() > 1;
+            trainer_Message_Next_btn.Enabled = displayTrainerMessage.Count > 1;
             trainer_Message_Back_btn.Enabled = false;
         }
 
-        private void addLine_btn_Click(object sender, EventArgs e)
+        private void trainer_Message_Next_btn_Click(object sender, EventArgs e)
         {
-            // If text has 2 lines, add 3rd line as \f
-            if (displayTrainerMessage[currentTrainerMessageIndex].Split('\n').Length == 2)
+            currentTrainerMessageIndex++;
+            trainer_Message_Back_btn.Enabled = currentTrainerMessageIndex > 0;
+            trainer_Message_Next_btn.Enabled = currentTrainerMessageIndex < displayTrainerMessage.Count - 1;
+
+            if (currentTrainerMessageIndex < displayTrainerMessage.Count)
             {
-                textEditor_Message.Text += "\\f";
-            }
-            // If text has 3 lines, add new page \r
-            else if (displayTrainerMessage[currentTrainerMessageIndex].Split('\n').Length == 3)
-            {
-                textEditor_Message.Text += "\\r";
-                currentTrainerMessageIndex++;
+                trainer_Message.Text = displayTrainerMessage[currentTrainerMessageIndex];
             }
             else
             {
-                textEditor_Message.Text += "\\f";
+                currentTrainerMessageIndex--;
+            }
+        }
+
+        private void trainer_Message_Back_btn_Click(object sender, EventArgs e)
+        {
+            currentTrainerMessageIndex--;
+            trainer_Message_Back_btn.Enabled = currentTrainerMessageIndex > 0;
+            trainer_Message_Next_btn.Enabled = currentTrainerMessageIndex >= 0;
+
+            if (currentTrainerMessageIndex >= 0)
+            {
+                trainer_Message.Text = displayTrainerMessage[currentTrainerMessageIndex];
+            }
+            else
+            {
+                currentTrainerMessageIndex++;
+            }
+        }
+
+        private void textEditor_Message_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                e.Handled = true;
             }
         }
     }
