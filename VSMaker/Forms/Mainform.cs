@@ -25,6 +25,7 @@ namespace VSMaker
 
         #region Editor Data
 
+        private bool trainerSpriteMessage = false;
         private List<MessageTrigger> messageTriggers = new();
         private List<Move> moves = new();
         private List<Pokemon> pokemons = new();
@@ -628,7 +629,7 @@ namespace VSMaker
                 DirNames.trainerGraphics,
                 DirNames.textArchives,
                 DirNames.monIcons,
-                DirNames.speciesData,
+                DirNames.personalPokeData,
                 DirNames.trainerTable
             });
 
@@ -926,12 +927,12 @@ namespace VSMaker
             Update();
             pokemons = new List<Pokemon>();
 
-            int numberOfPokemon = Directory.GetFiles(gameDirs[DirNames.speciesData].unpackedDir, "*").Length;
+            int numberOfPokemon = Directory.GetFiles(gameDirs[DirNames.personalPokeData].unpackedDir, "*").Length;
             pokemonSpecies = new SpeciesFile[numberOfPokemon];
 
             for (int i = 0; i < numberOfPokemon; i++)
             {
-                pokemonSpecies[i] = new SpeciesFile(new FileStream(gameDirs[DirNames.speciesData].unpackedDir + "\\" + i.ToString("D4"), FileMode.Open));
+                pokemonSpecies[i] = new SpeciesFile(new FileStream(gameDirs[DirNames.personalPokeData].unpackedDir + "\\" + i.ToString("D4"), FileMode.Open));
             }
 
             pokeNames = GetPokemonNames();
@@ -1041,6 +1042,15 @@ namespace VSMaker
 
         private int LoadTrainerClassPic(int trainerClassId)
         {
+            if (gameFamily == gFamEnum.DP)
+            {
+                if (!trainerSpriteMessage)
+                {
+                    MessageBox.Show("Diamond and Pearl trainer sprites are compressed.\nAt the moment they cannot be viewed.", "Unable To View Trainer Sprite", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    trainerSpriteMessage = true;
+                }
+                return 0;
+            }
             int paletteFileID = (trainerClassId * 5 + 1);
             string paletteFilename = paletteFileID.ToString("D4");
             trainerPal = new NCLR(gameDirs[DirNames.trainerGraphics].unpackedDir + "\\" + paletteFilename, paletteFileID, paletteFilename);
@@ -1048,11 +1058,6 @@ namespace VSMaker
             int tilesFileID = trainerClassId * 5;
             string tilesFilename = tilesFileID.ToString("D4");
             trainerTile = new NCGR(gameDirs[DirNames.trainerGraphics].unpackedDir + "\\" + tilesFilename, tilesFileID, tilesFilename);
-
-            if (gameFamily == gFamEnum.DP)
-            {
-                return 0;
-            }
 
             int spriteFileID = (trainerClassId * 5 + 2);
             string spriteFilename = spriteFileID.ToString("D4");
@@ -1341,7 +1346,6 @@ namespace VSMaker
                 int messageTriggerId = messageTriggers.Find(x => x.MessageTriggerName == selectedMessageTriggerName).MessageTriggerId;
                 string trainerText = selectedTrainer.TrainerMessages.Single(x => x.MessageTriggerId == messageTriggerId).MessageText;
 
-               
                 trainerText = trainerText.Replace("\\n", Environment.NewLine);
                 trainerText = trainerText.Replace("\\f", Environment.NewLine);
                 var messageArray = trainerText.Split(new string[] { seperator1 }, StringSplitOptions.None);
@@ -1537,6 +1541,11 @@ namespace VSMaker
             int messageTriggerId = messageTriggers.Find(x => x.MessageTriggerName == selectedMessageTriggerName).MessageTriggerId;
             string trainerText = selectedTrainer.TrainerMessages.Single(x => x.MessageTriggerId == messageTriggerId).MessageText;
             OpenTextEditor(selectedTrainer.TrainerId, trainerText);
+        }
+
+        private void trainer_Player_help_btn_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("This is the \"Player\" trainer file.\n\nChanging this can cause errors.", "Player File", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

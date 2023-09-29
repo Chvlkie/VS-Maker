@@ -1,13 +1,15 @@
-﻿using System;
+﻿using VSMaker;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using VSMaker.CommonFunctions;
 
-namespace VSMaker.CommonFunctions
+namespace NarcAPI
 {
     public class Narc
     { //Nitro Archive
-        public string Name { get; set; }
+        public String Name { get; set; }
         private MemoryStream[] Elements;
         private int FileNameTableOffset, FileImageOffset;
 
@@ -19,21 +21,21 @@ namespace VSMaker.CommonFunctions
         private const int FILE_IMAGE_HEADER_SIZE = 0x8;
         private const int FILE_NAME_TABLE_SIGNATURE_LENGTH = 0x4;
 
-        private Narc(string name)
+        private Narc(String name)
         {
-            Name = name;
+            this.Name = name;
         }
 
-        public static Narc NewEmpty(string name = "NewNarc")
+        public static Narc NewEmpty(String name = "NewNarc")
         {
             Narc narc = new Narc(name);
             return narc;
         }
 
-        public static Narc? Open(string filePath)
+        public static Narc Open(String filePath)
         {
-            Narc narc = new(Path.GetFileNameWithoutExtension(filePath));
-            BinaryReader br = new(File.OpenRead(filePath));
+            Narc narc = new Narc(Path.GetFileNameWithoutExtension(filePath));
+            BinaryReader br = new BinaryReader(File.OpenRead(filePath));
 
             if (br.ReadUInt32() != NARC_FILE_MAGIC_NUM)
             {
@@ -46,15 +48,14 @@ namespace VSMaker.CommonFunctions
             return narc;
         }
 
-        public static Narc FromFolder(string dirPath)
+        public static Narc FromFolder(String dirPath)
         {
-            Narc narc = new(Path.GetDirectoryName(dirPath));
-            string[] fileNames = Directory.GetFiles(dirPath, "*.*", SearchOption.AllDirectories);
+            Narc narc = new Narc(Path.GetDirectoryName(dirPath));
+            String[] fileNames = Directory.GetFiles(dirPath, "*.*", SearchOption.AllDirectories);
             uint numberOfElements = (uint)fileNames.Length;
             narc.Elements = new MemoryStream[numberOfElements];
 
-            Parallel.For(0, numberOfElements, i =>
-            {
+            Parallel.For(0, numberOfElements, i => {
                 FileStream fs = File.OpenRead(fileNames[i]);
                 MemoryStream ms = new MemoryStream();
                 byte[] buffer = new byte[fs.Length];
@@ -66,7 +67,7 @@ namespace VSMaker.CommonFunctions
             return narc;
         }
 
-        public void Save(string filePath)
+        public void Save(String filePath)
         {
             uint fileSizeOffset, fileImageSizeOffset, curOffset;
 
@@ -75,13 +76,13 @@ namespace VSMaker.CommonFunctions
             bw.Write(NARC_FILE_MAGIC_NUM);
             bw.Write(0x0100FFFE);
             fileSizeOffset = (uint)bw.BaseStream.Position;
-            bw.Write((uint)0x0);
+            bw.Write((UInt32)0x0);
             bw.Write((ushort)16);                   //full size of header section
             bw.Write((ushort)3);                    //the number of sections in the header
             // Write FATB Section
             bw.Write(0x46415442);                   // "BTAF"
-            bw.Write((uint)(FILE_ALLOCATION_TABLE_HEADER_LENGTH + Elements.Length * FILE_ALLOCATION_TABLE_ELEMENT_LENGTH));
-            bw.Write((uint)Elements.Length);      // Number of elements
+            bw.Write((UInt32)(FILE_ALLOCATION_TABLE_HEADER_LENGTH + Elements.Length * FILE_ALLOCATION_TABLE_ELEMENT_LENGTH));
+            bw.Write((UInt32)Elements.Length);      // Number of elements
             curOffset = 0;
             for (int i = 0; i < Elements.Length; i++)
             {
@@ -102,14 +103,14 @@ namespace VSMaker.CommonFunctions
             // Write FIMG Section
             bw.Write(0x46494D47);       // "GMIF"
             fileImageSizeOffset = (uint)bw.BaseStream.Position;
-            bw.Write((uint)0x0);
+            bw.Write((UInt32)0x0);
             curOffset = 0;
             byte[] buffer;
             for (int i = 0; i < Elements.Length; i++)
             {
                 while (curOffset % 4 != 0)
                 { // Force offsets to be a multiple of 4
-                    bw.Write((byte)0xFF); curOffset++;
+                    bw.Write((Byte)0xFF); curOffset++;
                 }
                 // Data writin'
                 buffer = new byte[Elements[i].Length];
@@ -121,13 +122,13 @@ namespace VSMaker.CommonFunctions
             // Writes sizes
             int fileSize = (int)bw.BaseStream.Position;
             bw.Seek((int)fileSizeOffset, SeekOrigin.Begin);         // File size
-            bw.Write((uint)fileSize);
+            bw.Write((UInt32)fileSize);
             bw.Seek((int)fileImageSizeOffset, SeekOrigin.Begin);         // seeks back to FIMG size
-            bw.Write(curOffset + FILE_IMAGE_HEADER_SIZE);   // FIMG size == Last end offset + File image header size
+            bw.Write((UInt32)curOffset + FILE_IMAGE_HEADER_SIZE);   // FIMG size == Last end offset + File image header size
             bw.Close();
         }
 
-        public void ExtractToFolder(string dirPath, string extension = null)
+        public void ExtractToFolder(String dirPath, string extension = null)
         {
             if (string.IsNullOrWhiteSpace(dirPath))
             {
@@ -144,7 +145,7 @@ namespace VSMaker.CommonFunctions
                         if (dirPath.IndexOf(RomInfo.folderSuffix, StringComparison.CurrentCultureIgnoreCase) >= 0)
                         {
                             Directory.Delete(dirPath, true);
-                            Console.WriteLine("Deleted Main-related folder \"" + dirPath + "\" without user confirmation.");
+                            Console.WriteLine("Deleted VSMaker-related folder \"" + dirPath + "\" without user confirmation.");
                         }
                         else
                         {
@@ -153,7 +154,7 @@ namespace VSMaker.CommonFunctions
                             if (d.Equals(DialogResult.Yes))
                             {
                                 Directory.Delete(dirPath, true);
-                                Console.WriteLine("Deleted non-Main-related folder \"" + dirPath + "\" after user confirmation.");
+                                Console.WriteLine("Deleted non-VSMaker-related folder \"" + dirPath + "\" after user confirmation.");
                             }
                         }
                     }
@@ -179,8 +180,7 @@ namespace VSMaker.CommonFunctions
                 }
             }
 
-            Parallel.For(0, Elements.Length, i =>
-            {
+            Parallel.For(0, Elements.Length, i => {
                 string path = Path.Combine(dirPath, i.ToString("D4") + (string.IsNullOrWhiteSpace(extension) ? "" : extension));
                 using (BinaryWriter wr = new BinaryWriter(File.Create(path)))
                 {
@@ -195,8 +195,7 @@ namespace VSMaker.CommonFunctions
 
         public void Free()
         { // Libera todos los recursos de memoria asociados (cierra los streams)
-            Parallel.For(0, Elements.Length, i =>
-            {
+            Parallel.For(0, Elements.Length, i => {
                 Elements[i].Close();
             });
         }

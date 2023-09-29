@@ -1,13 +1,19 @@
-﻿using LibNDSFormats.NSBMD;
+﻿using Ekona.Images;
+using Images;
+using LibNDSFormats.NSBMD;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using NarcAPI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using VSMaker.CommonFunctions;
+using static ScintillaNET.Style;
 using static VSMaker.CommonFunctions.RomInfo;
 
 namespace VSMaker.CommonFunctions
@@ -19,18 +25,18 @@ namespace VSMaker.CommonFunctions
         {
             public EasyReader(string path, long pos = 0) : base(File.OpenRead(path))
             {
-                BaseStream.Position = pos;
+                this.BaseStream.Position = pos;
             }
         }
         public class EasyWriter : BinaryWriter
         {
             public EasyWriter(string path, long pos = 0, FileMode fmode = FileMode.OpenOrCreate) : base(new FileStream(path, fmode, FileAccess.Write, FileShare.None))
             {
-                BaseStream.Position = pos;
+                this.BaseStream.Position = pos;
             }
             public void EditSize(int increment)
             {
-                BaseStream.SetLength(BaseStream.Length + increment);
+                this.BaseStream.SetLength(this.BaseStream.Length + increment);
             }
         }
         public static class ARM9
@@ -40,14 +46,14 @@ namespace VSMaker.CommonFunctions
             {
                 public Reader(long pos = 0) : base(arm9Path, pos)
                 {
-                    BaseStream.Position = pos;
+                    this.BaseStream.Position = pos;
                 }
             }
             public class Writer : EasyWriter
             {
                 public Writer(long pos = 0) : base(arm9Path, pos)
                 {
-                    BaseStream.Position = pos;
+                    this.BaseStream.Position = pos;
                 }
             }
             public static void EditSize(int increment)
@@ -67,7 +73,7 @@ namespace VSMaker.CommonFunctions
                 decompress.Start();
                 decompress.WaitForExit();
 
-                return new FileInfo(arm9Path).Length > 0xBC000;
+                return new FileInfo(RomInfo.arm9Path).Length > 0xBC000;
             }
             public static bool Compress(string path)
             {
@@ -79,27 +85,27 @@ namespace VSMaker.CommonFunctions
                 compress.Start();
                 compress.WaitForExit();
 
-                return new FileInfo(arm9Path).Length <= 0xBC000;
+                return new FileInfo(RomInfo.arm9Path).Length <= 0xBC000;
             }
             public static bool CheckCompressionMark()
             {
-                return BitConverter.ToInt32(ReadBytes((uint)(gameFamily == gFamEnum.DP ? 0xB7C : 0xBB4), 4), 0) != 0;
+                return BitConverter.ToInt32(DSUtils.ARM9.ReadBytes((uint)(RomInfo.gameFamily == gFamEnum.DP ? 0xB7C : 0xBB4), 4), 0) != 0;
             }
             public static byte[] ReadBytes(uint startOffset, long numberOfBytes = 0)
             {
-                return ReadFromFile(arm9Path, startOffset, numberOfBytes);
+                return ReadFromFile(RomInfo.arm9Path, startOffset, numberOfBytes);
             }
             public static void WriteBytes(byte[] bytesToWrite, uint destOffset, int indexFirstByteToWrite = 0, int? indexLastByteToWrite = null)
             {
-                WriteToFile(arm9Path, bytesToWrite, destOffset, indexFirstByteToWrite, indexLastByteToWrite);
+                WriteToFile(RomInfo.arm9Path, bytesToWrite, destOffset, indexFirstByteToWrite, indexLastByteToWrite);
             }
             public static byte ReadByte(uint startOffset)
             {
-                return ReadFromFile(arm9Path, startOffset, 1)[0];
+                return ReadFromFile(RomInfo.arm9Path, startOffset, 1)[0];
             }
             public static void WriteByte(byte value, uint destOffset)
             {
-                WriteToFile(arm9Path, BitConverter.GetBytes(value), destOffset, 0);
+                WriteToFile(RomInfo.arm9Path, BitConverter.GetBytes(value), destOffset, 0);
             }
         }
 
@@ -132,7 +138,7 @@ namespace VSMaker.CommonFunctions
 
         public static void ModelToDAE(string modelName, byte[] modelData, byte[] textureData)
         {
-            MessageBox.Show("Choose output folder.\nMain will automatically create a sub-folder in it.", "Awaiting user input", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Choose output folder.\nVSMaker will automatically create a sub-folder in it.", "Awaiting user input", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             CommonOpenFileDialog cofd = new CommonOpenFileDialog
             {
@@ -170,7 +176,7 @@ namespace VSMaker.CommonFunctions
 
             if (textureData != null && textureData.Length > 0)
             {
-                modelData = BuildNSBMDwithTextures(modelData, textureData);
+                modelData = DSUtils.BuildNSBMDwithTextures(modelData, textureData);
             }
 
             File.WriteAllBytes(tempNSBMDPath, modelData);
@@ -216,7 +222,7 @@ namespace VSMaker.CommonFunctions
 
         public static void ModelToGLB(string modelName, byte[] modelData, byte[] textureData)
         {
-            MessageBox.Show("Choose output folder.\nMain will automatically create a sub-folder in it.", "Awaiting user input", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Choose output folder.\nVSMaker will automatically create a sub-folder in it.", "Awaiting user input", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             CommonOpenFileDialog cofd = new CommonOpenFileDialog
             {
@@ -254,7 +260,7 @@ namespace VSMaker.CommonFunctions
 
             if (textureData != null && textureData.Length > 0)
             {
-                modelData = BuildNSBMDwithTextures(modelData, textureData);
+                modelData = DSUtils.BuildNSBMDwithTextures(modelData, textureData);
             }
 
             File.WriteAllBytes(tempNSBMDPath, modelData);
@@ -371,7 +377,7 @@ namespace VSMaker.CommonFunctions
 
             Process unpack = new Process();
             unpack.StartInfo.FileName = @"Tools\blz.exe";
-            string arguments = "-d " + '"' + overlayFilePath + '"';
+            String arguments = "-d " + '"' + overlayFilePath + '"';
             unpack.StartInfo.Arguments = arguments;
             Application.DoEvents();
             unpack.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
@@ -403,11 +409,11 @@ namespace VSMaker.CommonFunctions
         }
         public static string GetOverlayPath(int overlayNumber)
         {
-            return workDir + "overlay" + "\\" + "overlay_" + overlayNumber.ToString("D4") + ".bin";
+            return RomInfo.workDir + "overlay" + "\\" + "overlay_" + overlayNumber.ToString("D4") + ".bin";
         }
         public static void RestoreOverlayFromCompressedBackup(int overlayNumber, bool eventEditorIsReady)
         {
-            string overlayFilePath = GetOverlayPath(overlayNumber);
+            String overlayFilePath = GetOverlayPath(overlayNumber);
 
             if (File.Exists(overlayFilePath + backupSuffix))
             {
@@ -439,7 +445,7 @@ namespace VSMaker.CommonFunctions
          **/
         public static bool CheckOverlayHasCompressionFlag(int ovNumber)
         {
-            using (BinaryReader f = new BinaryReader(File.OpenRead(overlayTablePath)))
+            using (BinaryReader f = new BinaryReader(File.OpenRead(RomInfo.overlayTablePath)))
             {
                 f.BaseStream.Position = ovNumber * 32 + 31; //overlayNumber * size of entry + offset
                 return f.ReadByte() % 2 != 0;
@@ -451,11 +457,11 @@ namespace VSMaker.CommonFunctions
          **/
         public static bool OverlayIsCompressed(int ovNumber)
         {
-            return new FileInfo(GetOverlayPath(ovNumber)).Length < GetOverlayUncompressedSize(ovNumber);
+            return (new FileInfo(GetOverlayPath(ovNumber)).Length < GetOverlayUncompressedSize(ovNumber));
         }
         public static uint GetOverlayUncompressedSize(int ovNumber)
         {
-            using (BinaryReader f = new BinaryReader(File.OpenRead(overlayTablePath)))
+            using (BinaryReader f = new BinaryReader(File.OpenRead(RomInfo.overlayTablePath)))
             {
                 f.BaseStream.Position = ovNumber * 32 + 8; //overlayNumber * size of entry + offset
                 return f.ReadUInt32();
@@ -463,7 +469,7 @@ namespace VSMaker.CommonFunctions
         }
         public static uint GetOverlayRAMAddress(int ovNumber)
         {
-            using (BinaryReader f = new BinaryReader(File.OpenRead(overlayTablePath)))
+            using (BinaryReader f = new BinaryReader(File.OpenRead(RomInfo.overlayTablePath)))
             {
                 f.BaseStream.Position = ovNumber * 32 + 4; //overlayNumber * size of entry + offset
                 return f.ReadUInt32();
@@ -476,7 +482,7 @@ namespace VSMaker.CommonFunctions
                 Console.WriteLine("Compression status " + compressStatus + " is invalid. No operation performed.");
                 return;
             }
-            using (BinaryWriter f = new BinaryWriter(File.OpenWrite(overlayTablePath)))
+            using (BinaryWriter f = new BinaryWriter(File.OpenWrite(RomInfo.overlayTablePath)))
             {
                 f.BaseStream.Position = ovNumber * 32 + 31; //overlayNumber * size of entry + offset
                 f.Write(compressStatus);
@@ -487,14 +493,14 @@ namespace VSMaker.CommonFunctions
             Process repack = new Process();
             repack.StartInfo.FileName = @"Tools\ndstool.exe";
             repack.StartInfo.Arguments = "-c " + '"' + ndsFileName + '"'
-                + " -9 " + '"' + arm9Path + '"'
-                + " -7 " + '"' + workDir + "arm7.bin" + '"'
-                + " -y9 " + '"' + workDir + "y9.bin" + '"'
-                + " -y7 " + '"' + workDir + "y7.bin" + '"'
-                + " -d " + '"' + workDir + "data" + '"'
-                + " -y " + '"' + workDir + "overlay" + '"'
-                + " -t " + '"' + workDir + "banner.bin" + '"'
-                + " -h " + '"' + workDir + "header.bin" + '"';
+                + " -9 " + '"' + RomInfo.arm9Path + '"'
+                + " -7 " + '"' + RomInfo.workDir + "arm7.bin" + '"'
+                + " -y9 " + '"' + RomInfo.workDir + "y9.bin" + '"'
+                + " -y7 " + '"' + RomInfo.workDir + "y7.bin" + '"'
+                + " -d " + '"' + RomInfo.workDir + "data" + '"'
+                + " -y " + '"' + RomInfo.workDir + "overlay" + '"'
+                + " -t " + '"' + RomInfo.workDir + "banner.bin" + '"'
+                + " -h " + '"' + RomInfo.workDir + "header.bin" + '"';
 
             Application.DoEvents();
             repack.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
@@ -503,7 +509,7 @@ namespace VSMaker.CommonFunctions
             repack.WaitForExit();
         }
 
-        public static byte[] StringToByteArray(string hex)
+        public static byte[] StringToByteArray(String hex)
         {
             //Ummm what?
             int NumberChars = hex.Length;
@@ -538,56 +544,28 @@ namespace VSMaker.CommonFunctions
 
         public static void TryUnpackNarcs(List<DirNames> IDs)
         {
-            Parallel.ForEach(IDs, id =>
-            {
+            Parallel.ForEach(IDs, id => {
                 if (gameDirs.TryGetValue(id, out (string packedPath, string unpackedPath) paths))
                 {
-                    DirectoryInfo di = new(paths.unpackedPath);
+                    DirectoryInfo di = new DirectoryInfo(paths.unpackedPath);
 
                     if (!di.Exists || di.GetFiles().Length == 0)
                     {
-                        try
-                        {
-                            Narc opened = Narc.Open(paths.packedPath) ?? throw new NullReferenceException();
-                            opened.ExtractToFolder(paths.unpackedPath);
-                        }
-                        catch (Exception)
-                        {
-                            if (paths.packedPath.Contains("personal\\personal.narc"))
-                            {
-                                paths.packedPath.Replace("personal\\", "personal_pearl\\");
-                                try
-                                {
-                                    Narc opened = Narc.Open(paths.packedPath) ?? throw new NullReferenceException();
-                                    opened.ExtractToFolder(paths.unpackedPath);
-                                }
-                                catch (Exception)
-                                {
-                                    paths.packedPath.Replace("_pearl", "_diamond");
-                                    try
-                                    {
-                                        Narc opened = Narc.Open(paths.packedPath) ?? throw new NullReferenceException();
-                                        opened.ExtractToFolder(paths.unpackedPath);
-                                    }
-                                    catch (Exception)
-                                    {
+                        Narc opened = Narc.Open(paths.packedPath);
 
-                                        return;
-                                    }
-                                    return;
-                                }
-                            }
-                            return;
+                        if (opened is null)
+                        {
+                            throw new NullReferenceException();
                         }
 
+                        opened.ExtractToFolder(paths.unpackedPath);
                     }
                 }
             });
         }
         public static void ForceUnpackNarcs(List<DirNames> IDs)
         {
-            Parallel.ForEach(IDs, id =>
-            {
+            Parallel.ForEach(IDs, id => {
                 if (gameDirs.TryGetValue(id, out (string packedPath, string unpackedPath) paths))
                 {
                     Narc opened = Narc.Open(paths.packedPath);
@@ -649,8 +627,8 @@ namespace VSMaker.CommonFunctions
                 byteArrReader.BaseStream.Position = texAbsoluteOffset + 4;
                 uint textureSize = byteArrReader.ReadUInt32();
 
-                byte[] nsbtxHeader = BuildNSBTXHeader(20 + textureSize);
-                byte[] texData = ReadFromByteArray(modelFile, readFrom: texAbsoluteOffset);
+                byte[] nsbtxHeader = DSUtils.BuildNSBTXHeader(20 + textureSize);
+                byte[] texData = DSUtils.ReadFromByteArray(modelFile, readFrom: texAbsoluteOffset);
 
                 byte[] output = new byte[nsbtxHeader.Length + texData.Length];
                 Buffer.BlockCopy(nsbtxHeader, 0, output, 0, nsbtxHeader.Length);
@@ -730,6 +708,87 @@ namespace VSMaker.CommonFunctions
             Buffer.BlockCopy(NSBFile, (int)offsetToMainBlock, blockData, 0, blockSize);
 
             return blockData;
+        }
+
+        public static Image GetPokePic(int species, int w, int h)
+        {
+            PaletteBase paletteBase;
+            bool fiveDigits = false; // some extreme future proofing
+            string filename = "0000";
+
+            try
+            {
+                paletteBase = new NCLR(gameDirs[DirNames.monIcons].unpackedDir + "\\" + filename, 0, filename);
+            }
+            catch (FileNotFoundException)
+            {
+                filename += '0';
+                paletteBase = new NCLR(gameDirs[DirNames.monIcons].unpackedDir + "\\" + filename, 0, filename);
+                fiveDigits = true;
+            }
+
+            // read arm9 table to grab pal ID
+            int paletteId = 0;
+            string iconTablePath;
+
+            int iconPalTableOffsetFromFileStart;
+            string ov129path = DSUtils.GetOverlayPath(129);
+            if (File.Exists(ov129path))
+            {
+                // if overlay 129 exists, read it from there
+                iconPalTableOffsetFromFileStart = (int)(RomInfo.monIconPalTableAddress - DSUtils.GetOverlayRAMAddress(129));
+                iconTablePath = ov129path;
+            }
+            else if ((int)(RomInfo.monIconPalTableAddress - RomInfo.synthOverlayLoadAddress) >= 0)
+            {
+                // if there is a synthetic overlay, read it from there
+                iconPalTableOffsetFromFileStart = (int)(RomInfo.monIconPalTableAddress - RomInfo.synthOverlayLoadAddress);
+                iconTablePath = gameDirs[DirNames.synthOverlay].unpackedDir + "\\" + ROMToolboxDialog.expandedARMfileID.ToString("D4");
+            }
+            else
+            {
+                // default handling
+                iconPalTableOffsetFromFileStart = (int)(RomInfo.monIconPalTableAddress - DSUtils.ARM9.address);
+                iconTablePath = RomInfo.arm9Path;
+            }
+
+            using (DSUtils.EasyReader idReader = new DSUtils.EasyReader(iconTablePath, iconPalTableOffsetFromFileStart + species))
+            {
+                paletteId = idReader.ReadByte();
+            }
+
+            if (paletteId != 0)
+            {
+                paletteBase.Palette[0] = paletteBase.Palette[paletteId]; // update pal 0 to be the new pal
+            }
+
+            // grab tiles
+            int spriteFileID = species + 7;
+            string spriteFilename = spriteFileID.ToString("D" + (fiveDigits ? "5" : "4"));
+            ImageBase imageBase = new NCGR(gameDirs[DirNames.monIcons].unpackedDir + "\\" + spriteFilename, spriteFileID, spriteFilename);
+
+            // grab sprite
+            int ncerFileId = 2;
+            string ncerFileName = ncerFileId.ToString("D" + (fiveDigits ? "5" : "4"));
+            SpriteBase spriteBase = new NCER(gameDirs[DirNames.monIcons].unpackedDir + "\\" + ncerFileName, 2, ncerFileName);
+
+            // copy this from the trainer
+            int bank0OAMcount = spriteBase.Banks[0].oams.Length;
+            int[] OAMenabled = new int[bank0OAMcount];
+            for (int i = 0; i < OAMenabled.Length; i++)
+            {
+                OAMenabled[i] = i;
+            }
+
+            // finally compose image
+            try
+            {
+                return spriteBase.Get_Image(imageBase, paletteBase, 0, w, h, false, false, false, true, true, -1, OAMenabled);
+            }
+            catch (FormatException)
+            {
+                return Properties.Resources.IconPokeball;
+            }
         }
     }
 }

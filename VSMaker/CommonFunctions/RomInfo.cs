@@ -1,5 +1,4 @@
 ﻿using VSMaker.Resources;
-using VSMaker.Resources.ROMToolboxDB;
 using VSMaker.ROMFiles;
 
 namespace VSMaker.CommonFunctions
@@ -10,7 +9,7 @@ namespace VSMaker.CommonFunctions
 
     public class RomInfo
     {
-        public static string folderSuffix = "_extract";
+        public static string folderSuffix = "_VSMaker_contents";
         public static string romID { get; private set; }
         public static string fileName { get; private set; }
         public static string workDir { get; private set; }
@@ -84,6 +83,7 @@ namespace VSMaker.CommonFunctions
 
         public static SortedDictionary<uint, (uint trainerId, ushort messageTriggerId)> TrainerTable { get; private set; }
         public static uint[] TrainerMessageIds { get; private set; }
+
         public enum gVerEnum : byte
         {
             Diamond, Pearl, Platinum,
@@ -115,7 +115,7 @@ namespace VSMaker.CommonFunctions
 
         public enum DirNames : byte
         {
-            speciesData,
+            personalPokeData,
 
             synthOverlay,
             dynamicHeaders,
@@ -143,6 +143,7 @@ namespace VSMaker.CommonFunctions
             monIcons,
 
             interiorBuildingModels,
+            learnsets,
 
             trainerTable
         };
@@ -568,129 +569,6 @@ namespace VSMaker.CommonFunctions
             //}
         }
 
-        public static void SetOWtable()
-        {
-            switch (gameFamily)
-            {
-                case gFamEnum.DP:
-                    OWtablePath = DSUtils.GetOverlayPath(5);
-                    switch (gameLanguage)
-                    { // Go to the beginning of the overworld table
-                        case gLangEnum.English:
-                            OWTableOffset = 0x22BCC;
-                            break;
-
-                        case gLangEnum.Japanese:
-                            OWTableOffset = 0x23BB8;
-                            break;
-
-                        default:
-                            OWTableOffset = 0x22B84;
-                            break;
-                    }
-                    break;
-
-                case gFamEnum.Plat:
-                    OWtablePath = DSUtils.GetOverlayPath(5);
-                    switch (gameLanguage)
-                    { // Go to the beginning of the overworld table
-                        case gLangEnum.Italian:
-                            OWTableOffset = 0x2BC44;
-                            break;
-
-                        case gLangEnum.French:
-                        case gLangEnum.Spanish:
-                            OWTableOffset = 0x2BC3C;
-                            break;
-
-                        case gLangEnum.German:
-                            OWTableOffset = 0x2BC50;
-                            break;
-
-                        case gLangEnum.Japanese:
-                            OWTableOffset = 0x2BA24;
-                            break;
-
-                        default:
-                            OWTableOffset = 0x2BC34;
-                            break;
-                    }
-                    break;
-
-                case gFamEnum.HGSS:
-                    if (DSUtils.CheckOverlayHasCompressionFlag(1))
-                    {
-                        if (DSUtils.OverlayIsCompressed(1))
-                        {
-                            if (DSUtils.DecompressOverlay(1) < 0)
-                            {
-                                MessageBox.Show("Overlay 1 couldn't be decompressed.\nOverworld sprites in the Event Editor will be " +
-                                "displayed incorrectly or not displayed at all.", "Decompression error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            }
-                        }
-                    }
-
-                    string ov1Path = DSUtils.GetOverlayPath(1);
-                    uint ov1Address = DSUtils.GetOverlayRAMAddress(1);
-
-                    int ramAddrOfPointer;
-                    switch (gameLanguage)
-                    {
-                        case gLangEnum.Italian:
-                            ramAddrOfPointer = 0x021F929C;
-                            break;
-
-                        case gLangEnum.French:
-                        case gLangEnum.Spanish:
-                            ramAddrOfPointer = 0x021F931C;
-                            break;
-
-                        case gLangEnum.German:
-                            ramAddrOfPointer = 0x021F92DC;
-                            break;
-
-                        case gLangEnum.Japanese:
-                            ramAddrOfPointer = 0x021F86C4;
-                            break;
-
-                        default:
-                            ramAddrOfPointer = 0x021F92FC;
-                            break;
-                    }
-
-                    using (DSUtils.EasyReader bReader = new DSUtils.EasyReader(ov1Path, ramAddrOfPointer - ov1Address))
-                    { // read the pointer at the specified ram address and adjust accordingly below
-                        uint ramAddressOfTable = bReader.ReadUInt32();
-                        if (ramAddressOfTable >> 0x18 != 0x02)
-                        {
-                            MessageBox.Show("Something went wrong reading the Overworld configuration table.\nOverworld sprites in the Event Editor will be " +
-                                "displayed incorrectly or not displayed at all.", "Decompression error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
-                        }
-
-                        string ov131path = DSUtils.GetOverlayPath(131);
-                        if (File.Exists(ov131path))
-                        {
-                            // if HGE field extension overlay exists
-                            OWTableOffset = ramAddressOfTable - DSUtils.GetOverlayRAMAddress(131);
-                            OWtablePath = ov131path;
-                        }
-                        else if (ramAddressOfTable >= synthOverlayLoadAddress)
-                        {
-                            // if the pointer shows the table was moved to the synthetic overlay
-                            OWTableOffset = ramAddressOfTable - synthOverlayLoadAddress;
-                            OWtablePath = gameDirs[DirNames.synthOverlay].unpackedDir + "\\" + ToolboxDB.syntheticOverlayFileNumbersDB[gameFamily].ToString("D4");
-                        }
-                        else
-                        {
-                            OWTableOffset = ramAddressOfTable - ov1Address;
-                            OWtablePath = ov1Path;
-                        }
-                    }
-                    break;
-            }
-        }
-
         public static void SetConditionalMusicTableOffsetToRAMAddress()
         {
             switch (gameFamily)
@@ -840,7 +718,7 @@ namespace VSMaker.CommonFunctions
 
         public static void SetMonIconsPalTableAddress()
         {
-            switch (gameFamily)
+            switch (RomInfo.gameFamily)
             {
                 case gFamEnum.DP:
                     switch (gameLanguage)
@@ -953,7 +831,7 @@ namespace VSMaker.CommonFunctions
                     break;
 
                 case gFamEnum.HGSS:
-                    nullEncounterID = byte.MaxValue;
+                    nullEncounterID = Byte.MaxValue;
                     break;
             }
         }
@@ -1051,32 +929,6 @@ namespace VSMaker.CommonFunctions
             }
         }
 
-        private void SetTrainerTextMessageNumber()
-        {
-            switch (gameFamily)
-            {
-                case gFamEnum.DP:
-                    trainerTextMessageNumber = 555;
-                    if (gameLanguage.Equals(gLangEnum.Japanese))
-                    {
-                        trainerNamesMessageNumber -= 9;
-                    }
-                    break;
-
-                case gFamEnum.Plat:
-                    trainerTextMessageNumber = 559;
-                    break;
-
-                default:
-                    trainerTextMessageNumber = 728;
-                    if (gameLanguage == gLangEnum.Japanese)
-                    {
-                        trainerTextMessageNumber -= 10;
-                    }
-                    break;
-            }
-        }
-
         private void SetTrainerNamesMessageNumber()
         {
             switch (gameFamily)
@@ -1129,6 +981,32 @@ namespace VSMaker.CommonFunctions
             }
         }
 
+        private void SetTrainerTextMessageNumber()
+        {
+            switch (gameFamily)
+            {
+                case gFamEnum.DP:
+                    trainerTextMessageNumber = 555;
+                    if (gameLanguage.Equals(gLangEnum.Japanese))
+                    {
+                        trainerTextMessageNumber -= 9;
+                    }
+                    break;
+
+                case gFamEnum.Plat:
+                    trainerTextMessageNumber = 617;
+                    break;
+
+                default:
+                    trainerTextMessageNumber = 728;
+                    if (gameLanguage == gLangEnum.Japanese)
+                    {
+                        trainerTextMessageNumber -= 10;
+                    }
+                    break;
+            }
+        }
+
         public string GetBuildingModelsDirPath(bool interior) => interior ? gameDirs[DirNames.interiorBuildingModels].unpackedDir : gameDirs[DirNames.exteriorBuildingModels].unpackedDir;
 
         public string GetRomNameFromWorkdir() => workDir.Substring(0, workDir.Length - folderSuffix.Length - 1);
@@ -1142,7 +1020,6 @@ namespace VSMaker.CommonFunctions
         public static string[] GetTrainerMessages() => new TextArchive(trainerTextMessageNumber).Messages.ToArray();
 
         public static string GetSingleTrainerClassName(int id) => new TextArchive(trainerClassMessageNumber).Messages[id];
-
         public static string[] GetTrainerClassNames() => new TextArchive(trainerClassMessageNumber).Messages.ToArray();
 
         public static string[] GetItemNames() => new TextArchive(itemNamesTextNumber).Messages.ToArray();
@@ -1158,6 +1035,10 @@ namespace VSMaker.CommonFunctions
         public static string[] GetAbilityNames() => new TextArchive(abilityNamesTextNumber).Messages.ToArray();
 
         public static string[] GetAttackNames() => new TextArchive(attackNamesTextNumber).Messages.ToArray();
+
+        public static int GetLearnsetFilesCount() => Directory.GetFiles(gameDirs[DirNames.learnsets].unpackedDir).Length;
+
+        public static int GetPersonalFilesCount() => Directory.GetFiles(gameDirs[DirNames.personalPokeData].unpackedDir).Length;
 
         public int GetAreaDataCount() => Directory.GetFiles(gameDirs[DirNames.areaData].unpackedDir).Length;
 
@@ -1177,7 +1058,7 @@ namespace VSMaker.CommonFunctions
 
         public int GetBuildingCount(bool interior) => Directory.GetFiles(GetBuildingModelsDirPath(interior)).Length;
 
-        public static int GetEventFileCount() => Directory.GetFiles(gameDirs[DirNames.eventFiles].unpackedDir).Length;
+        public static int GetEventFileCount() => Directory.GetFiles(RomInfo.gameDirs[DirNames.eventFiles].unpackedDir).Length;
 
         #endregion Methods (22)
 
@@ -1266,7 +1147,7 @@ namespace VSMaker.CommonFunctions
 
                     packedDirsDict = new Dictionary<DirNames, string>()
                     {
-                        [DirNames.speciesData] = @"data\poketool\personal\personal.narc",
+                        [DirNames.personalPokeData] = gameVersion == gVerEnum.Pearl ? @"data\poketool\personal_pearl\personal.narc" : @"data\poketool\personal_diamond\personal.narc",
                         [DirNames.synthOverlay] = @"data\data\weather_sys.narc",
                         [DirNames.textArchives] = @"data\msgdata\msg.narc",
 
@@ -1291,15 +1172,15 @@ namespace VSMaker.CommonFunctions
                         [DirNames.monIcons] = @"data\poketool\icongra\poke_icon.narc",
 
                         [DirNames.encounters] = @"data\fielddata\encountdata\" + char.ToLower(gameVersion.ToString()[0]) + '_' + "enc_data.narc",
+                        [DirNames.learnsets] = workDir + @"data\poketool\personal\wotbl.narc",
                         [DirNames.trainerTable] = @"data\poketool\trmsg\trtbl.narc",
-
                     };
                     break;
 
                 case gFamEnum.Plat:
                     packedDirsDict = new Dictionary<DirNames, string>()
                     {
-                        [DirNames.speciesData] = @"data\poketool\personal\pl_personal.narc",
+                        [DirNames.personalPokeData] = @"data\poketool\personal\pl_personal.narc",
                         [DirNames.synthOverlay] = @"data\data\weather_sys.narc",
                         [DirNames.dynamicHeaders] = @"data\debug\cb_edit\d_test.narc",
 
@@ -1322,17 +1203,19 @@ namespace VSMaker.CommonFunctions
                         [DirNames.trainerProperties] = @"data\poketool\trainer\trdata.narc",
                         [DirNames.trainerParty] = @"data\poketool\trainer\trpoke.narc",
                         [DirNames.trainerGraphics] = @"data\poketool\trgra\trfgra.narc",
+                        [DirNames.trainerTable] = @"data\poketool\trmsg\trtbl.narc",
 
                         [DirNames.monIcons] = @"data\poketool\icongra\pl_poke_icon.narc",
 
-                        [DirNames.encounters] = @"data\fielddata\encountdata\" + gameVersion.ToString().Substring(0, 2).ToLower() + '_' + "enc_data.narc"
+                        [DirNames.encounters] = @"data\fielddata\encountdata\" + gameVersion.ToString().Substring(0, 2).ToLower() + '_' + "enc_data.narc",
+                        [DirNames.learnsets] = @"data\poketool\personal\wotbl.narc",
                     };
                     break;
 
                 case gFamEnum.HGSS:
                     packedDirsDict = new Dictionary<DirNames, string>()
                     {
-                        [DirNames.speciesData] = @"data\a\0\0\2",
+                        [DirNames.personalPokeData] = @"data\a\0\0\2",
                         [DirNames.synthOverlay] = @"data\a\0\2\8",
                         [DirNames.dynamicHeaders] = @"data\a\0\5\0",
 
@@ -1359,6 +1242,7 @@ namespace VSMaker.CommonFunctions
                         [DirNames.monIcons] = @"data\a\0\2\0",
 
                         [DirNames.interiorBuildingModels] = @"data\a\1\4\8",
+                        [DirNames.learnsets] = @"data\a\0\3\3",
                         [DirNames.trainerTable] = @"data\a\0\5\7",
                     };
 
@@ -1453,7 +1337,6 @@ namespace VSMaker.CommonFunctions
 
             TrainerMessageIds = TrainerTable.Keys.ToArray();
         }
+        #endregion System Methods
     }
-
-    #endregion System Methods
 }

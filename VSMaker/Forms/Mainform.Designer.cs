@@ -144,6 +144,7 @@ namespace VSMaker
             trainerPicBox = new PictureBox();
             label4 = new Label();
             panel5 = new Panel();
+            trainer_Player_help_btn = new Button();
             label2 = new Label();
             trainers_list = new ListBox();
             label1 = new Label();
@@ -166,6 +167,7 @@ namespace VSMaker
             trainerTextTable_addRow_btn = new ToolStripButton();
             trainerTextTable_delRow_btn = new ToolStripButton();
             toolStripSeparator4 = new ToolStripSeparator();
+            trainerText_sort = new ToolStripButton();
             mainContent_trainerTheme = new TabPage();
             panel14 = new Panel();
             button10 = new Button();
@@ -194,7 +196,6 @@ namespace VSMaker
             saveFileDialog1 = new SaveFileDialog();
             trainerMessageBindingSource1 = new BindingSource(components);
             trainerMessageBindingSource3 = new BindingSource(components);
-            trainerText_sort = new ToolStripButton();
             main_toolstrip.SuspendLayout();
             statusStrip1.SuspendLayout();
             mainContent.SuspendLayout();
@@ -437,13 +438,14 @@ namespace VSMaker
             // 
             // trainerClass_PrizeMoney_btn
             // 
+            trainerClass_PrizeMoney_btn.BackColor = SystemColors.Info;
             trainerClass_PrizeMoney_btn.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             trainerClass_PrizeMoney_btn.Location = new Point(326, 72);
             trainerClass_PrizeMoney_btn.Name = "trainerClass_PrizeMoney_btn";
             trainerClass_PrizeMoney_btn.Size = new Size(23, 23);
             trainerClass_PrizeMoney_btn.TabIndex = 5;
             trainerClass_PrizeMoney_btn.Text = "?";
-            trainerClass_PrizeMoney_btn.UseVisualStyleBackColor = true;
+            trainerClass_PrizeMoney_btn.UseVisualStyleBackColor = false;
             trainerClass_PrizeMoney_btn.Click += trainerClass_PrizeMoney_btn_Click;
             // 
             // trainerClass_Gender_comboBox
@@ -798,6 +800,7 @@ namespace VSMaker
             // playerClass_help_btn
             // 
             playerClass_help_btn.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            playerClass_help_btn.BackColor = SystemColors.Info;
             playerClass_help_btn.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             playerClass_help_btn.Location = new Point(173, 1);
             playerClass_help_btn.Name = "playerClass_help_btn";
@@ -805,7 +808,7 @@ namespace VSMaker
             playerClass_help_btn.TabIndex = 2;
             playerClass_help_btn.TabStop = false;
             playerClass_help_btn.Text = "?";
-            playerClass_help_btn.UseVisualStyleBackColor = true;
+            playerClass_help_btn.UseVisualStyleBackColor = false;
             playerClass_help_btn.Click += playerClass_help_btn_Click;
             // 
             // playerClass_Label
@@ -1500,6 +1503,7 @@ namespace VSMaker
             // 
             // panel5
             // 
+            panel5.Controls.Add(trainer_Player_help_btn);
             panel5.Controls.Add(label2);
             panel5.Controls.Add(trainers_list);
             panel5.Controls.Add(label1);
@@ -1509,6 +1513,20 @@ namespace VSMaker
             panel5.Name = "panel5";
             panel5.Size = new Size(200, 456);
             panel5.TabIndex = 0;
+            // 
+            // trainer_Player_help_btn
+            // 
+            trainer_Player_help_btn.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            trainer_Player_help_btn.BackColor = SystemColors.Info;
+            trainer_Player_help_btn.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            trainer_Player_help_btn.Location = new Point(173, 1);
+            trainer_Player_help_btn.Name = "trainer_Player_help_btn";
+            trainer_Player_help_btn.Size = new Size(23, 23);
+            trainer_Player_help_btn.TabIndex = 8;
+            trainer_Player_help_btn.TabStop = false;
+            trainer_Player_help_btn.Text = "?";
+            trainer_Player_help_btn.UseVisualStyleBackColor = false;
+            trainer_Player_help_btn.Click += trainer_Player_help_btn_Click;
             // 
             // label2
             // 
@@ -1722,6 +1740,15 @@ namespace VSMaker
             // 
             toolStripSeparator4.Name = "toolStripSeparator4";
             toolStripSeparator4.Size = new Size(6, 25);
+            // 
+            // trainerText_sort
+            // 
+            trainerText_sort.Image = Properties.Resources.sortIconSm;
+            trainerText_sort.ImageTransparentColor = Color.Magenta;
+            trainerText_sort.Name = "trainerText_sort";
+            trainerText_sort.Size = new Size(103, 22);
+            trainerText_sort.Text = "Sort + Repoint";
+            trainerText_sort.ToolTipText = "Arrange messages and repoint lookups";
             // 
             // mainContent_trainerTheme
             // 
@@ -1950,15 +1977,6 @@ namespace VSMaker
             panel2.Name = "panel2";
             panel2.Size = new Size(784, 490);
             panel2.TabIndex = 5;
-            // 
-            // trainerText_sort
-            // 
-            trainerText_sort.Image = Properties.Resources.sortIconSm;
-            trainerText_sort.ImageTransparentColor = Color.Magenta;
-            trainerText_sort.Name = "trainerText_sort";
-            trainerText_sort.Size = new Size(103, 22);
-            trainerText_sort.Text = "Sort + Repoint";
-            trainerText_sort.ToolTipText = "Arrange messages and repoint lookups";
             // 
             // Mainform
             // 
@@ -2214,5 +2232,6 @@ namespace VSMaker
         private DataGridViewComboBoxColumn MessageTriggerId;
         private DataGridViewTextBoxColumn Message;
         private ToolStripButton trainerText_sort;
+        private Button trainer_Player_help_btn;
     }
 }
