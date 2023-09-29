@@ -22,4 +22,11 @@ internal static class RomFileSystem
         trainerClassNames.Messages[trainerId] = newName;
         trainerClassNames.SaveToFileDefaultDir(RomInfo.trainerClassMessageNumber, showSuccessMessage: false);
     }
+    public static void UpdateTrainerTextMessages(string newMessage, int messageId)
+    {
+        TextArchive trainerMessages = new TextArchive(RomInfo.trainerTextMessageNumber);
+        trainerMessages.Messages[messageId] = newMessage;
+        trainerMessages.SaveToFileDefaultDir(RomInfo.trainerTextMessageNumber, showSuccessMessage: false);
+    }
+
 }

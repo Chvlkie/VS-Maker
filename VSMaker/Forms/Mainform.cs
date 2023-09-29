@@ -26,34 +26,30 @@ namespace VSMaker
 
         #region Editor Data
 
-        private bool trainerSpriteMessage = false;
+        private string[] abilityNames = Array.Empty<string>();
+        private int currentTrainerMessageIndex = 0;
+        private List<string> displayTrainerMessage = new();
+        private string[] itemNames = Array.Empty<string>();
         private List<MessageTrigger> messageTriggers = new();
+        private string[] moveNames = Array.Empty<string>();
         private List<Move> moves = new();
         private List<Pokemon> pokemons = new();
+        private SpeciesFile[] pokemonSpecies;
+        private (int abi1, int abi2)[] pokemonSpeciesAbilities;
+        private string[] pokeNames = Array.Empty<string>();
         private Trainer selectedTrainer;
         private TrainerClass selectedTrainerClass;
-
-        private TrainerFile trainerFile;
-        private SpeciesFile[] pokemonSpecies;
-
-        private string[] itemNames = Array.Empty<string>();
-        private string[] pokeNames = Array.Empty<string>();
-        private string[] moveNames = Array.Empty<string>();
-        private string[] abilityNames = Array.Empty<string>();
-
-        private (int abi1, int abi2)[] pokemonSpeciesAbilities;
+        private int selectedTrainerClassIndex = -1;
         private List<TrainerClass> trainerClasses = new();
+        private TrainerFile trainerFile;
         private List<TrainerMessage> trainerMessages = new();
         private PaletteBase trainerPal;
         private List<Trainer> trainers = new();
         private SpriteBase trainerSprite;
+        private bool trainerSpriteMessage = false;
         private ImageBase trainerTile;
 
         private bool unsavedChanges;
-
-        private List<string> displayTrainerMessage = new();
-        private int currentTrainerMessageIndex = 0;
-        private int selectedTrainerClassIndex = -1;
 
         #endregion Editor Data
 
@@ -376,21 +372,6 @@ namespace VSMaker
             OpenRom();
         }
 
-        private void statusLabelError(string errorMsg, bool severe = true)
-        {
-            SafeWriteLabel(statusLabel, errorMsg, new Font(statusLabel.Font, FontStyle.Bold), severe ? Color.Red : Color.DarkOrange);
-
-            statusLabel.Text = errorMsg;
-            statusLabel.Font = new Font(statusLabel.Font, FontStyle.Bold);
-            statusLabel.ForeColor = severe ? Color.Red : Color.DarkOrange;
-            statusLabel.Invalidate();
-        }
-
-        private void statusLabelMessage(string msg = "Ready")
-        {
-            SafeWriteLabel(statusLabel, msg, new Font(statusLabel.Font, FontStyle.Regular), Color.Black);
-        }
-
         private void SafeWriteLabel(ToolStripStatusLabel label, string text, Font font, Color color)
         {
             if (label.GetCurrentParent().InvokeRequired)
@@ -412,6 +393,21 @@ namespace VSMaker
             }
         }
 
+        private void statusLabelError(string errorMsg, bool severe = true)
+        {
+            SafeWriteLabel(statusLabel, errorMsg, new Font(statusLabel.Font, FontStyle.Bold), severe ? Color.Red : Color.DarkOrange);
+
+            statusLabel.Text = errorMsg;
+            statusLabel.Font = new Font(statusLabel.Font, FontStyle.Bold);
+            statusLabel.ForeColor = severe ? Color.Red : Color.DarkOrange;
+            statusLabel.Invalidate();
+        }
+
+        private void statusLabelMessage(string msg = "Ready")
+        {
+            SafeWriteLabel(statusLabel, msg, new Font(statusLabel.Font, FontStyle.Regular), Color.Black);
+        }
+
         #endregion Main Editor
 
         #region Trainer Class Editor
@@ -422,26 +418,6 @@ namespace VSMaker
             trainerClassListBox.Items.Clear();
             player_trainer_class.Items.Clear();
             trainerClass_Uses_list.Items.Clear();
-        }
-
-        private void playerClass_help_btn_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("These Trainer Classes are \"Player Classes\".\n\nChanging these can cause errors.", "Player Classes", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        private void saveClassName_btn_Click(object sender, EventArgs e)
-        {
-            if (trainerClassName.Text.Length > TrainerFile.maxClassNameLen)
-            {
-                MessageBox.Show($"Trainer Class name cannot exceed {TrainerFile.maxClassNameLen} characters.", "Trainer Class Name Length", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            else if (GetSingleTrainerClassName(selectedTrainerClass.TrainerClassId) != trainerClassName.Text)
-            {
-                RomFileSystem.UpdateCurrentTrainerClassName(trainerClassName.Text, selectedTrainerClass.TrainerClassId);
-                MessageBox.Show("Trainer Class name updated!", "Success!");
-                GetTrainerClasses();
-                SetupTrainerClassEditor();
-            }
         }
 
         private void DisableTrainerClassEditorInputs()
@@ -462,6 +438,35 @@ namespace VSMaker
             trainerClass_Gender_comboBox.Enabled = false;
             trainerClass_frames_num.Enabled = false;
             trainerClass_Uses_list.Enabled = false;
+        }
+
+        private void GoToTrainer()
+        {
+            int index = trainerClass_Uses_list.SelectedIndex;
+            var text = trainerClass_Uses_list.Items[index].ToString();
+            int id = int.Parse(text.Remove(0, 1).Remove(3));
+            selectedTrainer = trainers.SingleOrDefault(x => x.TrainerId == id);
+            mainContent.SelectedTab = mainContent_trainer;
+        }
+
+        private void playerClass_help_btn_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("These Trainer Classes are \"Player Classes\".\n\nChanging these can cause errors.", "Player Classes", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void saveClassName_btn_Click(object sender, EventArgs e)
+        {
+            if (trainerClassName.Text.Length > TrainerFile.maxClassNameLen)
+            {
+                MessageBox.Show($"Trainer Class name cannot exceed {TrainerFile.maxClassNameLen} characters.", "Trainer Class Name Length", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else if (GetSingleTrainerClassName(selectedTrainerClass.TrainerClassId) != trainerClassName.Text)
+            {
+                RomFileSystem.UpdateCurrentTrainerClassName(trainerClassName.Text, selectedTrainerClass.TrainerClassId);
+                MessageBox.Show("Trainer Class name updated!", "Success!");
+                GetTrainerClasses();
+                SetupTrainerClassEditor();
+            }
         }
 
         private void SetupTrainerClassEditor()
@@ -512,23 +517,14 @@ namespace VSMaker
             GoToTrainer();
         }
 
-        private void trainerClass_Uses_list_DoubleClick(object sender, EventArgs e)
-        {
-            GoToTrainer();
-        }
-
-        private void GoToTrainer()
-        {
-            int index = trainerClass_Uses_list.SelectedIndex;
-            var text = trainerClass_Uses_list.Items[index].ToString();
-            int id = int.Parse(text.Remove(0, 1).Remove(3));
-            selectedTrainer = trainers.SingleOrDefault(x => x.TrainerId == id);
-            mainContent.SelectedTab = mainContent_trainer;
-        }
-
         private void trainerClass_PrizeMoney_btn_Click(object sender, EventArgs e)
         {
             MessageBox.Show("This is the Base Rate Multiplier for calculating Prize Money.\nIt is multiplied by the level of a Trainer's last Pokémon.", "About Prize Money", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void trainerClass_Uses_list_DoubleClick(object sender, EventArgs e)
+        {
+            GoToTrainer();
         }
 
         private void trainerClass_Uses_list_SelectedIndexChanged(object sender, EventArgs e)
@@ -650,6 +646,12 @@ namespace VSMaker
 
         #region Get
 
+        private void GetAbilities()
+        {
+            statusLabelMessage("Getting Pokemon Abilities...");
+            Update(); abilityNames = GetAbilityNames();
+        }
+
         private void GetData()
         {
             if (trainers.Count == 0)
@@ -684,6 +686,12 @@ namespace VSMaker
             {
                 GetPokemon();
             }
+        }
+
+        private void GetItems()
+        {
+            statusLabelMessage("Getting Item Names...");
+            Update(); itemNames = GetItemNames();
         }
 
         private MessageTrigger GetMessageTriggerDetails(MessageTriggerEnum messageTrigger)
@@ -725,6 +733,77 @@ namespace VSMaker
                 GetMessageTriggerDetails(MessageTriggerEnum.notUsed0D),
                 GetMessageTriggerDetails(MessageTriggerEnum.notUsed0E),
             };
+        }
+
+        private void GetMoves()
+        {
+            statusLabelMessage("Getting Moves...");
+            Update(); moveNames = GetAttackNames();
+        }
+
+        private void GetPokemon()
+        {
+            statusLabelMessage("Getting Pokemon...");
+            Update();
+            pokemons = new List<Pokemon>();
+
+            int numberOfPokemon = Directory.GetFiles(gameDirs[DirNames.personalPokeData].unpackedDir, "*").Length;
+            pokemonSpecies = new SpeciesFile[numberOfPokemon];
+
+            for (int i = 0; i < numberOfPokemon; i++)
+            {
+                pokemonSpecies[i] = new SpeciesFile(new FileStream(gameDirs[DirNames.personalPokeData].unpackedDir + "\\" + i.ToString("D4"), FileMode.Open));
+            }
+
+            pokeNames = GetPokemonNames();
+            pokemonSpeciesAbilities = GetPokemonAbilities(numberOfPokemon);
+
+            for (int i = 0; i < pokeNames.Length; i++)
+            {
+                var pokemon = new Pokemon
+                {
+                    PokemonId = i,
+                    PokemonName = pokeNames[i]
+                };
+
+                pokemons.Add(pokemon);
+            }
+
+            var comboBoxes = new List<ComboBox>
+            {
+                trainer_Poke1_comboBox,
+                trainer_Poke2_comboBox,
+                trainer_Poke3_comboBox,
+                trainer_Poke4_comboBox,
+                trainer_Poke5_comboBox,
+                trainer_Poke6_comboBox
+            };
+
+            foreach (var item in comboBoxes)
+            {
+                item.Items.Clear();
+            }
+
+            pokemons.ForEach(x => trainer_Poke1_comboBox.Items.Add(x.PokemonName));
+            pokemons.ForEach(x => trainer_Poke2_comboBox.Items.Add(x.PokemonName));
+            pokemons.ForEach(x => trainer_Poke3_comboBox.Items.Add(x.PokemonName));
+            pokemons.ForEach(x => trainer_Poke4_comboBox.Items.Add(x.PokemonName));
+            pokemons.ForEach(x => trainer_Poke5_comboBox.Items.Add(x.PokemonName));
+            pokemons.ForEach(x => trainer_Poke6_comboBox.Items.Add(x.PokemonName));
+        }
+
+        private (int abi1, int abi2)[] GetPokemonAbilities(int numberOfPokemon)
+        {
+            statusLabelMessage("Getting Trainer's Pokemon Abilities...");
+            Update();
+            var pokemonSpeciesAbilities = new (int abi1, int abi2)[numberOfPokemon];
+
+            for (int i = 0; i < numberOfPokemon; i++)
+            {
+                pokemonSpeciesAbilities[i] = (pokemonSpecies[i].Ability1, pokemonSpecies[i].Ability2);
+            }
+
+            return pokemonSpeciesAbilities;
         }
 
         /// <summary>
@@ -904,89 +983,6 @@ namespace VSMaker
             EnablePokemon();
         }
 
-        private void GetItems()
-        {
-            statusLabelMessage("Getting Item Names...");
-            Update(); itemNames = GetItemNames();
-        }
-
-        private void GetMoves()
-        {
-            statusLabelMessage("Getting Moves...");
-            Update(); moveNames = GetAttackNames();
-        }
-
-        private void GetAbilities()
-        {
-            statusLabelMessage("Getting Pokemon Abilities...");
-            Update(); abilityNames = GetAbilityNames();
-        }
-
-        private void GetPokemon()
-        {
-            statusLabelMessage("Getting Pokemon...");
-            Update();
-            pokemons = new List<Pokemon>();
-
-            int numberOfPokemon = Directory.GetFiles(gameDirs[DirNames.personalPokeData].unpackedDir, "*").Length;
-            pokemonSpecies = new SpeciesFile[numberOfPokemon];
-
-            for (int i = 0; i < numberOfPokemon; i++)
-            {
-                pokemonSpecies[i] = new SpeciesFile(new FileStream(gameDirs[DirNames.personalPokeData].unpackedDir + "\\" + i.ToString("D4"), FileMode.Open));
-            }
-
-            pokeNames = GetPokemonNames();
-            pokemonSpeciesAbilities = GetPokemonAbilities(numberOfPokemon);
-
-            for (int i = 0; i < pokeNames.Length; i++)
-            {
-                var pokemon = new Pokemon
-                {
-                    PokemonId = i,
-                    PokemonName = pokeNames[i]
-                };
-
-                pokemons.Add(pokemon);
-            }
-
-            var comboBoxes = new List<ComboBox>
-            {
-                trainer_Poke1_comboBox,
-                trainer_Poke2_comboBox,
-                trainer_Poke3_comboBox,
-                trainer_Poke4_comboBox,
-                trainer_Poke5_comboBox,
-                trainer_Poke6_comboBox
-            };
-
-            foreach (var item in comboBoxes)
-            {
-                item.Items.Clear();
-            }
-
-            pokemons.ForEach(x => trainer_Poke1_comboBox.Items.Add(x.PokemonName));
-            pokemons.ForEach(x => trainer_Poke2_comboBox.Items.Add(x.PokemonName));
-            pokemons.ForEach(x => trainer_Poke3_comboBox.Items.Add(x.PokemonName));
-            pokemons.ForEach(x => trainer_Poke4_comboBox.Items.Add(x.PokemonName));
-            pokemons.ForEach(x => trainer_Poke5_comboBox.Items.Add(x.PokemonName));
-            pokemons.ForEach(x => trainer_Poke6_comboBox.Items.Add(x.PokemonName));
-        }
-
-        private (int abi1, int abi2)[] GetPokemonAbilities(int numberOfPokemon)
-        {
-            statusLabelMessage("Getting Trainer's Pokemon Abilities...");
-            Update();
-            var pokemonSpeciesAbilities = new (int abi1, int abi2)[numberOfPokemon];
-
-            for (int i = 0; i < numberOfPokemon; i++)
-            {
-                pokemonSpeciesAbilities[i] = (pokemonSpecies[i].Ability1, pokemonSpecies[i].Ability2);
-            }
-
-            return pokemonSpeciesAbilities;
-        }
-
         private void GetTrainerMessages()
         {
             trainerMessages = new List<TrainerMessage>();
@@ -1089,6 +1085,24 @@ namespace VSMaker
         }
 
         #endregion TrainerSprite
+
+        private static string ReadLine(string text, int lineNumber)
+        {
+            var reader = new StringReader(text);
+
+            string line;
+            int currentLineNumber = 0;
+
+            do
+            {
+                currentLineNumber += 1;
+                line = reader.ReadLine();
+            }
+            while (line != null && currentLineNumber < lineNumber);
+
+            return (currentLineNumber == lineNumber) ? line :
+                                                       string.Empty;
+        }
 
         private void EnablePokemon()
         {
@@ -1208,39 +1222,6 @@ namespace VSMaker
             }
         }
 
-        private void OpenPokemonEditor(int pokemonId)
-        {
-            pokemonEditor = new PokemonEditor();
-            pokemonEditor.Show();
-        }
-
-        private void OpenTextEditor(int trainerMessageId, string messageText)
-        {
-            textEditor = new TextEditor(trainerMessageId, messageText, vsMakerFont);
-            textEditor.Show();
-        }
-
-        private void SetupPokemonTab()
-        {
-            EnablePokemon();
-        }
-
-        private void SetupTrainerTextTab()
-        {
-            statusLabelMessage("Setting up Trainer Text Table Editor...");
-            Update();
-            trainerTextTable_dataGrid.SuspendLayout();
-            StartGetTrainerTextData();
-            trainerTextTable_dataGrid.ResumeLayout();
-        }
-
-        private async void StartGetTrainerTextData()
-        {
-            trainerTextTable_dataGrid.AllowUserToAddRows = true;
-            await Task.Run(() => GetTrainerTextTableData());
-            trainerTextTable_dataGrid.AllowUserToAddRows = false;
-        }
-
         private Task GetTrainerTextTableData()
         {
             if (trainerTextTable_dataGrid.RowCount == 1)
@@ -1276,6 +1257,146 @@ namespace VSMaker
             return Task.CompletedTask;
         }
 
+        private void mainContent_Selecting(object sender, TabControlCancelEventArgs e)
+        {
+            if (unsavedChanges)
+            {
+                var choice = MessageBox.Show("You have unsaved changes.\nDo you wish to discard these changes?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (choice == DialogResult.Yes)
+                {
+                    SetUnsavedChanges(false);
+                }
+                else
+                {
+                    e.Cancel = true;
+                }
+            }
+        }
+
+        private void OpenPokemonEditor(int pokemonId)
+        {
+            pokemonEditor = new PokemonEditor();
+            pokemonEditor.Show();
+        }
+
+        private void OpenTextEditor(int trainerMessageId, string messageText)
+        {
+            textEditor = new TextEditor(trainerMessageId, messageText, vsMakerFont);
+            textEditor.Show();
+        }
+
+        private void save_btn_Click(object sender, EventArgs e)
+        {
+            SaveRomChanges();
+        }
+
+        private void save_toolstrip_Click(object sender, EventArgs e)
+        {
+            SaveRomChanges();
+        }
+
+        private void SaveRomChanges()
+        {
+            SaveFileDialog saveRom = new SaveFileDialog
+            {
+                Filter = DSUtils.NDSRomFilter
+            };
+            if (saveRom.ShowDialog(this) != DialogResult.OK)
+            {
+                return;
+            }
+
+            statusLabelMessage("Repacking NARCS...");
+            Update();
+
+            // Repack NARCs
+            foreach (KeyValuePair<DirNames, (string packedDir, string unpackedDir)> kvp in RomInfo.gameDirs)
+            {
+                DirectoryInfo di = new DirectoryInfo(kvp.Value.unpackedDir);
+                if (di.Exists)
+                {
+                    Narc.FromFolder(kvp.Value.unpackedDir).Save(kvp.Value.packedDir); // Make new NARC from folder
+                }
+            }
+
+            if (DSUtils.ARM9.CheckCompressionMark())
+            {
+                statusLabelMessage("Awaiting user response...");
+                DialogResult d = MessageBox.Show("The ARM9 file of this ROM is currently uncompressed, but marked as compressed.\n" +
+                    "This will prevent your ROM from working on native hardware.\n\n" +
+                "Do you want to mark the ARM9 as uncompressed?", "ARM9 compression mismatch detected",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (d == DialogResult.Yes)
+                {
+                    DSUtils.ARM9.WriteBytes(new byte[4] { 0, 0, 0, 0 }, (uint)(RomInfo.gameFamily == gFamEnum.DP ? 0xB7C : 0xBB4));
+                }
+            }
+
+            statusLabelMessage("Repacking ROM...");
+
+            if (DSUtils.CheckOverlayHasCompressionFlag(1))
+            {
+                if (ROMToolboxDialog.overlay1MustBeRestoredFromBackup)
+                {
+                    DSUtils.RestoreOverlayFromCompressedBackup(1, false);
+                }
+                else
+                {
+                    if (!DSUtils.OverlayIsCompressed(1))
+                    {
+                        DSUtils.CompressOverlay(1);
+                    }
+                }
+            }
+
+            if (DSUtils.CheckOverlayHasCompressionFlag(RomInfo.initialMoneyOverlayNumber) && !DSUtils.OverlayIsCompressed(RomInfo.initialMoneyOverlayNumber))
+            {
+                DSUtils.CompressOverlay(RomInfo.initialMoneyOverlayNumber);
+            }
+
+            Update();
+
+            DSUtils.RepackROM(saveRom.FileName);
+
+            if (RomInfo.gameFamily != gFamEnum.DP && RomInfo.gameFamily != gFamEnum.Plat)
+            {
+                if (DSUtils.OverlayIsCompressed(1))
+                {
+                    DSUtils.DecompressOverlay(1);
+                }
+            }
+
+            // Properties.Settings.Default.Save();
+            statusLabelMessage();
+        }
+
+        private void SetUnsavedChanges(bool unsaved)
+        {
+            unsavedChanges = unsaved;
+        }
+
+        private void SetupPokemonTab()
+        {
+            EnablePokemon();
+        }
+
+        private void SetupTrainerTextTab()
+        {
+            statusLabelMessage("Setting up Trainer Text Table Editor...");
+            Update();
+            trainerTextTable_dataGrid.SuspendLayout();
+            StartGetTrainerTextData();
+            trainerTextTable_dataGrid.ResumeLayout();
+        }
+
+        private async void StartGetTrainerTextData()
+        {
+            trainerTextTable_dataGrid.AllowUserToAddRows = true;
+            await Task.Run(() => GetTrainerTextTableData());
+            trainerTextTable_dataGrid.AllowUserToAddRows = false;
+        }
+
         private void ThreadSafeDataTable(DataGridViewRow row)
         {
             if (trainerTextTable_dataGrid.InvokeRequired)
@@ -1308,6 +1429,19 @@ namespace VSMaker
             EnablePokemon();
         }
 
+        private void trainer_EditMessage_btn_Click(object sender, EventArgs e)
+        {
+            string selectedMessageTriggerName = trainer_MessageTrigger_list.SelectedItem.ToString();
+            int messageTriggerId = messageTriggers.Find(x => x.MessageTriggerName == selectedMessageTriggerName).MessageTriggerId;
+            var trainerMessage = selectedTrainer.TrainerMessages.Single(x => x.MessageTriggerId == messageTriggerId);
+            OpenTextEditor(trainerMessage.MessageId, trainerMessage.MessageText);
+        }
+
+        private void trainer_frames_num_ValueChanged(object sender, EventArgs e)
+        {
+            UpdateTrainerClassPic(trainerPicBox, (int)((NumericUpDown)sender).Value);
+        }
+
         private void trainer_GoToClass_btn_Click(object sender, EventArgs e)
         {
             int index = trainer_Class_comboBox.SelectedIndex;
@@ -1317,22 +1451,36 @@ namespace VSMaker
             mainContent.SelectedTab = mainContent_trainerClass;
         }
 
-        private static string ReadLine(string text, int lineNumber)
+        private void trainer_Message_Back_btn_Click(object sender, EventArgs e)
         {
-            var reader = new StringReader(text);
+            currentTrainerMessageIndex--;
+            trainer_Message_Back_btn.Enabled = currentTrainerMessageIndex > 0;
+            trainer_Message_Next_btn.Enabled = currentTrainerMessageIndex >= 0;
 
-            string line;
-            int currentLineNumber = 0;
-
-            do
+            if (currentTrainerMessageIndex >= 0)
             {
-                currentLineNumber += 1;
-                line = reader.ReadLine();
+                trainer_Message.Text = displayTrainerMessage[currentTrainerMessageIndex];
             }
-            while (line != null && currentLineNumber < lineNumber);
+            else
+            {
+                currentTrainerMessageIndex++;
+            }
+        }
 
-            return (currentLineNumber == lineNumber) ? line :
-                                                       string.Empty;
+        private void trainer_Message_Next_btn_Click(object sender, EventArgs e)
+        {
+            currentTrainerMessageIndex++;
+            trainer_Message_Back_btn.Enabled = currentTrainerMessageIndex > 0;
+            trainer_Message_Next_btn.Enabled = currentTrainerMessageIndex < displayTrainerMessage.Count() - 1;
+
+            if (currentTrainerMessageIndex < displayTrainerMessage.Count())
+            {
+                trainer_Message.Text = displayTrainerMessage[currentTrainerMessageIndex];
+            }
+            else
+            {
+                currentTrainerMessageIndex--;
+            }
         }
 
         private void trainer_MessageTrigger_list_SelectedIndexChanged(object sender, EventArgs e)
@@ -1389,61 +1537,9 @@ namespace VSMaker
             EnablePokemon();
         }
 
-        private void trainerClassName_TextChanged(object sender, EventArgs e)
+        private void trainer_Player_help_btn_Click(object sender, EventArgs e)
         {
-            if (!unsavedChanges)
-            {
-                undoTrainerClass_btn.Enabled = selectedTrainerClass.TrainerClassName != trainerClassName.Text;
-            }
-            SetUnsavedChanges(undoTrainerClass_btn.Enabled);
-        }
-
-        private void trainerEditor_tab_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (trainerEditor_tab.SelectedTab == trainerEditor_Pokemon)
-            {
-                SetupPokemonTab();
-            }
-        }
-
-        private void trainers_list_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            int index = trainers_list.SelectedIndex;
-            var text = trainers_list.Items[index].ToString();
-            int trainerId = int.Parse(text.Remove(0, 1).Remove(3));
-            trainer_MessageTrigger_list.SelectedIndex = -1;
-            GetTrainerInfo(trainerId);
-        }
-
-        private void trainerTextTable_dataGrid_TextDblClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.ColumnIndex == 3)
-            {
-                int trainerMessageId = e.RowIndex;
-                string messageText = trainerMessages.Find(x => x.MessageId == trainerMessageId).MessageText;
-                OpenTextEditor(trainerMessageId, messageText);
-            }
-        }
-
-        private void SetUnsavedChanges(bool unsaved)
-        {
-            unsavedChanges = unsaved;
-        }
-
-        private void mainContent_Selecting(object sender, TabControlCancelEventArgs e)
-        {
-            if (unsavedChanges)
-            {
-                var choice = MessageBox.Show("You have unsaved changes.\nDo you wish to discard these changes?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (choice == DialogResult.Yes)
-                {
-                    SetUnsavedChanges(false);
-                }
-                else
-                {
-                    e.Cancel = true;
-                }
-            }
+            MessageBox.Show("This is the \"Player\" trainer file.\n\nChanging this can cause errors.", "Player File", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void trainer_Poke1_btn_Click(object sender, EventArgs e)
@@ -1476,6 +1572,37 @@ namespace VSMaker
             OpenPokemonEditor(trainer_Poke6_comboBox.SelectedIndex);
         }
 
+        private void trainerClass_frames_num_ValueChanged(object sender, EventArgs e)
+        {
+            UpdateTrainerClassPic(trainerClassPicBox, (int)((NumericUpDown)sender).Value);
+        }
+
+        private void trainerClassName_TextChanged(object sender, EventArgs e)
+        {
+            if (!unsavedChanges)
+            {
+                undoTrainerClass_btn.Enabled = selectedTrainerClass.TrainerClassName != trainerClassName.Text;
+            }
+            SetUnsavedChanges(undoTrainerClass_btn.Enabled);
+        }
+
+        private void trainerEditor_tab_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (trainerEditor_tab.SelectedTab == trainerEditor_Pokemon)
+            {
+                SetupPokemonTab();
+            }
+        }
+
+        private void trainers_list_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int index = trainers_list.SelectedIndex;
+            var text = trainers_list.Items[index].ToString();
+            int trainerId = int.Parse(text.Remove(0, 1).Remove(3));
+            trainer_MessageTrigger_list.SelectedIndex = -1;
+            GetTrainerInfo(trainerId);
+        }
+
         private void trainerTextTable_dataGrid_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.ColumnIndex == 3)
@@ -1488,157 +1615,21 @@ namespace VSMaker
             }
         }
 
+        private void trainerTextTable_dataGrid_TextDblClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == 3)
+            {
+                int trainerMessageId = e.RowIndex;
+                var trainerMessage = trainerMessages.Find(x => x.MessageId == trainerMessageId);
+                OpenTextEditor(trainerMessage.MessageId, trainerMessage.MessageText);
+
+            }
+        }
+
         private void undoTrainerClass_btn_Click(object sender, EventArgs e)
         {
             SetUnsavedChanges(false);
             GetTrainerClassInfo(selectedTrainerClass.TrainerClassId);
-        }
-
-        private void trainerClass_frames_num_ValueChanged(object sender, EventArgs e)
-        {
-            UpdateTrainerClassPic(trainerClassPicBox, (int)((NumericUpDown)sender).Value);
-        }
-
-        private void trainer_frames_num_ValueChanged(object sender, EventArgs e)
-        {
-            UpdateTrainerClassPic(trainerPicBox, (int)((NumericUpDown)sender).Value);
-        }
-
-        private void trainer_Message_Next_btn_Click(object sender, EventArgs e)
-        {
-            currentTrainerMessageIndex++;
-            trainer_Message_Back_btn.Enabled = currentTrainerMessageIndex > 0;
-            trainer_Message_Next_btn.Enabled = currentTrainerMessageIndex < displayTrainerMessage.Count() - 1;
-
-            if (currentTrainerMessageIndex < displayTrainerMessage.Count())
-            {
-                trainer_Message.Text = displayTrainerMessage[currentTrainerMessageIndex];
-            }
-            else
-            {
-                currentTrainerMessageIndex--;
-            }
-        }
-
-        private void trainer_Message_Back_btn_Click(object sender, EventArgs e)
-        {
-            currentTrainerMessageIndex--;
-            trainer_Message_Back_btn.Enabled = currentTrainerMessageIndex > 0;
-            trainer_Message_Next_btn.Enabled = currentTrainerMessageIndex >= 0;
-
-            if (currentTrainerMessageIndex >= 0)
-            {
-                trainer_Message.Text = displayTrainerMessage[currentTrainerMessageIndex];
-            }
-            else
-            {
-                currentTrainerMessageIndex++;
-            }
-        }
-
-        private void trainer_EditMessage_btn_Click(object sender, EventArgs e)
-        {
-            string selectedMessageTriggerName = trainer_MessageTrigger_list.SelectedItem.ToString();
-            int messageTriggerId = messageTriggers.Find(x => x.MessageTriggerName == selectedMessageTriggerName).MessageTriggerId;
-            string trainerText = selectedTrainer.TrainerMessages.Single(x => x.MessageTriggerId == messageTriggerId).MessageText;
-            OpenTextEditor(selectedTrainer.TrainerId, trainerText);
-        }
-
-        private void trainer_Player_help_btn_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("This is the \"Player\" trainer file.\n\nChanging this can cause errors.", "Player File", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        private void save_btn_Click(object sender, EventArgs e)
-        {
-            SaveRomChanges();
-        }
-
-        private void SaveRomChanges()
-        {
-            SaveFileDialog saveRom = new SaveFileDialog
-            {
-                Filter = DSUtils.NDSRomFilter
-            };
-            if (saveRom.ShowDialog(this) != DialogResult.OK)
-            {
-                return;
-            }
-
-            statusLabelMessage("Repacking NARCS...");
-            Update();
-
-            // Repack NARCs
-            foreach (KeyValuePair<DirNames, (string packedDir, string unpackedDir)> kvp in RomInfo.gameDirs)
-            {
-                DirectoryInfo di = new DirectoryInfo(kvp.Value.unpackedDir);
-                if (di.Exists)
-                {
-                    Narc.FromFolder(kvp.Value.unpackedDir).Save(kvp.Value.packedDir); // Make new NARC from folder
-                }
-            }
-
-
-            if (DSUtils.ARM9.CheckCompressionMark())
-            {
-                statusLabelMessage("Awaiting user response...");
-                DialogResult d = MessageBox.Show("The ARM9 file of this ROM is currently uncompressed, but marked as compressed.\n" +
-                    "This will prevent your ROM from working on native hardware.\n\n" +
-                "Do you want to mark the ARM9 as uncompressed?", "ARM9 compression mismatch detected",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-                if (d == DialogResult.Yes)
-                {
-                    DSUtils.ARM9.WriteBytes(new byte[4] { 0, 0, 0, 0 }, (uint)(RomInfo.gameFamily == gFamEnum.DP ? 0xB7C : 0xBB4));
-                }
-            }
-
-            statusLabelMessage("Repacking ROM...");
-
-            if (DSUtils.CheckOverlayHasCompressionFlag(1))
-            {
-                if (ROMToolboxDialog.overlay1MustBeRestoredFromBackup)
-                {
-                    DSUtils.RestoreOverlayFromCompressedBackup(1, false);
-                }
-                else
-                {
-                    if (!DSUtils.OverlayIsCompressed(1))
-                    {
-                        DSUtils.CompressOverlay(1);
-                    }
-                }
-            }
-
-            if (DSUtils.CheckOverlayHasCompressionFlag(RomInfo.initialMoneyOverlayNumber))
-            {
-                if (!DSUtils.OverlayIsCompressed(RomInfo.initialMoneyOverlayNumber))
-                {
-                    DSUtils.CompressOverlay(RomInfo.initialMoneyOverlayNumber);
-                }
-            }
-
-
-            Update();
-
-            DSUtils.RepackROM(saveRom.FileName);
-
-            if (RomInfo.gameFamily != gFamEnum.DP && RomInfo.gameFamily != gFamEnum.Plat)
-            {
-               
-                    if (DSUtils.OverlayIsCompressed(1))
-                    {
-                        DSUtils.DecompressOverlay(1);
-                    }
-            }
-
-           // Properties.Settings.Default.Save();
-            statusLabelMessage();
-        }
-
-        private void save_toolstrip_Click(object sender, EventArgs e)
-        {
-            SaveRomChanges();
         }
     }
 }

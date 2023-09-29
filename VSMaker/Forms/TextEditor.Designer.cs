@@ -189,6 +189,7 @@
             trainerText_save.Name = "trainerText_save";
             trainerText_save.Size = new Size(51, 22);
             trainerText_save.Text = "Save";
+            trainerText_save.Click += trainerText_save_Click;
             // 
             // TextEditor
             // 

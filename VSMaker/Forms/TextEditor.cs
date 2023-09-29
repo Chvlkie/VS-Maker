@@ -134,6 +134,11 @@ namespace VSMaker.Forms
                 e.Handled = true;
             }
         }
+
+        private void trainerText_save_Click(object sender, EventArgs e)
+        {
+            RomFileSystem.UpdateTrainerTextMessages(textEditor_Message.Text, trainerMessageId);
+        }
     }
 }
 
