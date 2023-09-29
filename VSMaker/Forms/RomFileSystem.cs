@@ -16,10 +16,10 @@ internal static class RomFileSystem
         europeByte = br.ReadByte();
     }
 
-    public static void UpdateCurrentTrainerClassName(string newName, int index)
+    public static void UpdateCurrentTrainerClassName(string newName, int trainerId)
     {
-        TextArchive trainerClassNames = new(trainerClassMessageNumber);
-        trainerClassNames.Messages[index] = newName;
-        trainerClassNames.SaveToFileDefaultDir(trainerClassMessageNumber, showSuccessMessage: false);
+        TextArchive trainerClassNames = new TextArchive(RomInfo.trainerClassMessageNumber);
+        trainerClassNames.Messages[trainerId] = newName;
+        trainerClassNames.SaveToFileDefaultDir(RomInfo.trainerClassMessageNumber, showSuccessMessage: false);
     }
 }

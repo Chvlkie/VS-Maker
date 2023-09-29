@@ -1,6 +1,7 @@
 using Ekona.Images;
 using Images;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using NarcAPI;
 using System.Diagnostics;
 using VSMaker.CommonFunctions;
 using VSMaker.Data;
@@ -1546,6 +1547,98 @@ namespace VSMaker
         private void trainer_Player_help_btn_Click(object sender, EventArgs e)
         {
             MessageBox.Show("This is the \"Player\" trainer file.\n\nChanging this can cause errors.", "Player File", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void save_btn_Click(object sender, EventArgs e)
+        {
+            SaveRomChanges();
+        }
+
+        private void SaveRomChanges()
+        {
+            SaveFileDialog saveRom = new SaveFileDialog
+            {
+                Filter = DSUtils.NDSRomFilter
+            };
+            if (saveRom.ShowDialog(this) != DialogResult.OK)
+            {
+                return;
+            }
+
+            statusLabelMessage("Repacking NARCS...");
+            Update();
+
+            // Repack NARCs
+            foreach (KeyValuePair<DirNames, (string packedDir, string unpackedDir)> kvp in RomInfo.gameDirs)
+            {
+                DirectoryInfo di = new DirectoryInfo(kvp.Value.unpackedDir);
+                if (di.Exists)
+                {
+                    Narc.FromFolder(kvp.Value.unpackedDir).Save(kvp.Value.packedDir); // Make new NARC from folder
+                }
+            }
+
+
+            if (DSUtils.ARM9.CheckCompressionMark())
+            {
+                statusLabelMessage("Awaiting user response...");
+                DialogResult d = MessageBox.Show("The ARM9 file of this ROM is currently uncompressed, but marked as compressed.\n" +
+                    "This will prevent your ROM from working on native hardware.\n\n" +
+                "Do you want to mark the ARM9 as uncompressed?", "ARM9 compression mismatch detected",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (d == DialogResult.Yes)
+                {
+                    DSUtils.ARM9.WriteBytes(new byte[4] { 0, 0, 0, 0 }, (uint)(RomInfo.gameFamily == gFamEnum.DP ? 0xB7C : 0xBB4));
+                }
+            }
+
+            statusLabelMessage("Repacking ROM...");
+
+            if (DSUtils.CheckOverlayHasCompressionFlag(1))
+            {
+                if (ROMToolboxDialog.overlay1MustBeRestoredFromBackup)
+                {
+                    DSUtils.RestoreOverlayFromCompressedBackup(1, false);
+                }
+                else
+                {
+                    if (!DSUtils.OverlayIsCompressed(1))
+                    {
+                        DSUtils.CompressOverlay(1);
+                    }
+                }
+            }
+
+            if (DSUtils.CheckOverlayHasCompressionFlag(RomInfo.initialMoneyOverlayNumber))
+            {
+                if (!DSUtils.OverlayIsCompressed(RomInfo.initialMoneyOverlayNumber))
+                {
+                    DSUtils.CompressOverlay(RomInfo.initialMoneyOverlayNumber);
+                }
+            }
+
+
+            Update();
+
+            DSUtils.RepackROM(saveRom.FileName);
+
+            if (RomInfo.gameFamily != gFamEnum.DP && RomInfo.gameFamily != gFamEnum.Plat)
+            {
+               
+                    if (DSUtils.OverlayIsCompressed(1))
+                    {
+                        DSUtils.DecompressOverlay(1);
+                    }
+            }
+
+           // Properties.Settings.Default.Save();
+            statusLabelMessage();
+        }
+
+        private void save_toolstrip_Click(object sender, EventArgs e)
+        {
+            SaveRomChanges();
         }
     }
 }

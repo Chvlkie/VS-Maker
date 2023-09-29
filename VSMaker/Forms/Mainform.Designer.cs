@@ -286,6 +286,7 @@ namespace VSMaker
             save_toolstrip.Name = "save_toolstrip";
             save_toolstrip.Size = new Size(191, 22);
             save_toolstrip.Text = "Save";
+            save_toolstrip.Click += save_toolstrip_Click;
             // 
             // mainToolStrip_help
             // 
@@ -1925,6 +1926,7 @@ namespace VSMaker
             save_btn.Name = "save_btn";
             save_btn.Size = new Size(79, 22);
             save_btn.Text = "Save ROM";
+            save_btn.Click += save_btn_Click;
             // 
             // toolStripSeparator1
             // 
