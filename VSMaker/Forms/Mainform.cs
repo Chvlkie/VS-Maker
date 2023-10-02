@@ -2,15 +2,12 @@ using Ekona.Images;
 using Images;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using NarcAPI;
-using System;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
 using VSMaker.CommonFunctions;
 using VSMaker.Data;
 using VSMaker.Fonts;
 using VSMaker.Forms;
 using VSMaker.ROMFiles;
-using static System.Net.Mime.MediaTypeNames;
 using static VSMaker.CommonFunctions.RomInfo;
 using Application = System.Windows.Forms.Application;
 using Image = System.Drawing.Image;
@@ -1429,6 +1426,7 @@ namespace VSMaker
             trainerTextTable_dataGrid.SuspendLayout();
             StartGetTrainerTextData();
             trainerTextTable_dataGrid.ResumeLayout();
+            SetUnsavedChanges(false);
         }
 
         private async void StartGetTrainerTextData()
@@ -1731,6 +1729,7 @@ namespace VSMaker
 
         private void trainerTextTable_SaveChanges_btn(object sender, EventArgs e)
         {
+            trainerTextTable_dataGrid.EndEdit();
             var verify = VerifyTrainerTextTable();
             if (!verify.Valid)
             {
@@ -1751,18 +1750,28 @@ namespace VSMaker
             {
                 statusLabelMessage("Saving changes...");
                 Update();
+                String filePath = RomInfo.gameDirs[DirNames.trainerTable].unpackedDir + '\\' + 0.ToString("D4");
                 var trainerTextArchive = new TextArchive(RomInfo.trainerTextMessageNumber);
                 trainerTextArchive.Messages.Clear();
                 for (int i = 0; i < trainerTextTable_dataGrid.Rows.Count; i++)
                 {
                     string messageText = trainerTextTable_dataGrid.Rows[i].Cells[3].Value.ToString();
                     trainerTextArchive.Messages.Add(messageText);
+                    var selectedMessageTrigger = trainerTextTable_dataGrid.Rows[i].Cells[2].Value.ToString();
+                    var selectedTrainer = trainerTextTable_dataGrid.Rows[i].Cells[1].Value.ToString();
+                    int trainerId = int.Parse(selectedTrainer.Remove(0, 1).Remove(3));
+                    int messageTriggerId = messageTriggers.Find(x => x.MessageTriggerName == selectedMessageTrigger).MessageTriggerId;
+                    using (DSUtils.EasyWriter wr = new DSUtils.EasyWriter(filePath, 4 * i))
+                    {
+                        wr.Write((ushort)trainerId);
+                        wr.Write((ushort)messageTriggerId);
+                    };
                 }
-
                 trainerTextArchive.SaveToFileDefaultDir(RomInfo.trainerTextMessageNumber);
                 statusLabelMessage("Trainer Texts saved successfully");
                 Update();
                 SetUnsavedChanges(false);
+                RomInfo.ReadTrainerTable(); 
                 RefreshTrainerMessages();
             }
         }
@@ -1853,9 +1862,71 @@ namespace VSMaker
             return (true, -1);
         }
 
-        private void trainerTextTable_dataGrid_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
+        private void trainerText_sort_Click(object sender, EventArgs e)
         {
+            trainerTextTable_dataGrid.EndEdit();
+            var verify = VerifyTrainerTextTable();
+            if (!verify.Valid)
+            {
+                MessageBox.Show("You must only use each Message Trigger once per Trainer.\n\nPlease review entry " + verify.Row, "Unable to Save Changes", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                trainerTextTable_dataGrid.FirstDisplayedScrollingRowIndex = verify.Row;
+                trainerTextTable_dataGrid.ClearSelection();
+                trainerTextTable_dataGrid.Rows[verify.Row].Selected = true;
+                return;
+            }
 
+            var dialogResult = MessageBox.Show("This will sort the Trainer Text table to group Trainers.\n\nThe Trainer Text lookup table will also be sorted.\nThis allows for more efficient loading in-game.\n\nAll changes will be saved.", "Sort and Repoint", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+
+            if (dialogResult == DialogResult.Cancel)
+            {
+                return;
+            }
+            else if (dialogResult == DialogResult.OK)
+            {
+                var trainerTexts = new List<TrainerMessage>();
+              
+                // Sort Trainer Text Table by Trainer.
+                foreach (var trainer in trainers)
+                {
+                    var thisTrainerText = new List<TrainerMessage>();
+                    for (int i = 0; i < trainerTextTable_dataGrid.Rows.Count; i++)
+                    {
+                        var selectedMessageTrigger = trainerTextTable_dataGrid.Rows[i].Cells[2].Value.ToString();
+                        var selectedTrainer = trainerTextTable_dataGrid.Rows[i].Cells[1].Value.ToString();
+                        int trainerId = int.Parse(selectedTrainer.Remove(0, 1).Remove(3));
+
+                        if (trainerId == trainer.TrainerId)
+                        {
+                            var trainerMessage = new TrainerMessage
+                            {
+                                TrainerId = trainerId,
+                                MessageTriggerId = messageTriggers.Single(x => x.MessageTriggerName == selectedMessageTrigger).MessageTriggerId,
+                                MessageText = trainerTextTable_dataGrid.Rows[i].Cells[3].Value.ToString()
+                            };
+
+                            thisTrainerText.Add(trainerMessage);
+                        }
+                    }
+                    thisTrainerText = thisTrainerText.OrderBy(x => x.MessageTriggerId).ToList();
+                    trainerTexts.AddRange(thisTrainerText);
+                }
+                var trainerTextArchive = new TextArchive(RomInfo.trainerTextMessageNumber);
+                trainerTextArchive.Messages.Clear();
+                String filePath = RomInfo.gameDirs[DirNames.trainerTable].unpackedDir + '\\' + 0.ToString("D4");
+
+                for (int i = 0; i < trainerTexts.Count; i++)
+                {
+                    trainerTextArchive.Messages.Add(trainerTexts[i].MessageText);
+                    using (DSUtils.EasyWriter wr = new DSUtils.EasyWriter(filePath, 4 * i))
+                    {
+                        wr.Write((ushort)trainerTexts[i].TrainerId);
+                        wr.Write((ushort)trainerTexts[i].MessageTriggerId);
+                    };
+                }
+                trainerTextArchive.SaveToFileDefaultDir(RomInfo.trainerTextMessageNumber);
+                RomInfo.ReadTrainerTable();
+                RefreshTrainerMessages();
+            }
         }
     }
 }

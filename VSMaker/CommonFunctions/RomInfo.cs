@@ -1,4 +1,5 @@
-﻿using VSMaker.Resources;
+﻿using VSMaker.Data;
+using VSMaker.Resources;
 using VSMaker.ROMFiles;
 
 namespace VSMaker.CommonFunctions

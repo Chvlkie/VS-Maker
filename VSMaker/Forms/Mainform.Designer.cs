@@ -1643,7 +1643,6 @@ namespace VSMaker
             trainerTextTable_dataGrid.RowTemplate.Height = 25;
             trainerTextTable_dataGrid.Size = new Size(776, 437);
             trainerTextTable_dataGrid.TabIndex = 0;
-            trainerTextTable_dataGrid.CellBeginEdit += trainerTextTable_dataGrid_CellBeginEdit;
             trainerTextTable_dataGrid.CellClick += trainerTextTable_dataGrid_CellClick;
             trainerTextTable_dataGrid.CellContentDoubleClick += trainerTextTable_dataGrid_TextDblClick;
             // 
@@ -1734,8 +1733,8 @@ namespace VSMaker
             trainerTextTable_addRow_btn.Image = Properties.Resources.plusIconSm;
             trainerTextTable_addRow_btn.ImageTransparentColor = Color.Magenta;
             trainerTextTable_addRow_btn.Name = "trainerTextTable_addRow_btn";
-            trainerTextTable_addRow_btn.Size = new Size(106, 22);
-            trainerTextTable_addRow_btn.Text = "Add New Entry";
+            trainerTextTable_addRow_btn.Size = new Size(86, 22);
+            trainerTextTable_addRow_btn.Text = "Insert Entry";
             trainerTextTable_addRow_btn.Click += trainerTextTable_addRow_btn_Click;
             // 
             // trainerTextTable_delRow_btn
@@ -1760,6 +1759,7 @@ namespace VSMaker
             trainerText_sort.Size = new Size(103, 22);
             trainerText_sort.Text = "Sort + Repoint";
             trainerText_sort.ToolTipText = "Arrange messages and repoint lookups";
+            trainerText_sort.Click += trainerText_sort_Click;
             // 
             // mainContent_trainerTheme
             // 
