@@ -1224,7 +1224,7 @@ namespace VSMaker
 
         private Task GetTrainerTextTableData()
         {
-            if (trainerTextTable_dataGrid.RowCount == 1)
+            if (trainerTextTable_dataGrid.RowCount <= 1)
             {
                 statusLabelMessage("Reading Trainer Text Table");
                 string[] currentTrainers = new string[trainers.Count];
@@ -1281,7 +1281,7 @@ namespace VSMaker
 
         private void OpenTextEditor(int trainerMessageId, string messageText)
         {
-            textEditor = new TextEditor(trainerMessageId, messageText, vsMakerFont);
+            textEditor = new TextEditor(this, trainerMessageId, messageText, vsMakerFont);
             textEditor.Show();
         }
 
@@ -1393,7 +1393,7 @@ namespace VSMaker
         private async void StartGetTrainerTextData()
         {
             trainerTextTable_dataGrid.AllowUserToAddRows = true;
-            await Task.Run(() => GetTrainerTextTableData());
+            await Task.Run(() => GetTrainerTextTableData().Wait());
             trainerTextTable_dataGrid.AllowUserToAddRows = false;
         }
 
@@ -1622,7 +1622,6 @@ namespace VSMaker
                 int trainerMessageId = e.RowIndex;
                 var trainerMessage = trainerMessages.Find(x => x.MessageId == trainerMessageId);
                 OpenTextEditor(trainerMessage.MessageId, trainerMessage.MessageText);
-
             }
         }
 
@@ -1630,6 +1629,18 @@ namespace VSMaker
         {
             SetUnsavedChanges(false);
             GetTrainerClassInfo(selectedTrainerClass.TrainerClassId);
+        }
+
+        public void RefreshTrainerMessages()
+        {
+            trainerTextTable_dataGrid.Rows.Clear();
+            trainerMessages = new List<TrainerMessage>();
+            GetData();
+            SetupTrainerTextTab();
+            if (selectedTrainer != default)
+            {
+                GetTrainerInfo(selectedTrainer.TrainerId);
+            }
         }
     }
 }

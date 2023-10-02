@@ -20,8 +20,10 @@ namespace VSMaker.Forms
         private List<string> displayTrainerMessage = new();
         private string messageText;
         private int trainerMessageId;
-        public TextEditor(int trainerMessageId, string messageText, VsMakerFont vsMakerFont)
+        private Mainform mainform;
+        public TextEditor(Mainform mainform, int trainerMessageId, string messageText, VsMakerFont vsMakerFont)
         {
+            this.mainform = mainform;
             this.trainerMessageId = trainerMessageId;
             this.messageText = messageText;
             this.vsMakerFont = vsMakerFont;
@@ -138,6 +140,7 @@ namespace VSMaker.Forms
         private void trainerText_save_Click(object sender, EventArgs e)
         {
             RomFileSystem.UpdateTrainerTextMessages(textEditor_Message.Text, trainerMessageId);
+            mainform.RefreshTrainerMessages();
         }
     }
 }
