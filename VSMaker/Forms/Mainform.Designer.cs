@@ -661,6 +661,7 @@ namespace VSMaker
             saveTrainerClassAll_btn.Text = "Save All Changes";
             saveTrainerClassAll_btn.TextImageRelation = TextImageRelation.ImageBeforeText;
             saveTrainerClassAll_btn.UseVisualStyleBackColor = true;
+            saveTrainerClassAll_btn.Click += saveTrainerClassAll_btn_Click;
             // 
             // saveClassName_btn
             // 
@@ -1354,6 +1355,7 @@ namespace VSMaker
             undoTrainer_btn.Text = "Undo All Changes";
             undoTrainer_btn.TextImageRelation = TextImageRelation.ImageBeforeText;
             undoTrainer_btn.UseVisualStyleBackColor = true;
+            undoTrainer_btn.Click += undoTrainer_btn_Click;
             // 
             // saveTrainerAll_btn
             // 
@@ -1366,6 +1368,7 @@ namespace VSMaker
             saveTrainerAll_btn.Text = "Save All Changes";
             saveTrainerAll_btn.TextImageRelation = TextImageRelation.ImageBeforeText;
             saveTrainerAll_btn.UseVisualStyleBackColor = true;
+            saveTrainerAll_btn.Click += saveTrainerAll_btn_Click;
             // 
             // save_TrainerName_btn
             // 
@@ -1377,6 +1380,7 @@ namespace VSMaker
             save_TrainerName_btn.Text = "Save";
             save_TrainerName_btn.TextImageRelation = TextImageRelation.ImageBeforeText;
             save_TrainerName_btn.UseVisualStyleBackColor = true;
+            save_TrainerName_btn.Click += save_TrainerName_btn_Click;
             // 
             // trainer_Name
             // 
@@ -1385,6 +1389,7 @@ namespace VSMaker
             trainer_Name.Name = "trainer_Name";
             trainer_Name.Size = new Size(133, 23);
             trainer_Name.TabIndex = 11;
+            trainer_Name.TextChanged += trainer_Name_TextChanged;
             // 
             // trainer_Name_Label
             // 
@@ -1628,14 +1633,17 @@ namespace VSMaker
             trainerTextTable_dataGrid.AllowUserToAddRows = false;
             trainerTextTable_dataGrid.AllowUserToDeleteRows = false;
             trainerTextTable_dataGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCells;
+            trainerTextTable_dataGrid.CausesValidation = false;
             trainerTextTable_dataGrid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             trainerTextTable_dataGrid.Columns.AddRange(new DataGridViewColumn[] { MessageId, TrainerId, MessageTriggerId, Message });
             trainerTextTable_dataGrid.Dock = DockStyle.Fill;
             trainerTextTable_dataGrid.Location = new Point(0, 0);
+            trainerTextTable_dataGrid.MultiSelect = false;
             trainerTextTable_dataGrid.Name = "trainerTextTable_dataGrid";
             trainerTextTable_dataGrid.RowTemplate.Height = 25;
             trainerTextTable_dataGrid.Size = new Size(776, 437);
             trainerTextTable_dataGrid.TabIndex = 0;
+            trainerTextTable_dataGrid.CellBeginEdit += trainerTextTable_dataGrid_CellBeginEdit;
             trainerTextTable_dataGrid.CellClick += trainerTextTable_dataGrid_CellClick;
             trainerTextTable_dataGrid.CellContentDoubleClick += trainerTextTable_dataGrid_TextDblClick;
             // 
@@ -1678,7 +1686,6 @@ namespace VSMaker
             Message.DefaultCellStyle = dataGridViewCellStyle1;
             Message.HeaderText = "Text";
             Message.Name = "Message";
-            Message.ReadOnly = true;
             Message.Width = 287;
             // 
             // toolStrip1
@@ -1698,6 +1705,7 @@ namespace VSMaker
             toolStripButton3.Name = "toolStripButton3";
             toolStripButton3.Size = new Size(100, 22);
             toolStripButton3.Text = "Save Changes";
+            toolStripButton3.Click += trainerTextTable_SaveChanges_btn;
             // 
             // trainreText_Import_btn
             // 
@@ -1728,6 +1736,7 @@ namespace VSMaker
             trainerTextTable_addRow_btn.Name = "trainerTextTable_addRow_btn";
             trainerTextTable_addRow_btn.Size = new Size(106, 22);
             trainerTextTable_addRow_btn.Text = "Add New Entry";
+            trainerTextTable_addRow_btn.Click += trainerTextTable_addRow_btn_Click;
             // 
             // trainerTextTable_delRow_btn
             // 
@@ -1736,6 +1745,7 @@ namespace VSMaker
             trainerTextTable_delRow_btn.Name = "trainerTextTable_delRow_btn";
             trainerTextTable_delRow_btn.Size = new Size(90, 22);
             trainerTextTable_delRow_btn.Text = "Delete Entry";
+            trainerTextTable_delRow_btn.Click += trainerTextTable_delRow_btn_Click;
             // 
             // toolStripSeparator4
             // 
@@ -2229,11 +2239,11 @@ namespace VSMaker
         private Label trainer_Message;
         private ComboBox trainer_MessageTrigger_list;
         private Label trainerTextTable_help_label;
+        private ToolStripButton trainerText_sort;
+        private Button trainer_Player_help_btn;
         private DataGridViewTextBoxColumn MessageId;
         private DataGridViewComboBoxColumn TrainerId;
         private DataGridViewComboBoxColumn MessageTriggerId;
         private DataGridViewTextBoxColumn Message;
-        private ToolStripButton trainerText_sort;
-        private Button trainer_Player_help_btn;
     }
 }

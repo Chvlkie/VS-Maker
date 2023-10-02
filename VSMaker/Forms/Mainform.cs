@@ -2,13 +2,17 @@ using Ekona.Images;
 using Images;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using NarcAPI;
+using System;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using VSMaker.CommonFunctions;
 using VSMaker.Data;
 using VSMaker.Fonts;
 using VSMaker.Forms;
 using VSMaker.ROMFiles;
+using static System.Net.Mime.MediaTypeNames;
 using static VSMaker.CommonFunctions.RomInfo;
+using Application = System.Windows.Forms.Application;
 using Image = System.Drawing.Image;
 
 namespace VSMaker
@@ -440,6 +444,23 @@ namespace VSMaker
             trainerClass_Uses_list.Enabled = false;
         }
 
+        private void DisableTrainerEditorInputs()
+        {
+            //Disable Buttons
+            save_TrainerClass_btn.Enabled = false;
+            save_TrainerName_btn.Enabled = false;
+            saveTrainerPoke_btn.Enabled = false;
+            saveTrainerAll_btn.Enabled = false;
+            undoTrainer_btn.Enabled = false;
+            trainer_GoToClass_btn.Enabled = false;
+            trainer_EditMessage_btn.Enabled = false;
+
+            //Disable Fields
+            trainer_Name.Enabled = false;
+            trainer_Class_comboBox.Enabled = false;
+            trainer_MessageTrigger_list.Enabled = false;
+        }
+
         private void GoToTrainer()
         {
             int index = trainerClass_Uses_list.SelectedIndex;
@@ -456,16 +477,36 @@ namespace VSMaker
 
         private void saveClassName_btn_Click(object sender, EventArgs e)
         {
+            SaveTrainerClassName();
+        }
+
+        private void SaveTrainerClassName()
+        {
             if (trainerClassName.Text.Length > TrainerFile.maxClassNameLen)
             {
                 MessageBox.Show($"Trainer Class name cannot exceed {TrainerFile.maxClassNameLen} characters.", "Trainer Class Name Length", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
             else if (GetSingleTrainerClassName(selectedTrainerClass.TrainerClassId) != trainerClassName.Text)
             {
                 RomFileSystem.UpdateCurrentTrainerClassName(trainerClassName.Text, selectedTrainerClass.TrainerClassId);
-                MessageBox.Show("Trainer Class name updated!", "Success!");
                 GetTrainerClasses();
                 SetupTrainerClassEditor();
+            }
+        }
+
+        private void SaveTrainerName()
+        {
+            if (trainer_Name.Text.Length > TrainerFile.maxNameLen)
+            {
+                MessageBox.Show($"Trainer name cannot exceed {TrainerFile.maxNameLen} characters.", "Trainer Name Length", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            else if (GetSingleTrainerClassName(selectedTrainer.TrainerId) != trainer_Name.Text)
+            {
+                RomFileSystem.UpdateCurrentTrainerName(trainer_Name.Text, selectedTrainer.TrainerClassId);
+                GetTrainers();
+                SetupTrainerEditor();
             }
         }
 
@@ -1412,6 +1453,21 @@ namespace VSMaker
             }
         }
 
+        private void ThreadSafeDataTable(DataGridViewRow row, int index)
+        {
+            if (trainerTextTable_dataGrid.InvokeRequired)
+            {
+                trainerTextTable_dataGrid.Invoke((MethodInvoker)delegate
+                {
+                    trainerTextTable_dataGrid.Rows.Insert(index, row);
+                });
+            }
+            else
+            {
+                trainerTextTable_dataGrid.Rows.Insert(index, row);
+            }
+        }
+
         private void trainer_Double_checkBox_CheckedChanged(object sender, EventArgs e)
         {
             if (trainer_Double_checkBox.Checked)
@@ -1641,6 +1697,165 @@ namespace VSMaker
             {
                 GetTrainerInfo(selectedTrainer.TrainerId);
             }
+        }
+
+        private void save_TrainerName_btn_Click(object sender, EventArgs e)
+        {
+            SaveTrainerName();
+        }
+
+        private void saveTrainerAll_btn_Click(object sender, EventArgs e)
+        {
+            SaveTrainerName();
+        }
+
+        private void saveTrainerClassAll_btn_Click(object sender, EventArgs e)
+        {
+            SaveTrainerClassName();
+        }
+
+        private void undoTrainer_btn_Click(object sender, EventArgs e)
+        {
+            SetUnsavedChanges(false);
+            GetTrainerInfo(selectedTrainer.TrainerId);
+        }
+
+        private void trainer_Name_TextChanged(object sender, EventArgs e)
+        {
+            if (!unsavedChanges)
+            {
+                undoTrainer_btn.Enabled = selectedTrainer.TrainerName != trainer_Name.Text;
+            }
+            SetUnsavedChanges(undoTrainer_btn.Enabled);
+        }
+
+        private void trainerTextTable_SaveChanges_btn(object sender, EventArgs e)
+        {
+            var verify = VerifyTrainerTextTable();
+            if (!verify.Valid)
+            {
+                MessageBox.Show("You must only use each Message Trigger once per Trainer.\n\nPlease review entry " + verify.Row, "Unable to Save Changes", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                trainerTextTable_dataGrid.FirstDisplayedScrollingRowIndex = verify.Row;
+                trainerTextTable_dataGrid.ClearSelection();
+                trainerTextTable_dataGrid.Rows[verify.Row].Selected = true;
+                return;
+            }
+
+            var dialogResult = MessageBox.Show("Save all changes to Trainer Text Table?\nThis might take some time...", "Save Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (dialogResult == DialogResult.No)
+            {
+                return;
+            }
+            else if (dialogResult == DialogResult.Yes)
+            {
+                statusLabelMessage("Saving changes...");
+                Update();
+                var trainerTextArchive = new TextArchive(RomInfo.trainerTextMessageNumber);
+                trainerTextArchive.Messages.Clear();
+                for (int i = 0; i < trainerTextTable_dataGrid.Rows.Count; i++)
+                {
+                    string messageText = trainerTextTable_dataGrid.Rows[i].Cells[3].Value.ToString();
+                    trainerTextArchive.Messages.Add(messageText);
+                }
+
+                trainerTextArchive.SaveToFileDefaultDir(RomInfo.trainerTextMessageNumber);
+                statusLabelMessage("Trainer Texts saved successfully");
+                Update();
+                SetUnsavedChanges(false);
+                RefreshTrainerMessages();
+            }
+        }
+
+        private void trainerTextTable_addRow_btn_Click(object sender, EventArgs e)
+        {
+            int index = trainerTextTable_dataGrid.Rows.Count - 1;
+
+            // Get current selected row index - Can't multi-select
+            if (trainerTextTable_dataGrid.SelectedRows.Count > 0)
+            {
+                index = trainerTextTable_dataGrid.SelectedRows[0].Index;
+            }
+            else if (trainerTextTable_dataGrid.SelectedCells.Count > 0)
+            {
+                index = trainerTextTable_dataGrid.SelectedCells[0].RowIndex;
+            }
+            string[] currentTrainers = new string[trainers.Count];
+            string[] currentMessageTriggers = new string[messageTriggers.Count];
+
+            for (int i = 0; i < trainers.Count; i++)
+            {
+                currentTrainers[i] = $"[{trainers[i].DisplayTrainerId}] - {trainers[i].TrainerName}";
+            }
+
+            for (int i = 0; i < messageTriggers.Count; i++)
+            {
+                currentMessageTriggers[i] = $"{messageTriggers[i].MessageTriggerName}";
+            }
+
+            DataGridViewRow row = (DataGridViewRow)trainerTextTable_dataGrid.Rows[0].Clone();
+            row.Cells[0].Value = trainerTextTable_dataGrid.Rows.Count;
+            row.Cells[1] = new DataGridViewComboBoxCell { DataSource = currentTrainers, Value = currentTrainers[0] };
+            row.Cells[2] = new DataGridViewComboBoxCell { DataSource = currentMessageTriggers, Value = currentMessageTriggers[0] };
+            row.Cells[3].Value = "";
+            ThreadSafeDataTable(row, index + 1);
+            trainerTextTable_dataGrid.FirstDisplayedScrollingRowIndex = index > 0 ? index - 1 : index;
+            trainerTextTable_dataGrid.ClearSelection();
+            trainerTextTable_dataGrid.Rows[index + 1].Selected = true;
+            SetUnsavedChanges(true);
+        }
+
+        private void trainerTextTable_delRow_btn_Click(object sender, EventArgs e)
+        {
+            int index = trainerTextTable_dataGrid.Rows.Count - 1;
+
+            // Get current selected row index - Can't multi-select
+            if (trainerTextTable_dataGrid.SelectedRows.Count > 0)
+            {
+                index = trainerTextTable_dataGrid.SelectedRows[0].Index;
+            }
+            else if (trainerTextTable_dataGrid.SelectedCells.Count > 0)
+            {
+                index = trainerTextTable_dataGrid.SelectedCells[0].RowIndex;
+            }
+
+            trainerTextTable_dataGrid.Rows.RemoveAt(index);
+            trainerTextTable_dataGrid.FirstDisplayedScrollingRowIndex = index > 0 ? index - 1 : index;
+            trainerTextTable_dataGrid.ClearSelection();
+            trainerTextTable_dataGrid.Rows[index].Selected = true;
+            SetUnsavedChanges(true);
+        }
+
+        private (bool Valid, int Row) VerifyTrainerTextTable()
+        {
+            foreach (var trainer in trainers)
+            {
+                var checkMessages = new List<string>();
+                for (int i = 0; i < trainerTextTable_dataGrid.Rows.Count; i++)
+                {
+                    var selectedMessageTrigger = trainerTextTable_dataGrid.Rows[i].Cells[2].Value.ToString();
+                    var selectedTrainer = trainerTextTable_dataGrid.Rows[i].Cells[1].Value.ToString();
+                    int trainerId = int.Parse(selectedTrainer.Remove(0, 1).Remove(3));
+                    if (trainerId == trainer.TrainerId)
+                    {
+                        if (checkMessages.Contains(selectedMessageTrigger))
+                        {
+                            return (false, i);
+                        }
+                        else
+                        {
+                            checkMessages.Add(selectedMessageTrigger);
+                        }
+                    }
+                }
+            }
+
+            return (true, -1);
+        }
+
+        private void trainerTextTable_dataGrid_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
+        {
+
         }
     }
 }
