@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using VSMaker.Data;
-using VSMaker.Fonts;
+﻿using VSMaker.Fonts;
 
 namespace VSMaker.Forms
 {
@@ -16,20 +6,21 @@ namespace VSMaker.Forms
     {
         private VsMakerFont vsMakerFont;
 
-        private int currentTrainerMessageIndex = 0;
+        private int currentTrainerMessageIndex;
         private List<string> displayTrainerMessage = new();
-        private string messageText;
-        private int trainerMessageId;
-        private Mainform mainform;
-        public TextEditor(Mainform mainform, int trainerMessageId, string messageText, VsMakerFont vsMakerFont)
+        private readonly string message;
+        private readonly int trainerMessageId;
+        private readonly Mainform mainform;
+        private readonly string seperator = @"\r";
+
+        public TextEditor(Mainform mainform, int trainerMessageId, string message, VsMakerFont vsMakerFont)
         {
             this.mainform = mainform;
             this.trainerMessageId = trainerMessageId;
-            this.messageText = messageText;
+            this.message = message;
             this.vsMakerFont = vsMakerFont;
             InitializeComponent();
-            UpdateMessage(messageText);
-
+            UpdateMessage(message);
         }
 
         public void UpdateMessage(string text)
@@ -43,7 +34,7 @@ namespace VSMaker.Forms
             UpdateTextPreview(textEditor_Message.Text);
         }
 
-        private static string ReadLine(string text, int lineNumber)
+        private static string? ReadLine(string text, int lineNumber)
         {
             var reader = new StringReader(text);
 
@@ -52,24 +43,21 @@ namespace VSMaker.Forms
 
             do
             {
-                currentLineNumber += 1;
+                currentLineNumber++;
                 line = reader.ReadLine();
             }
             while (line != null && currentLineNumber < lineNumber);
 
-            return (currentLineNumber == lineNumber) ? line :
-                                                       string.Empty;
+            return (currentLineNumber == lineNumber) ? line : string.Empty;
         }
 
         private void UpdateTextPreview(string trainerText)
         {
             currentTrainerMessageIndex = 0;
             displayTrainerMessage = new List<string>();
-            const string seperator1 = @"\r";
             trainerText = trainerText.Replace("\\n", Environment.NewLine);
             trainerText = trainerText.Replace("\\f", Environment.NewLine);
-            var messageArray = trainerText.Split(new string[] { seperator1 }, StringSplitOptions.None);
-            foreach (var item in messageArray)
+            foreach (var item in trainerText.Split(new string[] { seperator }, StringSplitOptions.None))
             {
                 int numLines = item.Split('\n').Length;
                 if (numLines == 3 && !string.IsNullOrEmpty(ReadLine(item, 3)))
@@ -144,4 +132,3 @@ namespace VSMaker.Forms
         }
     }
 }
-

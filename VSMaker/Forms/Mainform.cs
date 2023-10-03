@@ -16,7 +16,7 @@ namespace VSMaker
 {
     public partial class Mainform : Form
     {
-        private VsMakerFont vsMakerFont;
+        private readonly VsMakerFont vsMakerFont;
 
         #region ROM Info
 
@@ -28,12 +28,11 @@ namespace VSMaker
         #region Editor Data
 
         private string[] abilityNames = Array.Empty<string>();
-        private int currentTrainerMessageIndex = 0;
+        private int currentTrainerMessageIndex;
         private List<string> displayTrainerMessage = new();
         private string[] itemNames = Array.Empty<string>();
         private List<MessageTrigger> messageTriggers = new();
         private string[] moveNames = Array.Empty<string>();
-        private List<Move> moves = new();
         private List<Pokemon> pokemons = new();
         private SpeciesFile[] pokemonSpecies;
         private (int abi1, int abi2)[] pokemonSpeciesAbilities;
@@ -77,8 +76,8 @@ namespace VSMaker
             versionLabel.Visible = true;
             languageLabel.Visible = true;
 
-            versionLabel.Text = gameVersion.ToString() + " " + "[" + romID + "]";
-            languageLabel.Text = "Lang: " + gameLanguage;
+            versionLabel.Text = $"{gameVersion} [{romID}]";
+            languageLabel.Text = $"Lang: {gameLanguage}";
 
             if (gameLanguage == gLangEnum.English)
             {
@@ -179,11 +178,12 @@ namespace VSMaker
 
         private void OpenRomFolder()
         {
-            CommonOpenFileDialog romFolder = new CommonOpenFileDialog
+            CommonOpenFileDialog romFolder = new()
             {
                 IsFolderPicker = true,
                 Multiselect = false
             };
+
             if (romFolder.ShowDialog() != CommonFileDialogResult.Ok)
             {
                 return;
@@ -242,16 +242,16 @@ namespace VSMaker
             mainContent.Visible = true;
 
             statusLabelMessage();
-            this.Text += "  -  " + fileName;
+            Text += $"  -  {fileName}";
         }
 
         private bool UnpackRom(string ndsFileName)
         {
-            statusLabelMessage("Unpacking ROM contents to " + workDir + " ...");
+            statusLabelMessage($"Unpacking ROM contents to {workDir} ...");
             Update();
 
             Directory.CreateDirectory(workDir);
-            Process unpack = new Process();
+            Process unpack = new();
             unpack.StartInfo.FileName = @"Tools\ndstool.exe";
             unpack.StartInfo.Arguments = "-x " + '"' + ndsFileName + '"'
                 + " -9 " + '"' + arm9Path + '"'
@@ -272,14 +272,14 @@ namespace VSMaker
             }
             catch (System.ComponentModel.Win32Exception)
             {
-                MessageBox.Show("Failed to call ndstool.exe" + Environment.NewLine + "Make sure VS-Maker's Tools folder is intact.",
+                MessageBox.Show($"Failed to call ndstool.exe{Environment.NewLine}Make sure VS-Maker's Tools folder is intact.",
                     "Couldn't unpack ROM", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
             return true;
         }
 
-        private int UnpackRomCheckUserChoice()
+        private static int UnpackRomCheckUserChoice()
         {
             // Check if extracted data for the ROM exists, and ask user if they want to load it.
             // Returns true if user aborted the process
@@ -345,7 +345,7 @@ namespace VSMaker
             }
             catch (Exception ex)
             {
-                MessageBox.Show("The extracted folder is not setup correctly.\nEssential files are missing.\n\n" + ex.Message, "Error Opening Folder", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"The extracted folder is not setup correctly.\nEssential files are missing.\n\n{ex.Message}", "Error Opening Folder", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 throw;
             }
         }
@@ -358,7 +358,7 @@ namespace VSMaker
             }
             catch (Exception ex)
             {
-                MessageBox.Show("The extracted folder is not setup correctly.\nEssential files are missing.\n\n" + ex.Message, "Error Opening Folder", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"The extracted folder is not setup correctly.\nEssential files are missing.\n\n{ex.Message}", "Error Opening Folder", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 throw;
             }
         }
@@ -373,7 +373,7 @@ namespace VSMaker
             OpenRom();
         }
 
-        private void SafeWriteLabel(ToolStripStatusLabel label, string text, Font font, Color color)
+        private static void SafeWriteLabel(ToolStripStatusLabel label, string text, Font font, Color color)
         {
             if (label.GetCurrentParent().InvokeRequired)
             {
@@ -482,7 +482,6 @@ namespace VSMaker
             if (trainerClassName.Text.Length > TrainerFile.maxClassNameLen)
             {
                 MessageBox.Show($"Trainer Class name cannot exceed {TrainerFile.maxClassNameLen} characters.", "Trainer Class Name Length", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
             }
             else if (GetSingleTrainerClassName(selectedTrainerClass.TrainerClassId) != trainerClassName.Text)
             {
@@ -497,7 +496,6 @@ namespace VSMaker
             if (trainer_Name.Text.Length > TrainerFile.maxNameLen)
             {
                 MessageBox.Show($"Trainer name cannot exceed {TrainerFile.maxNameLen} characters.", "Trainer Name Length", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
             }
             else if (GetSingleTrainerClassName(selectedTrainer.TrainerId) != trainer_Name.Text)
             {
@@ -676,7 +674,6 @@ namespace VSMaker
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
-                return;
             }
         }
 
@@ -732,7 +729,7 @@ namespace VSMaker
             Update(); itemNames = GetItemNames();
         }
 
-        private MessageTrigger GetMessageTriggerDetails(MessageTriggerEnum messageTrigger)
+        private static MessageTrigger GetMessageTriggerDetails(MessageTriggerEnum messageTrigger)
         {
             return new MessageTrigger
             {
@@ -776,7 +773,8 @@ namespace VSMaker
         private void GetMoves()
         {
             statusLabelMessage("Getting Moves...");
-            Update(); moveNames = GetAttackNames();
+            Update();
+            moveNames = GetAttackNames();
         }
 
         private void GetPokemon()
@@ -790,7 +788,7 @@ namespace VSMaker
 
             for (int i = 0; i < numberOfPokemon; i++)
             {
-                pokemonSpecies[i] = new SpeciesFile(new FileStream(gameDirs[DirNames.personalPokeData].unpackedDir + "\\" + i.ToString("D4"), FileMode.Open));
+                pokemonSpecies[i] = new SpeciesFile(new FileStream($"{gameDirs[DirNames.personalPokeData].unpackedDir}\\{i:D4}", FileMode.Open));
             }
 
             pokeNames = GetPokemonNames();
@@ -858,9 +856,8 @@ namespace VSMaker
 
             if (classNames.Length > byte.MaxValue + 1)
             {
-                MessageBox.Show("There can't be more than 256 trainer classes! [Found " + classNames.Length + "].\nAborting.",
+                MessageBox.Show($"There can't be more than 256 trainer classes! [Found {classNames.Length}].\nAborting.",
                     "Too many trainer classes", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
             }
 
             for (int i = 0; i < classNames.Length; i++)
@@ -1005,7 +1002,7 @@ namespace VSMaker
                 }
             }
 
-            if (selectedTrainer.Pokemon.Count() > 0)
+            if (selectedTrainer.Pokemon.Count > 0)
             {
                 trainer_NumPoke_num.Minimum = 1;
             }
@@ -1058,7 +1055,7 @@ namespace VSMaker
             for (int i = 0; i < trainerNames.Length; i++)
             {
                 string suffix = "\\" + i.ToString("D4");
-                var trainerProperties = new TrainerProperties((ushort)i, new FileStream(gameDirs[DirNames.trainerProperties].unpackedDir + suffix, FileMode.Open));
+                var trainerProperties = new TrainerProperties((ushort)i, new FileStream($"{gameDirs[DirNames.trainerProperties].unpackedDir}{suffix}", FileMode.Open));
                 var item = new Trainer
                 {
                     TrainerId = i,
@@ -1086,15 +1083,15 @@ namespace VSMaker
                 }
                 return 0;
             }
-            int paletteFileID = (trainerClassId * 5 + 1);
+            int tilesFileId = trainerClassId * 5;
+            int paletteFileID = (tilesFileId + 1);
             string paletteFilename = paletteFileID.ToString("D4");
             trainerPal = new NCLR(gameDirs[DirNames.trainerGraphics].unpackedDir + "\\" + paletteFilename, paletteFileID, paletteFilename);
 
-            int tilesFileID = trainerClassId * 5;
-            string tilesFilename = tilesFileID.ToString("D4");
-            trainerTile = new NCGR(gameDirs[DirNames.trainerGraphics].unpackedDir + "\\" + tilesFilename, tilesFileID, tilesFilename);
+            string tilesFilename = tilesFileId.ToString("D4");
+            trainerTile = new NCGR(gameDirs[DirNames.trainerGraphics].unpackedDir + "\\" + tilesFilename, tilesFileId, tilesFilename);
 
-            int spriteFileID = (trainerClassId * 5 + 2);
+            int spriteFileID = (tilesFileId + 2);
             string spriteFilename = spriteFileID.ToString("D4");
             trainerSprite = new NCER(gameDirs[DirNames.trainerGraphics].unpackedDir + "\\" + spriteFilename, spriteFileID, spriteFilename);
 
@@ -1117,8 +1114,7 @@ namespace VSMaker
             }
 
             frameNumber = Math.Min(trainerSprite.Banks.Length, frameNumber);
-            Image trSprite = trainerSprite.Get_Image(trainerTile, trainerPal, frameNumber, trainerClassPicBox.Width, trainerClassPicBox.Height, false, false, false, true, true, -1, OAMenabled);
-            pb.Image = trSprite;
+            pb.Image = trainerSprite.Get_Image(trainerTile, trainerPal, frameNumber, trainerClassPicBox.Width, trainerClassPicBox.Height, false, false, false, true, true, -1, OAMenabled);
             pb.Update();
         }
 
@@ -1313,7 +1309,7 @@ namespace VSMaker
 
         private void OpenPokemonEditor(int pokemonId)
         {
-            pokemonEditor = new PokemonEditor();
+            pokemonEditor = new PokemonEditor(this, pokemonId);
             pokemonEditor.Show();
         }
 
@@ -1335,7 +1331,7 @@ namespace VSMaker
 
         private void SaveRomChanges()
         {
-            SaveFileDialog saveRom = new SaveFileDialog
+            SaveFileDialog saveRom = new()
             {
                 Filter = DSUtils.NDSRomFilter
             };
@@ -1348,9 +1344,9 @@ namespace VSMaker
             Update();
 
             // Repack NARCs
-            foreach (KeyValuePair<DirNames, (string packedDir, string unpackedDir)> kvp in RomInfo.gameDirs)
+            foreach (KeyValuePair<DirNames, (string packedDir, string unpackedDir)> kvp in gameDirs)
             {
-                DirectoryInfo di = new DirectoryInfo(kvp.Value.unpackedDir);
+                DirectoryInfo di = new(kvp.Value.unpackedDir);
                 if (di.Exists)
                 {
                     Narc.FromFolder(kvp.Value.unpackedDir).Save(kvp.Value.packedDir); // Make new NARC from folder
@@ -1367,7 +1363,7 @@ namespace VSMaker
 
                 if (d == DialogResult.Yes)
                 {
-                    DSUtils.ARM9.WriteBytes(new byte[4] { 0, 0, 0, 0 }, (uint)(RomInfo.gameFamily == gFamEnum.DP ? 0xB7C : 0xBB4));
+                    DSUtils.ARM9.WriteBytes(new byte[4] { 0, 0, 0, 0 }, (uint)(gameFamily == gFamEnum.DP ? 0xB7C : 0xBB4));
                 }
             }
 
@@ -1750,8 +1746,8 @@ namespace VSMaker
             {
                 statusLabelMessage("Saving changes...");
                 Update();
-                String filePath = RomInfo.gameDirs[DirNames.trainerTable].unpackedDir + '\\' + 0.ToString("D4");
-                var trainerTextArchive = new TextArchive(RomInfo.trainerTextMessageNumber);
+                string filePath = $"{gameDirs[DirNames.trainerTable].unpackedDir}\\{0.ToString("D4")}";
+                var trainerTextArchive = new TextArchive(trainerTextMessageNumber);
                 trainerTextArchive.Messages.Clear();
                 for (int i = 0; i < trainerTextTable_dataGrid.Rows.Count; i++)
                 {
@@ -1767,11 +1763,11 @@ namespace VSMaker
                         wr.Write((ushort)messageTriggerId);
                     };
                 }
-                trainerTextArchive.SaveToFileDefaultDir(RomInfo.trainerTextMessageNumber);
+                trainerTextArchive.SaveToFileDefaultDir(trainerTextMessageNumber);
                 statusLabelMessage("Trainer Texts saved successfully");
                 Update();
                 SetUnsavedChanges(false);
-                RomInfo.ReadTrainerTable(); 
+                RomInfo.ReadTrainerTable();
                 RefreshTrainerMessages();
             }
         }
@@ -1868,7 +1864,7 @@ namespace VSMaker
             var verify = VerifyTrainerTextTable();
             if (!verify.Valid)
             {
-                MessageBox.Show("You must only use each Message Trigger once per Trainer.\n\nPlease review entry " + verify.Row, "Unable to Save Changes", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("You can only use each Message Trigger once per Trainer.\n\nPlease review entry " + verify.Row, "Unable to Save Changes", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 trainerTextTable_dataGrid.FirstDisplayedScrollingRowIndex = verify.Row;
                 trainerTextTable_dataGrid.ClearSelection();
                 trainerTextTable_dataGrid.Rows[verify.Row].Selected = true;
@@ -1884,7 +1880,7 @@ namespace VSMaker
             else if (dialogResult == DialogResult.OK)
             {
                 var trainerTexts = new List<TrainerMessage>();
-              
+
                 // Sort Trainer Text Table by Trainer.
                 foreach (var trainer in trainers)
                 {
@@ -1910,21 +1906,21 @@ namespace VSMaker
                     thisTrainerText = thisTrainerText.OrderBy(x => x.MessageTriggerId).ToList();
                     trainerTexts.AddRange(thisTrainerText);
                 }
-                var trainerTextArchive = new TextArchive(RomInfo.trainerTextMessageNumber);
+                var trainerTextArchive = new TextArchive(trainerTextMessageNumber);
                 trainerTextArchive.Messages.Clear();
-                String filePath = RomInfo.gameDirs[DirNames.trainerTable].unpackedDir + '\\' + 0.ToString("D4");
+                string filePath = $"{gameDirs[DirNames.trainerTable].unpackedDir}\\{0.ToString("D4")}";
 
                 for (int i = 0; i < trainerTexts.Count; i++)
                 {
                     trainerTextArchive.Messages.Add(trainerTexts[i].MessageText);
-                    using (DSUtils.EasyWriter wr = new DSUtils.EasyWriter(filePath, 4 * i))
+                    using (DSUtils.EasyWriter wr = new(filePath, 4 * i))
                     {
                         wr.Write((ushort)trainerTexts[i].TrainerId);
                         wr.Write((ushort)trainerTexts[i].MessageTriggerId);
                     };
                 }
-                trainerTextArchive.SaveToFileDefaultDir(RomInfo.trainerTextMessageNumber);
-                RomInfo.ReadTrainerTable();
+                trainerTextArchive.SaveToFileDefaultDir(trainerTextMessageNumber);
+                ReadTrainerTable();
                 RefreshTrainerMessages();
             }
         }

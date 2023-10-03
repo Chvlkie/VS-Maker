@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-
-namespace VSMaker.Forms
+﻿namespace VSMaker.Forms
 {
     public partial class PokemonEditor : Form
     {
-        public PokemonEditor()
+        private readonly Mainform mainform;
+        private int pokemonId;
+
+        public PokemonEditor(Mainform mainform, int pokemonId)
         {
+            this.mainform = mainform;
+            this.pokemonId = pokemonId;
             InitializeComponent();
         }
     }
