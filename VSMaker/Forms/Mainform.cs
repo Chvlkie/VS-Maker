@@ -1933,6 +1933,10 @@ namespace VSMaker
             }
         }
 
+        /// <summary>
+        /// Repoint Trainer Text Offset table.
+        /// </summary>
+        /// <param name="dataGrid"></param>
         private void RepointTrainerOffsetTable(DataGridView dataGrid)
         {
             List<uint> offset = new List<uint>();
@@ -1949,7 +1953,7 @@ namespace VSMaker
                     {
                         if (dataGrid.Rows[i].Cells[1].Value.ToString() == trainerListItem)
                         {
-                            index = i;
+                            index = i-1;
                             search = false;
                             break;
                         }
