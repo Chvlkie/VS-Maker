@@ -1,7 +1,9 @@
+using ClosedXML.Excel;
 using Ekona.Images;
 using Images;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using NarcAPI;
+using System.Data;
 using System.Diagnostics;
 using VSMaker.CommonFunctions;
 using VSMaker.Data;
@@ -10,7 +12,7 @@ using VSMaker.Forms;
 using VSMaker.ROMFiles;
 using static VSMaker.CommonFunctions.RomInfo;
 using Application = System.Windows.Forms.Application;
-using Image = System.Drawing.Image;
+using Font = System.Drawing.Font;
 
 namespace VSMaker
 {
@@ -663,7 +665,8 @@ namespace VSMaker
                 DirNames.textArchives,
                 DirNames.monIcons,
                 DirNames.personalPokeData,
-                DirNames.trainerTable
+                DirNames.trainerTextTable,
+                DirNames.trainerTextOffset,
             });
 
             SetTrainerTable();
@@ -1415,21 +1418,30 @@ namespace VSMaker
             EnablePokemon();
         }
 
-        private void SetupTrainerTextTab()
+        private void SetupTrainerTextTab(bool repoint = false)
         {
             statusLabelMessage("Setting up Trainer Text Table Editor...");
             Update();
             trainerTextTable_dataGrid.SuspendLayout();
-            StartGetTrainerTextData();
+            StartGetTrainerTextData(repoint);
             trainerTextTable_dataGrid.ResumeLayout();
             SetUnsavedChanges(false);
         }
 
-        private async void StartGetTrainerTextData()
+        private async void StartGetTrainerTextData(bool repoint = false)
         {
+            trainerText_toolstrip.Enabled = false;
             trainerTextTable_dataGrid.AllowUserToAddRows = true;
             await Task.Run(() => GetTrainerTextTableData().Wait());
+            trainerText_toolstrip.Enabled = true;
             trainerTextTable_dataGrid.AllowUserToAddRows = false;
+            if (repoint)
+            {
+                RepointTrainerOffsetTable(trainerTextTable_dataGrid);
+                statusLabelMessage();
+                Update();
+            }
+
         }
 
         private void ThreadSafeDataTable(DataGridViewRow row)
@@ -1681,12 +1693,12 @@ namespace VSMaker
             GetTrainerClassInfo(selectedTrainerClass.TrainerClassId);
         }
 
-        public void RefreshTrainerMessages()
+        public void RefreshTrainerMessages(bool repoint = false)
         {
             trainerTextTable_dataGrid.Rows.Clear();
             trainerMessages = new List<TrainerMessage>();
             GetData();
-            SetupTrainerTextTab();
+            SetupTrainerTextTab(repoint);
             if (selectedTrainer != default)
             {
                 GetTrainerInfo(selectedTrainer.TrainerId);
@@ -1746,7 +1758,7 @@ namespace VSMaker
             {
                 statusLabelMessage("Saving changes...");
                 Update();
-                string filePath = $"{gameDirs[DirNames.trainerTable].unpackedDir}\\{0.ToString("D4")}";
+                string filePath = $"{gameDirs[DirNames.trainerTextTable].unpackedDir}\\{0.ToString("D4")}";
                 var trainerTextArchive = new TextArchive(trainerTextMessageNumber);
                 trainerTextArchive.Messages.Clear();
                 for (int i = 0; i < trainerTextTable_dataGrid.Rows.Count; i++)
@@ -1873,11 +1885,7 @@ namespace VSMaker
 
             var dialogResult = MessageBox.Show("This will sort the Trainer Text table to group Trainers.\n\nThe Trainer Text lookup table will also be sorted.\nThis allows for more efficient loading in-game.\n\nAll changes will be saved.", "Sort and Repoint", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
 
-            if (dialogResult == DialogResult.Cancel)
-            {
-                return;
-            }
-            else if (dialogResult == DialogResult.OK)
+            if (dialogResult == DialogResult.OK)
             {
                 var trainerTexts = new List<TrainerMessage>();
 
@@ -1908,7 +1916,7 @@ namespace VSMaker
                 }
                 var trainerTextArchive = new TextArchive(trainerTextMessageNumber);
                 trainerTextArchive.Messages.Clear();
-                string filePath = $"{gameDirs[DirNames.trainerTable].unpackedDir}\\{0.ToString("D4")}";
+                string filePath = $"{gameDirs[DirNames.trainerTextTable].unpackedDir}\\{0.ToString("D4")}";
 
                 for (int i = 0; i < trainerTexts.Count; i++)
                 {
@@ -1921,8 +1929,130 @@ namespace VSMaker
                 }
                 trainerTextArchive.SaveToFileDefaultDir(trainerTextMessageNumber);
                 ReadTrainerTable();
-                RefreshTrainerMessages();
+                RefreshTrainerMessages(true);
             }
+        }
+
+        private void RepointTrainerOffsetTable(DataGridView dataGrid)
+        {
+            List<uint> offset = new List<uint>();
+            statusLabelMessage("Getting Trainer Text offsets.");
+            Update();
+            foreach (var trainer in trainers)
+            {
+                string trainerListItem = $"[{trainer.DisplayTrainerId}] - {trainer.TrainerName}";
+                int index = -1;
+                bool search = true;
+                while (search)
+                {
+                    for (int i = 0; i < dataGrid.Rows.Count; i++)
+                    {
+                        if (dataGrid.Rows[i].Cells[1].Value.ToString() == trainerListItem)
+                        {
+                            index = i;
+                            search = false;
+                            break;
+                        }
+                    }
+                    break;
+                }
+                index++;
+                index *= 4;
+                offset.Add((uint)index);
+            }
+            string filePath = $"{gameDirs[DirNames.trainerTextOffset].unpackedDir}\\{0.ToString("D4")}";
+
+            for (int i = 0; i < offset.Count; i++)
+            {
+                using (DSUtils.EasyWriter wr = new(filePath, 2 * i))
+                {
+                    wr.Write(offset[i]);
+                };
+            }
+            statusLabelMessage("Trainer Text offsets generated successfully...");
+            Update();
+            MessageBox.Show("Trainer Text offsets repointed!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void trainerText_Export_btn_Click(object sender, EventArgs e)
+        {
+            var (success, filePath) = ExportToExcel(trainerTextTable_dataGrid);
+            if (success)
+            {
+                MessageBox.Show("Speadsheet exported to\n\n" + filePath, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        /// <summary>
+        /// Export given DataGridView to an Excel file.
+        /// </summary>
+        /// <param name="dataGrid"></param>
+        /// <returns>Success/Failure bool and File Path</returns>
+        private (bool Success, string FilePath) ExportToExcel(DataGridView dataGrid)
+        {
+            // Do nothing if no data.
+            if (dataGrid.Rows.Count > 0)
+            {
+                SaveFileDialog sfd = new()
+                {
+                    Filter = "Excel (.xlsx)|  *.xlsx",
+                    FileName = "Trainer Text Table.xlsx"
+                };
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    string filePath = sfd.FileName;
+
+                    // Setup DataTable for Export
+                    var dataTable = new DataTable();
+                    foreach (DataGridViewColumn col in dataGrid.Columns)
+                    {
+                        dataTable.Columns.Add(col.HeaderText);
+                    }
+                    foreach (DataGridViewRow row in dataGrid.Rows)
+                    {
+                        dataTable.Rows.Add(row);
+                        foreach (DataGridViewCell cell in row.Cells)
+                        {
+                            string value = cell.Value.ToString();
+                            if (cell.ColumnIndex == 1)
+                            {
+                                value = value.Remove(0, 1).Remove(3);
+                            }
+                            else if (cell.ColumnIndex == 2)
+                            {
+                                value = (messageTriggers.Find(x => x.MessageTriggerName == value).MessageTriggerId + 1).ToString();
+                            }
+                            dataTable.Rows[row.Index][cell.ColumnIndex] = value;
+                        }
+                    }
+
+                    // Setup Spreadsheet.
+                    using XLWorkbook workbook = new();
+                    workbook.Worksheets.Add(dataTable, "Trainer Text");
+                    // Add Message Trigger List to new Sheet
+                    var worksheet = workbook.Worksheets.Add("Message Triggers");
+                    worksheet.Cell("A1").Value = "Message Trigger ID";
+                    worksheet.Cell("B1").Value = "Message Trigger Name";
+                    for (int i = 0; i < messageTriggers.Count; i++)
+                    {
+                        string cellNumber = (i + 2).ToString();
+                        worksheet.Cell("A" + cellNumber).Value = (messageTriggers[i].MessageTriggerId + 1).ToString("D2");
+                        worksheet.Cell("B" + cellNumber).Value = messageTriggers[i].MessageTriggerName;
+                    }
+                    // Try save Spreadsheet
+                    try
+                    {
+                        workbook.SaveAs(filePath);
+                        return (true, filePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Speadsheet not exported.\n\n" + ex.Message, "Unable to Export", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return (false, filePath);
+                    }
+                }
+            }
+            return (false, string.Empty);
         }
     }
 }

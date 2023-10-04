@@ -1,5 +1,4 @@
-﻿using VSMaker.Data;
-using VSMaker.Resources;
+﻿using VSMaker.Resources;
 using VSMaker.ROMFiles;
 
 namespace VSMaker.CommonFunctions
@@ -146,7 +145,8 @@ namespace VSMaker.CommonFunctions
             interiorBuildingModels,
             learnsets,
 
-            trainerTable
+            trainerTextTable,
+            trainerTextOffset,
         };
 
         public static Dictionary<DirNames, (string packedDir, string unpackedDir)> gameDirs { get; private set; }
@@ -552,22 +552,7 @@ namespace VSMaker.CommonFunctions
 
         public static void SetTrainerTable()
         {
-            TrainerTablePath = workDir + "\\unpacked\\trainerTable\\0000";
-            //switch (gameFamily)
-            //{
-            //    case gFamEnum.DP:
-            //        break;
-
-            //    case gFamEnum.Plat:
-            //        break;
-
-            //    case gFamEnum.HGSS:
-
-            //        break;
-
-            //    default:
-            //        break;
-            //}
+            TrainerTablePath = workDir + "\\unpacked\\trainerTextTable\\0000";
         }
 
         public static void SetConditionalMusicTableOffsetToRAMAddress()
@@ -1021,6 +1006,7 @@ namespace VSMaker.CommonFunctions
         public static string[] GetTrainerMessages() => new TextArchive(trainerTextMessageNumber).Messages.ToArray();
 
         public static string GetSingleTrainerClassName(int id) => new TextArchive(trainerClassMessageNumber).Messages[id];
+
         public static string[] GetTrainerClassNames() => new TextArchive(trainerClassMessageNumber).Messages.ToArray();
 
         public static string[] GetItemNames() => new TextArchive(itemNamesTextNumber).Messages.ToArray();
@@ -1169,12 +1155,13 @@ namespace VSMaker.CommonFunctions
                         [DirNames.trainerProperties] = @"data\poketool\trainer\trdata.narc",
                         [DirNames.trainerParty] = @"data\poketool\trainer\trpoke.narc",
                         [DirNames.trainerGraphics] = @"data\poketool\trgra\trfgra.narc",
+                        [DirNames.trainerTextTable] = @"data\poketool\trmsg\trtbl.narc",
+                        [DirNames.trainerTextOffset] = @"data\poketool\trmsg\trtblofs.narc",
 
                         [DirNames.monIcons] = @"data\poketool\icongra\poke_icon.narc",
 
                         [DirNames.encounters] = @"data\fielddata\encountdata\" + char.ToLower(gameVersion.ToString()[0]) + '_' + "enc_data.narc",
                         [DirNames.learnsets] = workDir + @"data\poketool\personal\wotbl.narc",
-                        [DirNames.trainerTable] = @"data\poketool\trmsg\trtbl.narc",
                     };
                     break;
 
@@ -1204,7 +1191,8 @@ namespace VSMaker.CommonFunctions
                         [DirNames.trainerProperties] = @"data\poketool\trainer\trdata.narc",
                         [DirNames.trainerParty] = @"data\poketool\trainer\trpoke.narc",
                         [DirNames.trainerGraphics] = @"data\poketool\trgra\trfgra.narc",
-                        [DirNames.trainerTable] = @"data\poketool\trmsg\trtbl.narc",
+                        [DirNames.trainerTextTable] = @"data\poketool\trmsg\trtbl.narc",
+                        [DirNames.trainerTextOffset] = @"data\poketool\trmsg\trtblofs.narc",
 
                         [DirNames.monIcons] = @"data\poketool\icongra\pl_poke_icon.narc",
 
@@ -1239,12 +1227,13 @@ namespace VSMaker.CommonFunctions
                         [DirNames.trainerProperties] = @"data\a\0\5\5",
                         [DirNames.trainerParty] = @"data\a\0\5\6",
                         [DirNames.trainerGraphics] = @"data\a\0\5\8",
+                        [DirNames.trainerTextTable] = @"data\a\0\5\7",
+                        [DirNames.trainerTextOffset] = @"data\a\1\3\1",
 
                         [DirNames.monIcons] = @"data\a\0\2\0",
 
                         [DirNames.interiorBuildingModels] = @"data\a\1\4\8",
                         [DirNames.learnsets] = @"data\a\0\3\3",
-                        [DirNames.trainerTable] = @"data\a\0\5\7",
                     };
 
                     //Encounter archive is different for SS
@@ -1338,6 +1327,7 @@ namespace VSMaker.CommonFunctions
 
             TrainerMessageIds = TrainerTable.Keys.ToArray();
         }
+
         #endregion System Methods
     }
 }
