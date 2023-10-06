@@ -654,6 +654,7 @@ namespace VSMaker
 
         private void SetupTrainerEditor()
         {
+            selectedTrainerIndex = -1;
             DisableTrainerEditorInputs();
             trainers_Player_list.Items.Clear();
             trainers_list.Items.Clear();
@@ -2103,9 +2104,10 @@ namespace VSMaker
         {
             if (ValidateTrainerPokemon())
             {
+                SetUnsavedChanges(false);
                 // Get any edited but unsaved values from other fields
                 string trainerName = trainer_Name.Text;
-                int trainerClass = trainer_Class_comboBox.SelectedIndex;
+                int trainerClass = trainer_Class_comboBox.SelectedIndex + 2;
 
                 SaveTrainerPokemon();
                 GetTrainerInfo(selectedTrainer.TrainerId);
