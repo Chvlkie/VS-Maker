@@ -32,13 +32,13 @@ namespace VSMaker
         private string[] abilityNames = Array.Empty<string>();
         private int currentTrainerMessageIndex;
         private List<string> displayTrainerMessage = new();
-        private string[] itemNames = Array.Empty<string>();
+        private List<string> itemNames = new();
         private List<MessageTrigger> messageTriggers = new();
         private string[] moveNames = Array.Empty<string>();
         private List<Pokemon> pokemons = new();
         private SpeciesFile[] pokemonSpecies;
         private (int abi1, int abi2)[] pokemonSpeciesAbilities;
-        private string[] pokeNames = Array.Empty<string>();
+        private List<string> pokeNames = new();
         private Trainer selectedTrainer;
         private TrainerClass selectedTrainerClass;
         private int selectedTrainerClassIndex = -1;
@@ -52,6 +52,7 @@ namespace VSMaker
         private bool trainerSpriteMessage;
         private ImageBase trainerTile;
         private List<ComboBox> pokeComboBoxes;
+        private List<ComboBox> pokeItemComboBoxes;
         private List<NumericUpDown> pokeLevels;
         private bool unsavedChanges;
 
@@ -90,6 +91,16 @@ namespace VSMaker
                 trainer_Poke4_Level,
                 trainer_Poke5_Level,
                 trainer_Poke6_Level,
+            };
+
+            pokeItemComboBoxes = new List<ComboBox>
+            {
+                trainer_Poke1_Item,
+                trainer_Poke2_Item,
+                trainer_Poke3_Item,
+                trainer_Poke4_Item,
+                trainer_Poke5_Item,
+                trainer_Poke6_Item,
             };
         }
 
@@ -441,7 +452,6 @@ namespace VSMaker
         {
             // Clear Lists
             trainerClassListBox.Items.Clear();
-            player_trainer_class.Items.Clear();
             trainerClass_Uses_list.Items.Clear();
         }
 
@@ -548,14 +558,7 @@ namespace VSMaker
 
             foreach (var item in trainerClasses)
             {
-                if (item.IsPlayerClass)
-                {
-                    player_trainer_class.Items.Add($"[{item.DisplayTrainerClassId}] - {item.TrainerClassName}");
-                }
-                else
-                {
-                    trainerClassListBox.Items.Add($"[{item.DisplayTrainerClassId}] - {item.TrainerClassName}");
-                }
+                trainerClassListBox.Items.Add($"[{item.DisplayTrainerClassId}] - {item.TrainerClassName}");
             }
             if (trainerClassListBox.Items.Count > 0)
             {
@@ -567,7 +570,7 @@ namespace VSMaker
 
             if (selectedTrainerClass != default)
             {
-                trainerClassListBox.SelectedIndex = selectedTrainerClass.TrainerClassId - 2;
+                trainerClassListBox.SelectedIndex = selectedTrainerClass.TrainerClassId;
             }
         }
 
@@ -682,7 +685,7 @@ namespace VSMaker
 
         private void trainer_Class_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int trainerId = trainer_Class_comboBox.SelectedIndex + 2;
+            int trainerId = trainer_Class_comboBox.SelectedIndex;
             selectedTrainer.TrainerSpriteFrames = LoadTrainerClassPic(trainerId);
             UpdateTrainerClassPic(trainerPicBox);
             trainer_frames_num.Maximum = selectedTrainer.TrainerSpriteFrames;
@@ -750,7 +753,7 @@ namespace VSMaker
             {
                 GetTrainerMessages();
             }
-            if (itemNames.Length == 0)
+            if (itemNames.Count == 0)
             {
                 GetItems();
             }
@@ -771,7 +774,7 @@ namespace VSMaker
         private void GetItems()
         {
             statusLabelMessage("Getting Item Names...");
-            Update(); itemNames = GetItemNames();
+            Update(); itemNames = GetItemNames().ToList();
         }
 
         private static MessageTrigger GetMessageTriggerDetails(MessageTriggerEnum messageTrigger)
@@ -835,32 +838,18 @@ namespace VSMaker
             {
                 pokemonSpecies[i] = new SpeciesFile(new FileStream($"{gameDirs[DirNames.personalPokeData].unpackedDir}\\{i:D4}", FileMode.Open));
             }
-
-            pokeNames = GetPokemonNames();
+            pokeNames = GetPokemonNames(2).ToList();
             pokemonSpeciesAbilities = GetPokemonAbilities(numberOfPokemon);
 
-            for (int i = 0; i < pokeNames.Length; i++)
+            for (int i = 0; i < pokeNames.Count; i++)
             {
                 var pokemon = new Pokemon
                 {
                     PokemonId = i,
-                    PokemonName = pokeNames[i]
+                    PokemonName = pokeNames[i],
                 };
-
                 pokemons.Add(pokemon);
             }
-
-            foreach (var item in pokeComboBoxes)
-            {
-                item.Items.Clear();
-            }
-
-            pokemons.ForEach(x => trainer_Poke1_comboBox.Items.Add(x.PokemonName));
-            pokemons.ForEach(x => trainer_Poke2_comboBox.Items.Add(x.PokemonName));
-            pokemons.ForEach(x => trainer_Poke3_comboBox.Items.Add(x.PokemonName));
-            pokemons.ForEach(x => trainer_Poke4_comboBox.Items.Add(x.PokemonName));
-            pokemons.ForEach(x => trainer_Poke5_comboBox.Items.Add(x.PokemonName));
-            pokemons.ForEach(x => trainer_Poke6_comboBox.Items.Add(x.PokemonName));
         }
 
         private (int abi1, int abi2)[] GetPokemonAbilities(int numberOfPokemon)
@@ -904,7 +893,7 @@ namespace VSMaker
                     UsedByTrainers = new List<Trainer>(),
                     TrainerSpriteFrames = 0
                 };
-                item.UsedByTrainers.AddRange(trainers.Where(x => x.TrainerClassId == item.TrainerClassId));
+                item.UsedByTrainers.AddRange(trainers.Where(x => x.TrainerClassId == item.TrainerClassId && !x.IsPlayerTrainer));
                 trainerClasses.Add(item);
             }
         }
@@ -955,7 +944,7 @@ namespace VSMaker
             selectedTrainer.Pokemon = new List<Pokemon>();
 
             int currentIndex = trainerId;
-            string suffix = "\\" + currentIndex.ToString("D4");
+            string suffix = $"\\{currentIndex.ToString("D4")}";
 
             trainerFile = new TrainerFile(
                 new TrainerProperties(
@@ -970,16 +959,17 @@ namespace VSMaker
 
             //Setup Trainer Class
 
-            foreach (var item in trainerClasses.Where(x => !x.IsPlayerClass))
+            foreach (var item in trainerClasses)
             {
                 trainer_Class_comboBox.Items.Add($"[{item.DisplayTrainerClassId}] - {item.TrainerClassName}");
             }
 
             if (trainer_Class_comboBox.Items.Count > 0)
             {
+                int index = selectedTrainer.TrainerClassId;
                 trainer_Class_comboBox.Enabled = true;
                 trainer_GoToClass_btn.Enabled = true;
-                trainer_Class_comboBox.SelectedIndex = selectedTrainer.TrainerClassId - 2;
+                trainer_Class_comboBox.SelectedIndex = index > -1 ? index : 0;
             }
 
             //Setup Trainer Messages
@@ -1003,16 +993,32 @@ namespace VSMaker
             trainer_Message_Next_btn.Enabled = displayTrainerMessage.Count > 1;
 
             // Setup Trainer Pokemon
+            foreach (var item in pokeComboBoxes)
+            {
+                item.Items.Clear();
+                pokemons.ForEach(x => item.Items.Add(x.PokemonName));
+            }
+
+            foreach (var item in pokeItemComboBoxes)
+            {
+                item.Items.Clear();
+                itemNames.ForEach(x => item.Items.Add(x));
+            }
             trainer_Double_checkBox.Enabled = true;
             trainer_NumPoke_num.Enabled = true;
             trainer_Poke_HeldItem_checkBox.Enabled = true;
             trainer_Poke_Moves_checkBox.Enabled = true;
             trainer_NumPoke_num.Enabled = true;
             trainer_Double_checkBox.Checked = trainerFile.trp.doubleBattle;
+            trainer_Poke_HeldItem_checkBox.Checked = trainerFile.trp.chooseItems;
+            trainer_Poke_Moves_checkBox.Checked = trainerFile.trp.chooseMoves;
+
             for (int i = 0; i < 6; i++)
             {
                 var partyPokemon = trainerFile.party[i];
+                int heldItemId = partyPokemon.heldItem.HasValue ? (int)partyPokemon.heldItem.Value : 0;
                 pokeComboBoxes[i].SelectedIndex = partyPokemon.pokeID ?? 0;
+                pokeItemComboBoxes[i].SelectedIndex = heldItemId;
                 pokeLevels[i].Value = (int?)partyPokemon.level ?? 0;
                 if (partyPokemon?.pokeID.HasValue == true)
                 {
@@ -1023,6 +1029,7 @@ namespace VSMaker
                         PokemonName = pokeNames[partyPokemon.pokeID.Value],
                         DV = partyPokemon.difficulty,
                         Level = (short)partyPokemon.level,
+                        HeldItemId = heldItemId
                     };
                     selectedTrainer.Pokemon.Add(pokemon);
                     pokeLevels[i].Value = partyPokemon.level;
@@ -2073,17 +2080,20 @@ namespace VSMaker
 
                     // Setup Spreadsheet.
                     using XLWorkbook workbook = new();
-                    workbook.Worksheets.Add(dataTable, "Trainer Text");
+                    var trainerText = workbook.Worksheets.Add(dataTable, "Trainer Text");
                     // Add Message Trigger List to new Sheet
-                    var worksheet = workbook.Worksheets.Add("Message Triggers");
-                    worksheet.Cell("A1").Value = "Message Trigger ID";
-                    worksheet.Cell("B1").Value = "Message Trigger Name";
+                    var messageTriggerTypes = workbook.Worksheets.Add("Message Triggers");
+                    messageTriggerTypes.Cell("A1").Value = "Message Trigger ID";
+                    messageTriggerTypes.Cell("B1").Value = "Message Trigger Name";
                     for (int i = 0; i < messageTriggers.Count; i++)
                     {
                         string cellNumber = (i + 2).ToString();
-                        worksheet.Cell("A" + cellNumber).Value = (messageTriggers[i].MessageTriggerId + 1).ToString("D2");
-                        worksheet.Cell("B" + cellNumber).Value = messageTriggers[i].MessageTriggerName;
+                        messageTriggerTypes.Cell("A" + cellNumber).Value = (messageTriggers[i].MessageTriggerId + 1).ToString("D2");
+                        messageTriggerTypes.Cell("B" + cellNumber).Value = messageTriggers[i].MessageTriggerName;
                     }
+                    trainerText.Columns().AdjustToContents();
+                    messageTriggerTypes.Columns().AdjustToContents();
+
                     // Try save Spreadsheet
                     try
                     {
@@ -2107,7 +2117,7 @@ namespace VSMaker
                 SetUnsavedChanges(false);
                 // Get any edited but unsaved values from other fields
                 string trainerName = trainer_Name.Text;
-                int trainerClass = trainer_Class_comboBox.SelectedIndex + 2;
+                int trainerClass = trainer_Class_comboBox.SelectedIndex;
 
                 SaveTrainerPokemon();
                 GetTrainerInfo(selectedTrainer.TrainerId);
@@ -2129,15 +2139,18 @@ namespace VSMaker
         private void SaveTrainerPokemon()
         {
             trainerFile.trp.doubleBattle = trainer_Double_checkBox.Checked;
+            trainerFile.trp.chooseItems = trainer_Poke_HeldItem_checkBox.Checked;
+            trainerFile.trp.chooseMoves = trainer_Poke_Moves_checkBox.Checked;
             trainerFile.trp.partyCount = (byte)trainer_NumPoke_num.Value;
             for (int i = 0; i < trainer_NumPoke_num.Value; i++)
             {
                 trainerFile.party[i].pokeID = (ushort)pokeComboBoxes[i].SelectedIndex;
                 trainerFile.party[i].level = (ushort)pokeLevels[i].Value;
+                trainerFile.party[i].heldItem = trainer_Poke_HeldItem_checkBox.Checked ? (ushort)pokeItemComboBoxes[i].SelectedIndex : null;
             }
             /*Write to File*/
-            string indexStr = "\\" + selectedTrainer.TrainerId.ToString("D4");
-            File.WriteAllBytes(RomInfo.gameDirs[DirNames.trainerProperties].unpackedDir + indexStr, trainerFile.trp.ToByteArray());
+            string indexStr = $"\\{selectedTrainer.TrainerId:D4}";
+            File.WriteAllBytes(gameDirs[DirNames.trainerProperties].unpackedDir + indexStr, trainerFile.trp.ToByteArray());
             File.WriteAllBytes(gameDirs[DirNames.trainerParty].unpackedDir + indexStr, trainerFile.party.ToByteArray());
         }
 

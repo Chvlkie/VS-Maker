@@ -1017,7 +1017,7 @@ namespace VSMaker.CommonFunctions
             return itemNames.Messages.GetRange(startIndex, count == null ? itemNames.Messages.Count - 1 : (int)count).ToArray();
         }
 
-        public static string[] GetPokemonNames() => new TextArchive(pokemonNamesTextNumbers[0]).Messages.ToArray();
+        public static string[] GetPokemonNames(int messageNumber = 0) => new TextArchive(pokemonNamesTextNumbers[messageNumber]).Messages.ToArray();
 
         public static string[] GetAbilityNames() => new TextArchive(abilityNamesTextNumber).Messages.ToArray();
 

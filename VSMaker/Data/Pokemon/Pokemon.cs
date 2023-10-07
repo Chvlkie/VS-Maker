@@ -21,5 +21,9 @@ namespace VSMaker.Data
         public int Move4Id { get; set; }
         public int NatureId { get; set; }
         public int FormId { get; set; }
+        public int? Ability1 { get; set; }
+        public int? Ability2 { get; set; }
+        public int? SelectedAbility { get; set; }
+        public int HeldItemId { get; set; }
     }
 }
