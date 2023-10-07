@@ -1320,13 +1320,13 @@ namespace VSMaker
         private void OpenPokemonEditor(int pokemonId)
         {
             pokemonEditor = new PokemonEditor(this, pokemonId);
-            pokemonEditor.Show();
+            pokemonEditor.ShowDialog();
         }
 
         private void OpenTextEditor(int trainerMessageId, string messageText)
         {
             textEditor = new TextEditor(this, trainerMessageId, messageText, vsMakerFont);
-            textEditor.Show();
+            textEditor.ShowDialog();
         }
 
         private void save_btn_Click(object sender, EventArgs e)
@@ -2218,6 +2218,11 @@ namespace VSMaker
         private void trainer_Poke_Moves_checkBox_CheckedChanged(object sender, EventArgs e)
         {
             EnablePokemon();
+        }
+
+        private void trainer_Item4_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -33,7 +33,7 @@ namespace VSMaker
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Mainform));
             main_toolstrip = new MenuStrip();
             mainToolStrip_file = new ToolStripMenuItem();
@@ -221,6 +221,27 @@ namespace VSMaker
             saveFileDialog1 = new SaveFileDialog();
             trainerMessageBindingSource1 = new BindingSource(components);
             trainerMessageBindingSource3 = new BindingSource(components);
+            label14 = new Label();
+            trainer_ai_Basic_checkbox = new CheckBox();
+            trainer_ai_evaluate_checkBox = new CheckBox();
+            trainer_ai_expert_checkBox = new CheckBox();
+            trainer_ai_status_checkBox = new CheckBox();
+            trainer_ai_misc_checkBox = new CheckBox();
+            trainer_ai_baton_checkBox = new CheckBox();
+            trainer_ai_dmg_checkBox = new CheckBox();
+            trainer_ai_risk_checkBox = new CheckBox();
+            trainer_ai_tag_checkBox = new CheckBox();
+            trainer_ai_weather_checkBox = new CheckBox();
+            trainer_ai_checkHp_checkBox = new CheckBox();
+            label19 = new Label();
+            trainer_Item1_comboBox = new ComboBox();
+            trainer_Item2_comboBox = new ComboBox();
+            label22 = new Label();
+            label23 = new Label();
+            label24 = new Label();
+            label25 = new Label();
+            trainer_Item4_comboBox = new ComboBox();
+            trainer_Item3_comboBox = new ComboBox();
             main_toolstrip.SuspendLayout();
             statusStrip1.SuspendLayout();
             mainContent.SuspendLayout();
@@ -345,7 +366,7 @@ namespace VSMaker
             // 
             statusStrip1.ImageScalingSize = new Size(24, 24);
             statusStrip1.Items.AddRange(new ToolStripItem[] { statusLabel });
-            statusStrip1.Location = new Point(0, 596);
+            statusStrip1.Location = new Point(0, 566);
             statusStrip1.Margin = new Padding(15, 0, 0, 2);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.RenderMode = ToolStripRenderMode.ManagerRenderMode;
@@ -371,7 +392,7 @@ namespace VSMaker
             mainContent.Margin = new Padding(10);
             mainContent.Name = "mainContent";
             mainContent.SelectedIndex = 0;
-            mainContent.Size = new Size(899, 547);
+            mainContent.Size = new Size(899, 517);
             mainContent.TabIndex = 3;
             mainContent.Visible = false;
             mainContent.SelectedIndexChanged += mainContent_SelectedIndexChanged;
@@ -389,7 +410,7 @@ namespace VSMaker
             mainContent_trainerClass.Location = new Point(4, 24);
             mainContent_trainerClass.Name = "mainContent_trainerClass";
             mainContent_trainerClass.Padding = new Padding(3);
-            mainContent_trainerClass.Size = new Size(891, 519);
+            mainContent_trainerClass.Size = new Size(891, 489);
             mainContent_trainerClass.TabIndex = 3;
             mainContent_trainerClass.Text = "Trainer Class";
             mainContent_trainerClass.UseVisualStyleBackColor = true;
@@ -418,7 +439,7 @@ namespace VSMaker
             label21.AutoSize = true;
             label21.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label21.ImageAlign = ContentAlignment.MiddleLeft;
-            label21.Location = new Point(7, 74);
+            label21.Location = new Point(7, 75);
             label21.Name = "label21";
             label21.Size = new Size(104, 15);
             label21.TabIndex = 41;
@@ -453,7 +474,7 @@ namespace VSMaker
             trainerClass_Gender_label.AutoSize = true;
             trainerClass_Gender_label.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             trainerClass_Gender_label.ImageAlign = ContentAlignment.MiddleLeft;
-            trainerClass_Gender_label.Location = new Point(243, 75);
+            trainerClass_Gender_label.Location = new Point(286, 75);
             trainerClass_Gender_label.Name = "trainerClass_Gender_label";
             trainerClass_Gender_label.Size = new Size(52, 15);
             trainerClass_Gender_label.TabIndex = 38;
@@ -466,7 +487,7 @@ namespace VSMaker
             trainerClass_EyeContactMain_comboBox.Enabled = false;
             trainerClass_EyeContactMain_comboBox.FlatStyle = FlatStyle.Popup;
             trainerClass_EyeContactMain_comboBox.FormattingEnabled = true;
-            trainerClass_EyeContactMain_comboBox.Location = new Point(126, 40);
+            trainerClass_EyeContactMain_comboBox.Location = new Point(154, 40);
             trainerClass_EyeContactMain_comboBox.Name = "trainerClass_EyeContactMain_comboBox";
             trainerClass_EyeContactMain_comboBox.Size = new Size(99, 23);
             trainerClass_EyeContactMain_comboBox.TabIndex = 32;
@@ -477,7 +498,7 @@ namespace VSMaker
             trainerClass_EyeContactAlt_comboBox.Enabled = false;
             trainerClass_EyeContactAlt_comboBox.FlatStyle = FlatStyle.Popup;
             trainerClass_EyeContactAlt_comboBox.FormattingEnabled = true;
-            trainerClass_EyeContactAlt_comboBox.Location = new Point(126, 72);
+            trainerClass_EyeContactAlt_comboBox.Location = new Point(154, 72);
             trainerClass_EyeContactAlt_comboBox.Name = "trainerClass_EyeContactAlt_comboBox";
             trainerClass_EyeContactAlt_comboBox.Size = new Size(99, 23);
             trainerClass_EyeContactAlt_comboBox.TabIndex = 30;
@@ -486,7 +507,7 @@ namespace VSMaker
             // 
             trainerClass_PrizeMoney_btn.BackColor = SystemColors.Info;
             trainerClass_PrizeMoney_btn.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            trainerClass_PrizeMoney_btn.Location = new Point(434, 41);
+            trainerClass_PrizeMoney_btn.Location = new Point(441, 40);
             trainerClass_PrizeMoney_btn.Name = "trainerClass_PrizeMoney_btn";
             trainerClass_PrizeMoney_btn.Size = new Size(23, 23);
             trainerClass_PrizeMoney_btn.TabIndex = 5;
@@ -500,17 +521,17 @@ namespace VSMaker
             trainerClass_Gender_comboBox.Enabled = false;
             trainerClass_Gender_comboBox.FlatStyle = FlatStyle.Popup;
             trainerClass_Gender_comboBox.FormattingEnabled = true;
-            trainerClass_Gender_comboBox.Location = new Point(337, 75);
+            trainerClass_Gender_comboBox.Location = new Point(384, 72);
             trainerClass_Gender_comboBox.Name = "trainerClass_Gender_comboBox";
-            trainerClass_Gender_comboBox.Size = new Size(117, 23);
+            trainerClass_Gender_comboBox.Size = new Size(80, 23);
             trainerClass_Gender_comboBox.TabIndex = 33;
             // 
             // trainerClass_PrizeMoney_num
             // 
             trainerClass_PrizeMoney_num.Enabled = false;
-            trainerClass_PrizeMoney_num.Location = new Point(337, 41);
+            trainerClass_PrizeMoney_num.Location = new Point(384, 41);
             trainerClass_PrizeMoney_num.Name = "trainerClass_PrizeMoney_num";
-            trainerClass_PrizeMoney_num.Size = new Size(84, 23);
+            trainerClass_PrizeMoney_num.Size = new Size(51, 23);
             trainerClass_PrizeMoney_num.TabIndex = 37;
             // 
             // trainerClass_EyeContactMusic_Main_label
@@ -530,7 +551,7 @@ namespace VSMaker
             trainerClass_PrizeMoney_label.AutoSize = true;
             trainerClass_PrizeMoney_label.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             trainerClass_PrizeMoney_label.ImageAlign = ContentAlignment.MiddleLeft;
-            trainerClass_PrizeMoney_label.Location = new Point(243, 43);
+            trainerClass_PrizeMoney_label.Location = new Point(286, 43);
             trainerClass_PrizeMoney_label.Name = "trainerClass_PrizeMoney_label";
             trainerClass_PrizeMoney_label.Size = new Size(79, 15);
             trainerClass_PrizeMoney_label.TabIndex = 36;
@@ -539,7 +560,7 @@ namespace VSMaker
             // 
             // panel3
             // 
-            panel3.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+            panel3.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             panel3.Controls.Add(trainerClass_Theme_label);
             panel3.Controls.Add(trainerClass_BattleMusic_label);
             panel3.Controls.Add(trainerClass_battleMusic);
@@ -549,7 +570,7 @@ namespace VSMaker
             panel3.Controls.Add(trainerClass_introGfx_label);
             panel3.Location = new Point(415, 188);
             panel3.Name = "panel3";
-            panel3.Size = new Size(472, 333);
+            panel3.Size = new Size(472, 303);
             panel3.TabIndex = 6;
             // 
             // trainerClass_Theme_label
@@ -557,7 +578,7 @@ namespace VSMaker
             trainerClass_Theme_label.AutoSize = true;
             trainerClass_Theme_label.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             trainerClass_Theme_label.ImageAlign = ContentAlignment.MiddleLeft;
-            trainerClass_Theme_label.Location = new Point(106, 238);
+            trainerClass_Theme_label.Location = new Point(131, 238);
             trainerClass_Theme_label.Name = "trainerClass_Theme_label";
             trainerClass_Theme_label.Size = new Size(120, 15);
             trainerClass_Theme_label.TabIndex = 36;
@@ -578,16 +599,17 @@ namespace VSMaker
             // 
             // trainerClass_battleMusic
             // 
+            trainerClass_battleMusic.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
             trainerClass_battleMusic.Location = new Point(6, 257);
             trainerClass_battleMusic.Name = "trainerClass_battleMusic";
             trainerClass_battleMusic.ReadOnly = true;
-            trainerClass_battleMusic.Size = new Size(82, 23);
+            trainerClass_battleMusic.Size = new Size(97, 23);
             trainerClass_battleMusic.TabIndex = 15;
             // 
             // saveClassTheme_btn
             // 
             saveClassTheme_btn.Image = Properties.Resources.saveIconSm;
-            saveClassTheme_btn.Location = new Point(286, 254);
+            saveClassTheme_btn.Location = new Point(289, 257);
             saveClassTheme_btn.Name = "saveClassTheme_btn";
             saveClassTheme_btn.Size = new Size(56, 23);
             saveClassTheme_btn.TabIndex = 33;
@@ -611,9 +633,9 @@ namespace VSMaker
             trainerClass_Theme_comboBox.Enabled = false;
             trainerClass_Theme_comboBox.FlatStyle = FlatStyle.Popup;
             trainerClass_Theme_comboBox.FormattingEnabled = true;
-            trainerClass_Theme_comboBox.Location = new Point(106, 257);
+            trainerClass_Theme_comboBox.Location = new Point(131, 257);
             trainerClass_Theme_comboBox.Name = "trainerClass_Theme_comboBox";
-            trainerClass_Theme_comboBox.Size = new Size(176, 23);
+            trainerClass_Theme_comboBox.Size = new Size(152, 23);
             trainerClass_Theme_comboBox.TabIndex = 33;
             // 
             // trainerClass_introGfx_label
@@ -630,13 +652,13 @@ namespace VSMaker
             // 
             // trainerClass_Used_panel
             // 
-            trainerClass_Used_panel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            trainerClass_Used_panel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
             trainerClass_Used_panel.Controls.Add(trainerClass_GoToTrainer_btn);
             trainerClass_Used_panel.Controls.Add(trainerClass_Uses_list);
             trainerClass_Used_panel.Controls.Add(trainerClassUse_label);
             trainerClass_Used_panel.Location = new Point(209, 188);
             trainerClass_Used_panel.Name = "trainerClass_Used_panel";
-            trainerClass_Used_panel.Size = new Size(200, 333);
+            trainerClass_Used_panel.Size = new Size(200, 295);
             trainerClass_Used_panel.TabIndex = 4;
             // 
             // trainerClass_GoToTrainer_btn
@@ -658,7 +680,7 @@ namespace VSMaker
             trainerClass_Uses_list.ItemHeight = 15;
             trainerClass_Uses_list.Location = new Point(7, 39);
             trainerClass_Uses_list.Name = "trainerClass_Uses_list";
-            trainerClass_Uses_list.Size = new Size(190, 259);
+            trainerClass_Uses_list.Size = new Size(190, 244);
             trainerClass_Uses_list.TabIndex = 27;
             trainerClass_Uses_list.SelectedIndexChanged += trainerClass_Uses_list_SelectedIndexChanged;
             trainerClass_Uses_list.DoubleClick += trainerClass_Uses_list_DoubleClick;
@@ -677,7 +699,6 @@ namespace VSMaker
             // 
             // trainerClass_Info_panel
             // 
-            trainerClass_Info_panel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             trainerClass_Info_panel.Controls.Add(undoTrainerClass_btn);
             trainerClass_Info_panel.Controls.Add(saveTrainerClassAll_btn);
             trainerClass_Info_panel.Controls.Add(saveClassName_btn);
@@ -809,7 +830,7 @@ namespace VSMaker
             trainerClass_List_panel.Dock = DockStyle.Left;
             trainerClass_List_panel.Location = new Point(3, 3);
             trainerClass_List_panel.Name = "trainerClass_List_panel";
-            trainerClass_List_panel.Size = new Size(200, 513);
+            trainerClass_List_panel.Size = new Size(200, 483);
             trainerClass_List_panel.TabIndex = 0;
             // 
             // trainerClassListBox
@@ -819,7 +840,7 @@ namespace VSMaker
             trainerClassListBox.ItemHeight = 15;
             trainerClassListBox.Location = new Point(5, 29);
             trainerClassListBox.Name = "trainerClassListBox";
-            trainerClassListBox.Size = new Size(190, 454);
+            trainerClassListBox.Size = new Size(190, 439);
             trainerClassListBox.TabIndex = 1;
             trainerClassListBox.SelectedIndexChanged += trainerClassListBox_SelectedIndexChanged;
             // 
@@ -845,7 +866,7 @@ namespace VSMaker
             mainContent_trainer.Location = new Point(4, 24);
             mainContent_trainer.Name = "mainContent_trainer";
             mainContent_trainer.Padding = new Padding(3);
-            mainContent_trainer.Size = new Size(891, 519);
+            mainContent_trainer.Size = new Size(891, 489);
             mainContent_trainer.TabIndex = 1;
             mainContent_trainer.Text = "Trainers";
             mainContent_trainer.UseVisualStyleBackColor = true;
@@ -857,7 +878,7 @@ namespace VSMaker
             panel9.Controls.Add(trainer_EditMessage_btn);
             panel9.Controls.Add(label6);
             panel9.Dock = DockStyle.Bottom;
-            panel9.Location = new Point(203, 395);
+            panel9.Location = new Point(203, 365);
             panel9.Name = "panel9";
             panel9.Size = new Size(685, 121);
             panel9.TabIndex = 5;
@@ -867,7 +888,7 @@ namespace VSMaker
             trainer_MessageTrigger_list.DropDownStyle = ComboBoxStyle.DropDownList;
             trainer_MessageTrigger_list.FlatStyle = FlatStyle.Popup;
             trainer_MessageTrigger_list.FormattingEnabled = true;
-            trainer_MessageTrigger_list.Location = new Point(130, 7);
+            trainer_MessageTrigger_list.Location = new Point(130, 5);
             trainer_MessageTrigger_list.Name = "trainer_MessageTrigger_list";
             trainer_MessageTrigger_list.Size = new Size(239, 23);
             trainer_MessageTrigger_list.TabIndex = 50;
@@ -946,7 +967,7 @@ namespace VSMaker
             label6.AutoSize = true;
             label6.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label6.ImageAlign = ContentAlignment.MiddleLeft;
-            label6.Location = new Point(13, 11);
+            label6.Location = new Point(13, 9);
             label6.Name = "label6";
             label6.Size = new Size(101, 15);
             label6.TabIndex = 11;
@@ -959,7 +980,7 @@ namespace VSMaker
             panel8.Controls.Add(trainerEditor_tab);
             panel8.Location = new Point(209, 77);
             panel8.Name = "panel8";
-            panel8.Size = new Size(478, 306);
+            panel8.Size = new Size(478, 276);
             panel8.TabIndex = 4;
             // 
             // trainerEditor_tab
@@ -970,7 +991,7 @@ namespace VSMaker
             trainerEditor_tab.Location = new Point(0, 0);
             trainerEditor_tab.Name = "trainerEditor_tab";
             trainerEditor_tab.SelectedIndex = 0;
-            trainerEditor_tab.Size = new Size(478, 306);
+            trainerEditor_tab.Size = new Size(478, 276);
             trainerEditor_tab.TabIndex = 0;
             trainerEditor_tab.SelectedIndexChanged += trainerEditor_tab_SelectedIndexChanged;
             // 
@@ -979,7 +1000,7 @@ namespace VSMaker
             trainerEditor_Pokemon.Controls.Add(panel10);
             trainerEditor_Pokemon.Location = new Point(4, 24);
             trainerEditor_Pokemon.Name = "trainerEditor_Pokemon";
-            trainerEditor_Pokemon.Size = new Size(470, 278);
+            trainerEditor_Pokemon.Size = new Size(470, 248);
             trainerEditor_Pokemon.TabIndex = 3;
             trainerEditor_Pokemon.Text = "Pokemon";
             trainerEditor_Pokemon.UseVisualStyleBackColor = true;
@@ -991,16 +1012,16 @@ namespace VSMaker
             panel10.Dock = DockStyle.Fill;
             panel10.Location = new Point(0, 0);
             panel10.Name = "panel10";
-            panel10.Size = new Size(470, 278);
+            panel10.Size = new Size(470, 248);
             panel10.TabIndex = 0;
             // 
             // panel19
             // 
             panel19.Controls.Add(panel20);
             panel19.Dock = DockStyle.Fill;
-            panel19.Location = new Point(0, 84);
+            panel19.Location = new Point(0, 62);
             panel19.Name = "panel19";
-            panel19.Size = new Size(470, 194);
+            panel19.Size = new Size(470, 186);
             panel19.TabIndex = 48;
             // 
             // panel20
@@ -1050,7 +1071,7 @@ namespace VSMaker
             panel20.Dock = DockStyle.Fill;
             panel20.Location = new Point(0, 0);
             panel20.Name = "panel20";
-            panel20.Size = new Size(470, 194);
+            panel20.Size = new Size(470, 186);
             panel20.TabIndex = 60;
             // 
             // pictureBox5
@@ -1594,15 +1615,15 @@ namespace VSMaker
             panel11.Dock = DockStyle.Top;
             panel11.Location = new Point(0, 0);
             panel11.Name = "panel11";
-            panel11.Size = new Size(470, 84);
+            panel11.Size = new Size(470, 62);
             panel11.TabIndex = 47;
             // 
             // trainer_Poke_Num_pic
             // 
             trainer_Poke_Num_pic.Image = Properties.Resources.pokeballs0;
-            trainer_Poke_Num_pic.Location = new Point(15, 33);
+            trainer_Poke_Num_pic.Location = new Point(132, 6);
             trainer_Poke_Num_pic.Name = "trainer_Poke_Num_pic";
-            trainer_Poke_Num_pic.Size = new Size(111, 40);
+            trainer_Poke_Num_pic.Size = new Size(111, 23);
             trainer_Poke_Num_pic.SizeMode = PictureBoxSizeMode.Zoom;
             trainer_Poke_Num_pic.TabIndex = 54;
             trainer_Poke_Num_pic.TabStop = false;
@@ -1612,10 +1633,10 @@ namespace VSMaker
             trainer_Poke_Moves_checkBox.AutoSize = true;
             trainer_Poke_Moves_checkBox.Enabled = false;
             trainer_Poke_Moves_checkBox.FlatAppearance.BorderSize = 2;
-            trainer_Poke_Moves_checkBox.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            trainer_Poke_Moves_checkBox.Location = new Point(140, 58);
+            trainer_Poke_Moves_checkBox.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            trainer_Poke_Moves_checkBox.Location = new Point(207, 37);
             trainer_Poke_Moves_checkBox.Name = "trainer_Poke_Moves_checkBox";
-            trainer_Poke_Moves_checkBox.Size = new Size(106, 19);
+            trainer_Poke_Moves_checkBox.Size = new Size(104, 19);
             trainer_Poke_Moves_checkBox.TabIndex = 53;
             trainer_Poke_Moves_checkBox.Text = "Choose Moves";
             trainer_Poke_Moves_checkBox.UseVisualStyleBackColor = true;
@@ -1626,10 +1647,10 @@ namespace VSMaker
             trainer_Poke_HeldItem_checkBox.AutoSize = true;
             trainer_Poke_HeldItem_checkBox.Enabled = false;
             trainer_Poke_HeldItem_checkBox.FlatAppearance.BorderSize = 2;
-            trainer_Poke_HeldItem_checkBox.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            trainer_Poke_HeldItem_checkBox.Location = new Point(140, 33);
+            trainer_Poke_HeldItem_checkBox.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            trainer_Poke_HeldItem_checkBox.Location = new Point(118, 37);
             trainer_Poke_HeldItem_checkBox.Name = "trainer_Poke_HeldItem_checkBox";
-            trainer_Poke_HeldItem_checkBox.Size = new Size(87, 19);
+            trainer_Poke_HeldItem_checkBox.Size = new Size(83, 19);
             trainer_Poke_HeldItem_checkBox.TabIndex = 52;
             trainer_Poke_HeldItem_checkBox.Text = "Held Items";
             trainer_Poke_HeldItem_checkBox.UseVisualStyleBackColor = true;
@@ -1640,10 +1661,10 @@ namespace VSMaker
             trainer_Double_checkBox.AutoSize = true;
             trainer_Double_checkBox.Enabled = false;
             trainer_Double_checkBox.FlatAppearance.BorderSize = 2;
-            trainer_Double_checkBox.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            trainer_Double_checkBox.Location = new Point(140, 8);
+            trainer_Double_checkBox.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            trainer_Double_checkBox.Location = new Point(15, 37);
             trainer_Double_checkBox.Name = "trainer_Double_checkBox";
-            trainer_Double_checkBox.Size = new Size(103, 19);
+            trainer_Double_checkBox.Size = new Size(97, 19);
             trainer_Double_checkBox.TabIndex = 51;
             trainer_Double_checkBox.Text = "Double Battle";
             trainer_Double_checkBox.UseVisualStyleBackColor = true;
@@ -1690,7 +1711,7 @@ namespace VSMaker
             trainerEditor_trnProperties.Location = new Point(4, 24);
             trainerEditor_trnProperties.Name = "trainerEditor_trnProperties";
             trainerEditor_trnProperties.Padding = new Padding(3);
-            trainerEditor_trnProperties.Size = new Size(470, 278);
+            trainerEditor_trnProperties.Size = new Size(470, 248);
             trainerEditor_trnProperties.TabIndex = 2;
             trainerEditor_trnProperties.Text = "Trainer Properties";
             trainerEditor_trnProperties.UseVisualStyleBackColor = true;
@@ -1701,16 +1722,37 @@ namespace VSMaker
             panel12.Dock = DockStyle.Fill;
             panel12.Location = new Point(3, 3);
             panel12.Name = "panel12";
-            panel12.Size = new Size(464, 272);
+            panel12.Size = new Size(464, 242);
             panel12.TabIndex = 0;
             // 
             // panel18
             // 
+            panel18.Controls.Add(label24);
+            panel18.Controls.Add(label25);
+            panel18.Controls.Add(trainer_Item4_comboBox);
+            panel18.Controls.Add(trainer_Item3_comboBox);
+            panel18.Controls.Add(label23);
+            panel18.Controls.Add(label22);
+            panel18.Controls.Add(trainer_Item2_comboBox);
+            panel18.Controls.Add(trainer_Item1_comboBox);
+            panel18.Controls.Add(label19);
+            panel18.Controls.Add(trainer_ai_tag_checkBox);
+            panel18.Controls.Add(trainer_ai_weather_checkBox);
+            panel18.Controls.Add(trainer_ai_checkHp_checkBox);
+            panel18.Controls.Add(trainer_ai_misc_checkBox);
+            panel18.Controls.Add(trainer_ai_baton_checkBox);
+            panel18.Controls.Add(trainer_ai_dmg_checkBox);
+            panel18.Controls.Add(trainer_ai_risk_checkBox);
+            panel18.Controls.Add(trainer_ai_status_checkBox);
+            panel18.Controls.Add(trainer_ai_expert_checkBox);
+            panel18.Controls.Add(trainer_ai_evaluate_checkBox);
+            panel18.Controls.Add(trainer_ai_Basic_checkbox);
+            panel18.Controls.Add(label14);
             panel18.Controls.Add(saveTrainerProperties_btn);
             panel18.Dock = DockStyle.Fill;
             panel18.Location = new Point(0, 0);
             panel18.Name = "panel18";
-            panel18.Size = new Size(464, 272);
+            panel18.Size = new Size(464, 242);
             panel18.TabIndex = 0;
             // 
             // saveTrainerProperties_btn
@@ -1913,7 +1955,7 @@ namespace VSMaker
             panel5.Dock = DockStyle.Left;
             panel5.Location = new Point(3, 3);
             panel5.Name = "panel5";
-            panel5.Size = new Size(200, 513);
+            panel5.Size = new Size(200, 483);
             panel5.TabIndex = 0;
             // 
             // trainer_Player_help_btn
@@ -1949,7 +1991,7 @@ namespace VSMaker
             trainers_list.ItemHeight = 15;
             trainers_list.Location = new Point(5, 104);
             trainers_list.Name = "trainers_list";
-            trainers_list.Size = new Size(190, 379);
+            trainers_list.Size = new Size(190, 364);
             trainers_list.TabIndex = 6;
             trainers_list.SelectedIndexChanged += trainers_list_SelectedIndexChanged;
             // 
@@ -1981,7 +2023,7 @@ namespace VSMaker
             mainContent_trainerText.Controls.Add(panel17);
             mainContent_trainerText.Location = new Point(4, 24);
             mainContent_trainerText.Name = "mainContent_trainerText";
-            mainContent_trainerText.Size = new Size(891, 519);
+            mainContent_trainerText.Size = new Size(891, 489);
             mainContent_trainerText.TabIndex = 2;
             mainContent_trainerText.Text = "Trainer Text Table";
             mainContent_trainerText.UseVisualStyleBackColor = true;
@@ -1993,7 +2035,7 @@ namespace VSMaker
             panel17.Dock = DockStyle.Fill;
             panel17.Location = new Point(0, 0);
             panel17.Name = "panel17";
-            panel17.Size = new Size(891, 519);
+            panel17.Size = new Size(891, 489);
             panel17.TabIndex = 2;
             // 
             // panel16
@@ -2003,14 +2045,14 @@ namespace VSMaker
             panel16.Dock = DockStyle.Fill;
             panel16.Location = new Point(0, 31);
             panel16.Name = "panel16";
-            panel16.Size = new Size(891, 488);
+            panel16.Size = new Size(891, 458);
             panel16.TabIndex = 15;
             // 
             // panel15
             // 
             panel15.Controls.Add(trainerTextTable_help_label);
             panel15.Dock = DockStyle.Bottom;
-            panel15.Location = new Point(0, 463);
+            panel15.Location = new Point(0, 433);
             panel15.Name = "panel15";
             panel15.Size = new Size(891, 25);
             panel15.TabIndex = 1;
@@ -2038,7 +2080,7 @@ namespace VSMaker
             trainerTextTable_dataGrid.Name = "trainerTextTable_dataGrid";
             trainerTextTable_dataGrid.RowHeadersWidth = 62;
             trainerTextTable_dataGrid.RowTemplate.Height = 25;
-            trainerTextTable_dataGrid.Size = new Size(891, 488);
+            trainerTextTable_dataGrid.Size = new Size(891, 458);
             trainerTextTable_dataGrid.TabIndex = 0;
             trainerTextTable_dataGrid.CellClick += trainerTextTable_dataGrid_CellClick;
             trainerTextTable_dataGrid.CellContentDoubleClick += trainerTextTable_dataGrid_TextDblClick;
@@ -2081,8 +2123,8 @@ namespace VSMaker
             // Message
             // 
             Message.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
-            Message.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
+            Message.DefaultCellStyle = dataGridViewCellStyle2;
             Message.HeaderText = "Text";
             Message.MinimumWidth = 8;
             Message.Name = "Message";
@@ -2172,7 +2214,7 @@ namespace VSMaker
             mainContent_trainerTheme.Location = new Point(4, 24);
             mainContent_trainerTheme.Name = "mainContent_trainerTheme";
             mainContent_trainerTheme.Padding = new Padding(3);
-            mainContent_trainerTheme.Size = new Size(891, 519);
+            mainContent_trainerTheme.Size = new Size(891, 489);
             mainContent_trainerTheme.TabIndex = 4;
             mainContent_trainerTheme.Text = "Trainer Themes";
             mainContent_trainerTheme.UseVisualStyleBackColor = true;
@@ -2186,9 +2228,10 @@ namespace VSMaker
             panel14.Controls.Add(label18);
             panel14.Controls.Add(label16);
             panel14.Controls.Add(pictureBox1);
-            panel14.Location = new Point(209, 3);
+            panel14.Dock = DockStyle.Fill;
+            panel14.Location = new Point(203, 3);
             panel14.Name = "panel14";
-            panel14.Size = new Size(564, 456);
+            panel14.Size = new Size(685, 483);
             panel14.TabIndex = 7;
             // 
             // button10
@@ -2277,7 +2320,7 @@ namespace VSMaker
             panel13.Dock = DockStyle.Left;
             panel13.Location = new Point(3, 3);
             panel13.Name = "panel13";
-            panel13.Size = new Size(200, 513);
+            panel13.Size = new Size(200, 483);
             panel13.TabIndex = 0;
             // 
             // label15
@@ -2397,15 +2440,295 @@ namespace VSMaker
             panel2.Dock = DockStyle.Fill;
             panel2.Location = new Point(0, 49);
             panel2.Name = "panel2";
-            panel2.Size = new Size(899, 547);
+            panel2.Size = new Size(899, 517);
             panel2.TabIndex = 5;
+            // 
+            // label14
+            // 
+            label14.AutoSize = true;
+            label14.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label14.ImageAlign = ContentAlignment.MiddleLeft;
+            label14.Location = new Point(15, 9);
+            label14.Name = "label14";
+            label14.Size = new Size(61, 15);
+            label14.TabIndex = 49;
+            label14.Text = "Trainer AI";
+            label14.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // trainer_ai_Basic_checkbox
+            // 
+            trainer_ai_Basic_checkbox.AutoSize = true;
+            trainer_ai_Basic_checkbox.Enabled = false;
+            trainer_ai_Basic_checkbox.FlatAppearance.BorderSize = 2;
+            trainer_ai_Basic_checkbox.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            trainer_ai_Basic_checkbox.Location = new Point(15, 40);
+            trainer_ai_Basic_checkbox.Name = "trainer_ai_Basic_checkbox";
+            trainer_ai_Basic_checkbox.Size = new Size(53, 19);
+            trainer_ai_Basic_checkbox.TabIndex = 52;
+            trainer_ai_Basic_checkbox.Text = "Basic";
+            trainer_ai_Basic_checkbox.UseVisualStyleBackColor = true;
+            // 
+            // trainer_ai_evaluate_checkBox
+            // 
+            trainer_ai_evaluate_checkBox.AutoSize = true;
+            trainer_ai_evaluate_checkBox.Enabled = false;
+            trainer_ai_evaluate_checkBox.FlatAppearance.BorderSize = 2;
+            trainer_ai_evaluate_checkBox.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            trainer_ai_evaluate_checkBox.Location = new Point(15, 65);
+            trainer_ai_evaluate_checkBox.Name = "trainer_ai_evaluate_checkBox";
+            trainer_ai_evaluate_checkBox.Size = new Size(94, 19);
+            trainer_ai_evaluate_checkBox.TabIndex = 53;
+            trainer_ai_evaluate_checkBox.Text = "Evaluate Atk.";
+            trainer_ai_evaluate_checkBox.UseVisualStyleBackColor = true;
+            // 
+            // trainer_ai_expert_checkBox
+            // 
+            trainer_ai_expert_checkBox.AutoSize = true;
+            trainer_ai_expert_checkBox.Enabled = false;
+            trainer_ai_expert_checkBox.FlatAppearance.BorderSize = 2;
+            trainer_ai_expert_checkBox.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            trainer_ai_expert_checkBox.Location = new Point(117, 40);
+            trainer_ai_expert_checkBox.Name = "trainer_ai_expert_checkBox";
+            trainer_ai_expert_checkBox.Size = new Size(59, 19);
+            trainer_ai_expert_checkBox.TabIndex = 54;
+            trainer_ai_expert_checkBox.Text = "Expert";
+            trainer_ai_expert_checkBox.UseVisualStyleBackColor = true;
+            // 
+            // trainer_ai_status_checkBox
+            // 
+            trainer_ai_status_checkBox.AutoSize = true;
+            trainer_ai_status_checkBox.Enabled = false;
+            trainer_ai_status_checkBox.FlatAppearance.BorderSize = 2;
+            trainer_ai_status_checkBox.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            trainer_ai_status_checkBox.Location = new Point(15, 90);
+            trainer_ai_status_checkBox.Name = "trainer_ai_status_checkBox";
+            trainer_ai_status_checkBox.Size = new Size(58, 19);
+            trainer_ai_status_checkBox.TabIndex = 55;
+            trainer_ai_status_checkBox.Text = "Status";
+            trainer_ai_status_checkBox.UseVisualStyleBackColor = true;
+            // 
+            // trainer_ai_misc_checkBox
+            // 
+            trainer_ai_misc_checkBox.AutoSize = true;
+            trainer_ai_misc_checkBox.Enabled = false;
+            trainer_ai_misc_checkBox.FlatAppearance.BorderSize = 2;
+            trainer_ai_misc_checkBox.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            trainer_ai_misc_checkBox.Location = new Point(15, 165);
+            trainer_ai_misc_checkBox.Name = "trainer_ai_misc_checkBox";
+            trainer_ai_misc_checkBox.Size = new Size(41, 19);
+            trainer_ai_misc_checkBox.TabIndex = 59;
+            trainer_ai_misc_checkBox.Text = "???";
+            trainer_ai_misc_checkBox.UseVisualStyleBackColor = true;
+            // 
+            // trainer_ai_baton_checkBox
+            // 
+            trainer_ai_baton_checkBox.AutoSize = true;
+            trainer_ai_baton_checkBox.Enabled = false;
+            trainer_ai_baton_checkBox.FlatAppearance.BorderSize = 2;
+            trainer_ai_baton_checkBox.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            trainer_ai_baton_checkBox.Location = new Point(15, 140);
+            trainer_ai_baton_checkBox.Name = "trainer_ai_baton_checkBox";
+            trainer_ai_baton_checkBox.Size = new Size(83, 19);
+            trainer_ai_baton_checkBox.TabIndex = 58;
+            trainer_ai_baton_checkBox.Text = "Baton Pass";
+            trainer_ai_baton_checkBox.UseVisualStyleBackColor = true;
+            // 
+            // trainer_ai_dmg_checkBox
+            // 
+            trainer_ai_dmg_checkBox.AutoSize = true;
+            trainer_ai_dmg_checkBox.Enabled = false;
+            trainer_ai_dmg_checkBox.FlatAppearance.BorderSize = 2;
+            trainer_ai_dmg_checkBox.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            trainer_ai_dmg_checkBox.Location = new Point(117, 65);
+            trainer_ai_dmg_checkBox.Name = "trainer_ai_dmg_checkBox";
+            trainer_ai_dmg_checkBox.Size = new Size(111, 19);
+            trainer_ai_dmg_checkBox.TabIndex = 57;
+            trainer_ai_dmg_checkBox.Text = "Damage Priority";
+            trainer_ai_dmg_checkBox.UseVisualStyleBackColor = true;
+            // 
+            // trainer_ai_risk_checkBox
+            // 
+            trainer_ai_risk_checkBox.AutoSize = true;
+            trainer_ai_risk_checkBox.Enabled = false;
+            trainer_ai_risk_checkBox.FlatAppearance.BorderSize = 2;
+            trainer_ai_risk_checkBox.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            trainer_ai_risk_checkBox.Location = new Point(15, 115);
+            trainer_ai_risk_checkBox.Name = "trainer_ai_risk_checkBox";
+            trainer_ai_risk_checkBox.Size = new Size(47, 19);
+            trainer_ai_risk_checkBox.TabIndex = 56;
+            trainer_ai_risk_checkBox.Text = "Risk";
+            trainer_ai_risk_checkBox.UseVisualStyleBackColor = true;
+            // 
+            // trainer_ai_tag_checkBox
+            // 
+            trainer_ai_tag_checkBox.AutoSize = true;
+            trainer_ai_tag_checkBox.Enabled = false;
+            trainer_ai_tag_checkBox.FlatAppearance.BorderSize = 2;
+            trainer_ai_tag_checkBox.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            trainer_ai_tag_checkBox.Location = new Point(117, 140);
+            trainer_ai_tag_checkBox.Name = "trainer_ai_tag_checkBox";
+            trainer_ai_tag_checkBox.Size = new Size(75, 19);
+            trainer_ai_tag_checkBox.TabIndex = 62;
+            trainer_ai_tag_checkBox.Text = "Tag Team";
+            trainer_ai_tag_checkBox.UseVisualStyleBackColor = true;
+            // 
+            // trainer_ai_weather_checkBox
+            // 
+            trainer_ai_weather_checkBox.AutoSize = true;
+            trainer_ai_weather_checkBox.Enabled = false;
+            trainer_ai_weather_checkBox.FlatAppearance.BorderSize = 2;
+            trainer_ai_weather_checkBox.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            trainer_ai_weather_checkBox.Location = new Point(117, 90);
+            trainer_ai_weather_checkBox.Name = "trainer_ai_weather_checkBox";
+            trainer_ai_weather_checkBox.Size = new Size(108, 19);
+            trainer_ai_weather_checkBox.TabIndex = 61;
+            trainer_ai_weather_checkBox.Text = "Weather Effects";
+            trainer_ai_weather_checkBox.UseVisualStyleBackColor = true;
+            // 
+            // trainer_ai_checkHp_checkBox
+            // 
+            trainer_ai_checkHp_checkBox.AutoSize = true;
+            trainer_ai_checkHp_checkBox.Enabled = false;
+            trainer_ai_checkHp_checkBox.FlatAppearance.BorderSize = 2;
+            trainer_ai_checkHp_checkBox.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            trainer_ai_checkHp_checkBox.Location = new Point(117, 115);
+            trainer_ai_checkHp_checkBox.Name = "trainer_ai_checkHp_checkBox";
+            trainer_ai_checkHp_checkBox.Size = new Size(78, 19);
+            trainer_ai_checkHp_checkBox.TabIndex = 60;
+            trainer_ai_checkHp_checkBox.Text = "Check HP";
+            trainer_ai_checkHp_checkBox.UseVisualStyleBackColor = true;
+            // 
+            // label19
+            // 
+            label19.AutoSize = true;
+            label19.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label19.ImageAlign = ContentAlignment.MiddleLeft;
+            label19.Location = new Point(252, 9);
+            label19.Name = "label19";
+            label19.Size = new Size(89, 15);
+            label19.TabIndex = 63;
+            label19.Text = "Trainer's Items";
+            label19.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // trainer_Item1_comboBox
+            // 
+            trainer_Item1_comboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            trainer_Item1_comboBox.AutoCompleteMode = AutoCompleteMode.Append;
+            trainer_Item1_comboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
+            trainer_Item1_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            trainer_Item1_comboBox.Enabled = false;
+            trainer_Item1_comboBox.FlatStyle = FlatStyle.Popup;
+            trainer_Item1_comboBox.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            trainer_Item1_comboBox.FormattingEnabled = true;
+            trainer_Item1_comboBox.ImeMode = ImeMode.Off;
+            trainer_Item1_comboBox.Location = new Point(274, 36);
+            trainer_Item1_comboBox.Name = "trainer_Item1_comboBox";
+            trainer_Item1_comboBox.Size = new Size(113, 23);
+            trainer_Item1_comboBox.TabIndex = 96;
+            // 
+            // trainer_Item2_comboBox
+            // 
+            trainer_Item2_comboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            trainer_Item2_comboBox.AutoCompleteMode = AutoCompleteMode.Append;
+            trainer_Item2_comboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
+            trainer_Item2_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            trainer_Item2_comboBox.Enabled = false;
+            trainer_Item2_comboBox.FlatStyle = FlatStyle.Popup;
+            trainer_Item2_comboBox.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            trainer_Item2_comboBox.FormattingEnabled = true;
+            trainer_Item2_comboBox.ImeMode = ImeMode.Off;
+            trainer_Item2_comboBox.Location = new Point(274, 65);
+            trainer_Item2_comboBox.Name = "trainer_Item2_comboBox";
+            trainer_Item2_comboBox.Size = new Size(113, 23);
+            trainer_Item2_comboBox.TabIndex = 98;
+            // 
+            // label22
+            // 
+            label22.AutoSize = true;
+            label22.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label22.ImageAlign = ContentAlignment.MiddleLeft;
+            label22.Location = new Point(254, 39);
+            label22.Name = "label22";
+            label22.Size = new Size(14, 15);
+            label22.TabIndex = 99;
+            label22.Text = "1";
+            label22.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // label23
+            // 
+            label23.AutoSize = true;
+            label23.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label23.ImageAlign = ContentAlignment.MiddleLeft;
+            label23.Location = new Point(254, 68);
+            label23.Name = "label23";
+            label23.Size = new Size(14, 15);
+            label23.TabIndex = 100;
+            label23.Text = "2";
+            label23.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // label24
+            // 
+            label24.AutoSize = true;
+            label24.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label24.ImageAlign = ContentAlignment.MiddleLeft;
+            label24.Location = new Point(254, 126);
+            label24.Name = "label24";
+            label24.Size = new Size(14, 15);
+            label24.TabIndex = 104;
+            label24.Text = "4";
+            label24.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // label25
+            // 
+            label25.AutoSize = true;
+            label25.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label25.ImageAlign = ContentAlignment.MiddleLeft;
+            label25.Location = new Point(254, 97);
+            label25.Name = "label25";
+            label25.Size = new Size(14, 15);
+            label25.TabIndex = 103;
+            label25.Text = "3";
+            label25.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // trainer_Item4_comboBox
+            // 
+            trainer_Item4_comboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            trainer_Item4_comboBox.AutoCompleteMode = AutoCompleteMode.Append;
+            trainer_Item4_comboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
+            trainer_Item4_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            trainer_Item4_comboBox.Enabled = false;
+            trainer_Item4_comboBox.FlatStyle = FlatStyle.Popup;
+            trainer_Item4_comboBox.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            trainer_Item4_comboBox.FormattingEnabled = true;
+            trainer_Item4_comboBox.ImeMode = ImeMode.Off;
+            trainer_Item4_comboBox.Location = new Point(274, 123);
+            trainer_Item4_comboBox.Name = "trainer_Item4_comboBox";
+            trainer_Item4_comboBox.Size = new Size(113, 23);
+            trainer_Item4_comboBox.TabIndex = 102;
+            trainer_Item4_comboBox.SelectedIndexChanged += trainer_Item4_comboBox_SelectedIndexChanged;
+            // 
+            // trainer_Item3_comboBox
+            // 
+            trainer_Item3_comboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            trainer_Item3_comboBox.AutoCompleteMode = AutoCompleteMode.Append;
+            trainer_Item3_comboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
+            trainer_Item3_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            trainer_Item3_comboBox.Enabled = false;
+            trainer_Item3_comboBox.FlatStyle = FlatStyle.Popup;
+            trainer_Item3_comboBox.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            trainer_Item3_comboBox.FormattingEnabled = true;
+            trainer_Item3_comboBox.ImeMode = ImeMode.Off;
+            trainer_Item3_comboBox.Location = new Point(274, 94);
+            trainer_Item3_comboBox.Name = "trainer_Item3_comboBox";
+            trainer_Item3_comboBox.Size = new Size(113, 23);
+            trainer_Item3_comboBox.TabIndex = 101;
             // 
             // Mainform
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             AutoSize = true;
-            ClientSize = new Size(899, 618);
+            ClientSize = new Size(899, 588);
             Controls.Add(panel2);
             Controls.Add(panel1);
             Controls.Add(statusStrip1);
@@ -2467,6 +2790,7 @@ namespace VSMaker
             trainerEditor_trnProperties.ResumeLayout(false);
             panel12.ResumeLayout(false);
             panel18.ResumeLayout(false);
+            panel18.PerformLayout();
             panel7.ResumeLayout(false);
             panel7.PerformLayout();
             panel6.ResumeLayout(false);
@@ -2694,5 +3018,26 @@ namespace VSMaker
         private ComboBox trainer_Poke2_comboBox;
         private Button trainer_Poke2_Stats_btn;
         private PictureBox pictureBox2;
+        private Label label24;
+        private Label label25;
+        private ComboBox trainer_Item4_comboBox;
+        private ComboBox trainer_Item3_comboBox;
+        private Label label23;
+        private Label label22;
+        private ComboBox trainer_Item2_comboBox;
+        private ComboBox trainer_Item1_comboBox;
+        private Label label19;
+        private CheckBox trainer_ai_tag_checkBox;
+        private CheckBox trainer_ai_weather_checkBox;
+        private CheckBox trainer_ai_checkHp_checkBox;
+        private CheckBox trainer_ai_misc_checkBox;
+        private CheckBox trainer_ai_baton_checkBox;
+        private CheckBox trainer_ai_dmg_checkBox;
+        private CheckBox trainer_ai_risk_checkBox;
+        private CheckBox trainer_ai_status_checkBox;
+        private CheckBox trainer_ai_expert_checkBox;
+        private CheckBox trainer_ai_evaluate_checkBox;
+        private CheckBox trainer_ai_Basic_checkbox;
+        private Label label14;
     }
 }
