@@ -53,8 +53,10 @@ namespace VSMaker
         private ImageBase trainerTile;
         private List<ComboBox> pokeComboBoxes;
         private List<ComboBox> pokeItemComboBoxes;
+        private List<ComboBox> trainerItemComboBoxes;
         private List<NumericUpDown> pokeLevels;
         private bool unsavedChanges;
+        private Dictionary<byte, (uint entryOffset, ushort musicD, ushort? musicN)> trainerClassEncounterMusicDict;
 
         #endregion Editor Data
 
@@ -101,6 +103,14 @@ namespace VSMaker
                 trainer_Poke4_Item,
                 trainer_Poke5_Item,
                 trainer_Poke6_Item,
+            };
+
+            trainerItemComboBoxes = new List<ComboBox>
+            {
+                trainer_Item1_comboBox,
+                trainer_Item2_comboBox,
+                trainer_Item3_comboBox,
+                trainer_Item4_comboBox,
             };
         }
 
@@ -352,6 +362,33 @@ namespace VSMaker
             }
         }
 
+        private void GetTrainerClassEncounterMusic()
+        {
+            SetEncounterMusicTableOffsetToRAMAddress();
+            trainerClassEncounterMusicDict = new Dictionary<byte, (uint entryOffset, ushort musicD, ushort? musicN)>();
+
+            uint encounterMusicTableTableStartAddress = BitConverter.ToUInt32(DSUtils.ARM9.ReadBytes(encounterMusicTableOffsetToRAMAddress, 4), 0) - DSUtils.ARM9.address;
+
+            uint entrySize = 4;
+            uint tableSizeOffset = 10;
+            if (gameFamily == gFamEnum.HGSS)
+            {
+                entrySize += 2;
+                tableSizeOffset += 2;
+            }
+
+            byte tableEntriesCount = DSUtils.ARM9.ReadByte(encounterMusicTableOffsetToRAMAddress - tableSizeOffset);
+            using DSUtils.ARM9.Reader ar = new DSUtils.ARM9.Reader(encounterMusicTableTableStartAddress);
+            for (int i = 0; i < tableEntriesCount; i++)
+            {
+                uint entryOffset = (uint)ar.BaseStream.Position;
+                byte tclass = (byte)ar.ReadUInt16();
+                ushort musicD = ar.ReadUInt16();
+                ushort? musicN = gameFamily == gFamEnum.HGSS ? ar.ReadUInt16() : (ushort?)null;
+                trainerClassEncounterMusicDict[tclass] = (entryOffset, musicD, musicN);
+            }
+        }
+
         #endregion ROM
 
         #region Main Editor
@@ -458,17 +495,14 @@ namespace VSMaker
         private void DisableTrainerClassEditorInputs()
         {
             //Disable Buttons
-            saveClassName_btn.Enabled = false;
-            saveClassTheme_btn.Enabled = false;
-            saveClassProperties_btn.Enabled = false;
             saveTrainerClassAll_btn.Enabled = false;
             undoTrainerClass_btn.Enabled = false;
             trainerClass_GoToTrainer_btn.Enabled = false;
 
             //Disable Fields
             trainerClassName.Enabled = false;
-            trainerClass_EyeContactMain_comboBox.Enabled = false;
-            trainerClass_EyeContactAlt_comboBox.Enabled = false;
+            trainerClass_EyeContactMain_num.Enabled = false;
+            trainerClass_EyeContact_Alt_num.Enabled = false;
             trainerClass_PrizeMoney_num.Enabled = false;
             trainerClass_Gender_comboBox.Enabled = false;
             trainerClass_frames_num.Enabled = false;
@@ -478,9 +512,6 @@ namespace VSMaker
         private void DisableTrainerEditorInputs()
         {
             //Disable Buttons
-            save_TrainerClass_btn.Enabled = false;
-            save_TrainerName_btn.Enabled = false;
-            saveTrainerPoke_btn.Enabled = false;
             saveTrainerAll_btn.Enabled = false;
             undoTrainer_btn.Enabled = false;
             trainer_GoToClass_btn.Enabled = false;
@@ -506,17 +537,6 @@ namespace VSMaker
             MessageBox.Show("These Trainer Classes are \"Player Classes\".\n\nChanging these can cause errors.", "Player Classes", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private void saveClassName_btn_Click(object sender, EventArgs e)
-        {
-            if (ValidateTrainerClassName())
-            {
-                SaveTrainerClassName();
-                MessageBox.Show("Saved Trainer Class Name!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                GetTrainerClasses();
-                SetupTrainerClassEditor();
-            }
-        }
-
         private bool ValidateTrainerClassName()
         {
             if (trainerClassName.Text.Length > TrainerFile.maxClassNameLen)
@@ -534,15 +554,19 @@ namespace VSMaker
 
         private void SaveTrainerName()
         {
+            RomFileSystem.UpdateCurrentTrainerName(trainer_Name.Text, selectedTrainer.TrainerClassId);
+        }
+
+        private bool ValidateTrainerName()
+        {
             if (trainer_Name.Text.Length > TrainerFile.maxNameLen)
             {
                 MessageBox.Show($"Trainer name cannot exceed {TrainerFile.maxNameLen} characters.", "Trainer Name Length", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
-            else if (GetSingleTrainerClassName(selectedTrainer.TrainerId) != trainer_Name.Text)
+            else
             {
-                RomFileSystem.UpdateCurrentTrainerName(trainer_Name.Text, selectedTrainer.TrainerClassId);
-                GetTrainers();
-                SetupTrainerEditor();
+                return true;
             }
         }
 
@@ -580,6 +604,10 @@ namespace VSMaker
             trainerClass_Uses_list.Enabled = trainerClass.InUse;
             trainerClass_frames_num.Enabled = trainerClass.TrainerSpriteFrames > 0;
             trainerClass_frames_num.Maximum = trainerClass.TrainerSpriteFrames;
+            trainerClass_EyeContactMain_num.Value = trainerClass.EyeContactMusic;
+            trainerClass_EyeContactMain_num.Enabled = true;
+            trainerClass_EyeContact_Alt_num.Value = trainerClass.EyeContactAltMusic;
+            trainerClass_EyeContact_Alt_num.Enabled = gameFamily == gFamEnum.HGSS;
         }
 
         private void SetupTrainerEditorInputs(Trainer trainer)
@@ -588,6 +616,34 @@ namespace VSMaker
             trainer_Class_comboBox.Enabled = trainer.TrainerClassId >= 0;
             trainer_frames_num.Enabled = trainer.TrainerSpriteFrames > 0;
             trainer_frames_num.Maximum = trainer.TrainerSpriteFrames;
+            trainer_ai_Basic_checkbox.Enabled = true;
+            trainer_ai_baton_checkBox.Enabled = true;
+            trainer_ai_checkHp_checkBox.Enabled = true;
+            trainer_ai_dmg_checkBox.Enabled = true;
+            trainer_ai_evaluate_checkBox.Enabled = true;
+            trainer_ai_expert_checkBox.Enabled = true;
+            trainer_ai_misc_checkBox.Enabled = true;
+            trainer_ai_risk_checkBox.Enabled = true;
+            trainer_ai_status_checkBox.Enabled = true;
+            trainer_ai_tag_checkBox.Enabled = true;
+            trainer_ai_weather_checkBox.Enabled = true;
+            trainerItemComboBoxes.ForEach(x => x.Enabled = true);
+            trainer_Item1_comboBox.SelectedIndex = trainer.TrainerItem1Id;
+            trainer_Item2_comboBox.SelectedIndex = trainer.TrainerItem2Id;
+            trainer_Item3_comboBox.SelectedIndex = trainer.TrainerItem3Id;
+            trainer_Item4_comboBox.SelectedIndex = trainer.TrainerItem4Id;
+
+            trainer_ai_Basic_checkbox.Checked = trainer.AI.Basic;
+            trainer_ai_baton_checkBox.Checked = trainer.AI.BatonPass;
+            trainer_ai_checkHp_checkBox.Checked = trainer.AI.CheckHp;
+            trainer_ai_dmg_checkBox.Checked = trainer.AI.DamagePriority;
+            trainer_ai_evaluate_checkBox.Checked = trainer.AI.EvaluateAttack;
+            trainer_ai_expert_checkBox.Checked = trainer.AI.Expert;
+            trainer_ai_misc_checkBox.Checked = trainer.AI.Unknown;
+            trainer_ai_risk_checkBox.Checked = trainer.AI.Risky;
+            trainer_ai_status_checkBox.Checked = trainer.AI.Status;
+            trainer_ai_tag_checkBox.Checked = trainer.AI.TagTeam;
+            trainer_ai_weather_checkBox.Checked = trainer.AI.WeatherEffect;
         }
 
         private void trainerClass_GoToTrainer_btn_Click(object sender, EventArgs e)
@@ -690,7 +746,7 @@ namespace VSMaker
             UpdateTrainerClassPic(trainerPicBox);
             trainer_frames_num.Maximum = selectedTrainer.TrainerSpriteFrames;
             trainer_frames_num.Enabled = selectedTrainer.TrainerSpriteFrames > 0;
-            SetUnsavedChanges(false);
+            SetUnsavedChanges(true);
             undoTrainer_btn.Enabled = unsavedChanges;
         }
 
@@ -713,6 +769,7 @@ namespace VSMaker
                 DirNames.trainerTextTable,
                 DirNames.trainerTextOffset,
             });
+            GetTrainerClassEncounterMusic();
 
             SetTrainerTable();
             try
@@ -886,14 +943,28 @@ namespace VSMaker
 
             for (int i = 0; i < classNames.Length; i++)
             {
+                string suffix = "\\" + i.ToString("D4");
+                var classProperties = new TrainerProperties((ushort)i, new FileStream($"{gameDirs[DirNames.trainerProperties].unpackedDir}{suffix}", FileMode.Open));
+
                 var item = new TrainerClass
                 {
                     TrainerClassId = i,
                     TrainerClassName = classNames[i],
                     UsedByTrainers = new List<Trainer>(),
-                    TrainerSpriteFrames = 0
+                    TrainerSpriteFrames = 0,
                 };
                 item.UsedByTrainers.AddRange(trainers.Where(x => x.TrainerClassId == item.TrainerClassId && !x.IsPlayerTrainer));
+
+                if (trainerClassEncounterMusicDict.TryGetValue((byte)i, out (uint entryOffset, ushort musicD, ushort? musicN) output))
+                {
+                    item.EyeContactMusic = output.musicD;
+                }
+                else
+                {
+                    item.EyeContactMusic = 0;
+                }
+
+                item.EyeContactAltMusic = output.musicN != null ? (ushort)output.musicN : 0;
                 trainerClasses.Add(item);
             }
         }
@@ -920,9 +991,9 @@ namespace VSMaker
             }
             selectedTrainerClass.TrainerSpriteFrames = LoadTrainerClassPic(trainerClassId);
             UpdateTrainerClassPic(trainerClassPicBox);
+
             SetupTrainerClassEditorInputs(selectedTrainerClass);
             saveTrainerClassAll_btn.Enabled = true;
-            saveClassName_btn.Enabled = true;
         }
 
         /// <summary>
@@ -944,7 +1015,7 @@ namespace VSMaker
             selectedTrainer.Pokemon = new List<Pokemon>();
 
             int currentIndex = trainerId;
-            string suffix = $"\\{currentIndex.ToString("D4")}";
+            string suffix = $"\\{currentIndex:D4}";
 
             trainerFile = new TrainerFile(
                 new TrainerProperties(
@@ -1009,9 +1080,9 @@ namespace VSMaker
             trainer_Poke_HeldItem_checkBox.Enabled = true;
             trainer_Poke_Moves_checkBox.Enabled = true;
             trainer_NumPoke_num.Enabled = true;
-            trainer_Double_checkBox.Checked = trainerFile.trp.doubleBattle;
-            trainer_Poke_HeldItem_checkBox.Checked = trainerFile.trp.chooseItems;
-            trainer_Poke_Moves_checkBox.Checked = trainerFile.trp.chooseMoves;
+            trainer_Double_checkBox.Checked = selectedTrainer.IsDouble;
+            trainer_Poke_HeldItem_checkBox.Checked = selectedTrainer.HeldItems;
+            trainer_Poke_Moves_checkBox.Checked = selectedTrainer.ChooseMoves;
 
             for (int i = 0; i < 6; i++)
             {
@@ -1048,7 +1119,14 @@ namespace VSMaker
                 SetUnsavedChanges(true);
                 undoTrainer_btn.Enabled = true;
             }
+
             trainer_NumPoke_num.Value = selectedTrainer.Pokemon.Count;
+
+            foreach (var item in trainerItemComboBoxes)
+            {
+                item.Items.Clear();
+                itemNames.ForEach(x => item.Items.Add(x));
+            }
             EnablePokemon();
             SetupTrainerEditorInputs(selectedTrainer);
             EnableTrainerButtons();
@@ -1058,10 +1136,7 @@ namespace VSMaker
 
         private void EnableTrainerButtons()
         {
-            save_TrainerName_btn.Enabled = true;
             saveTrainerAll_btn.Enabled = true;
-            save_TrainerClass_btn.Enabled = true;
-            saveTrainerPoke_btn.Enabled = true;
         }
 
         private void GetTrainerMessages()
@@ -1108,8 +1183,25 @@ namespace VSMaker
                     TrainerName = trainerNames[i],
                     TrainerClassId = trainerProperties.trainerClass,
                     Pokemon = new List<Pokemon>(),
-                    IsDouble = trainerProperties.doubleBattle
+                    IsDouble = trainerProperties.doubleBattle,
+                    TrainerItem1Id = (int)trainerProperties.trainerItems[0],
+                    TrainerItem2Id = (int)trainerProperties.trainerItems[1],
+                    TrainerItem3Id = (int)trainerProperties.trainerItems[2],
+                    TrainerItem4Id = (int)trainerProperties.trainerItems[3],
+                    HeldItems = trainerProperties.chooseItems,
+                    ChooseMoves = trainerProperties.chooseMoves,
                 };
+                item.AI.Basic = trainerProperties.AI[0];
+                item.AI.EvaluateAttack = trainerProperties.AI[1];
+                item.AI.Expert = trainerProperties.AI[2];
+                item.AI.Status = trainerProperties.AI[3];
+                item.AI.Risky = trainerProperties.AI[4];
+                item.AI.DamagePriority = trainerProperties.AI[5];
+                item.AI.BatonPass = trainerProperties.AI[6];
+                item.AI.TagTeam = trainerProperties.AI[7];
+                item.AI.CheckHp = trainerProperties.AI[8];
+                item.AI.WeatherEffect = trainerProperties.AI[9];
+                item.AI.Unknown = trainerProperties.AI[10];
 
                 trainers.Add(item);
             }
@@ -1317,9 +1409,9 @@ namespace VSMaker
             }
         }
 
-        private void OpenPokemonEditor(int pokemonId)
+        private void OpenPokemonEditor(int partyIndex)
         {
-            pokemonEditor = new PokemonEditor(this, pokemonId);
+            pokemonEditor = new PokemonEditor(this, partyIndex, trainerFile);
             pokemonEditor.ShowDialog();
         }
 
@@ -1621,32 +1713,32 @@ namespace VSMaker
 
         private void trainer_Poke1_btn_Click(object sender, EventArgs e)
         {
-            OpenPokemonEditor(trainer_Poke1_comboBox.SelectedIndex);
+            OpenPokemonEditor(0);
         }
 
         private void trainer_Poke2_btn_Click(object sender, EventArgs e)
         {
-            OpenPokemonEditor(trainer_Poke2_comboBox.SelectedIndex);
+            OpenPokemonEditor(1);
         }
 
         private void trainer_Poke3_btn_Click(object sender, EventArgs e)
         {
-            OpenPokemonEditor(trainer_Poke3_comboBox.SelectedIndex);
+            OpenPokemonEditor(2);
         }
 
         private void trainer_Poke4_btn_Click(object sender, EventArgs e)
         {
-            OpenPokemonEditor(trainer_Poke4_comboBox.SelectedIndex);
+            OpenPokemonEditor(3);
         }
 
         private void trainer_Poke5_btn_Click(object sender, EventArgs e)
         {
-            OpenPokemonEditor(trainer_Poke5_comboBox.SelectedIndex);
+            OpenPokemonEditor(4);
         }
 
         private void trainer_Poke6_btn_Click(object sender, EventArgs e)
         {
-            OpenPokemonEditor(trainer_Poke6_comboBox.SelectedIndex);
+            OpenPokemonEditor(5);
         }
 
         private void trainerClass_frames_num_ValueChanged(object sender, EventArgs e)
@@ -1753,19 +1845,66 @@ namespace VSMaker
             }
         }
 
-        private void save_TrainerName_btn_Click(object sender, EventArgs e)
-        {
-            SaveTrainerName();
-        }
-
         private void saveTrainerAll_btn_Click(object sender, EventArgs e)
         {
-            SaveTrainerName();
+            bool valid = ValidateTrainerName() && ValidateTrainerPokemon();
+            if (valid)
+            {
+                SaveTrainerName();
+                SaveTrainerPokemon();
+                SaveTrainerProperties();
+                SaveTrainerClass();
+                TrainerChangesCommit();
+                GetTrainers();
+                SetupTrainerEditor();
+            }
+        }
+
+        private void TrainerChangesCommit()
+        {
+            /*Write to File*/
+            string indexStr = $"\\{selectedTrainer.TrainerId:D4}";
+            File.WriteAllBytes(gameDirs[DirNames.trainerProperties].unpackedDir + indexStr, trainerFile.trp.ToByteArray());
+            File.WriteAllBytes(gameDirs[DirNames.trainerParty].unpackedDir + indexStr, trainerFile.party.ToByteArray());
+        }
+
+        private void SaveTrainerClass()
+        {
+            trainerFile.trp.trainerClass = (byte)trainer_Class_comboBox.SelectedIndex;
+        }
+
+        private void SaveTrainerProperties()
+        {
+            // Set Trainer AI Flags
+            trainerFile.trp.AI[0] = trainer_ai_Basic_checkbox.Checked;
+            trainerFile.trp.AI[1] = trainer_ai_evaluate_checkBox.Checked;
+            trainerFile.trp.AI[2] = trainer_ai_expert_checkBox.Checked;
+            trainerFile.trp.AI[3] = trainer_ai_status_checkBox.Checked;
+            trainerFile.trp.AI[4] = trainer_ai_risk_checkBox.Checked;
+            trainerFile.trp.AI[5] = trainer_ai_dmg_checkBox.Checked;
+            trainerFile.trp.AI[6] = trainer_ai_baton_checkBox.Checked;
+            trainerFile.trp.AI[7] = trainer_ai_tag_checkBox.Checked;
+            trainerFile.trp.AI[8] = trainer_ai_checkHp_checkBox.Checked;
+            trainerFile.trp.AI[9] = trainer_ai_weather_checkBox.Checked;
+            trainerFile.trp.AI[10] = trainer_ai_misc_checkBox.Checked;
+
+            // Set Trainer Items
+            for (int i = 0; i < trainerItemComboBoxes.Count; i++)
+            {
+                trainerFile.trp.trainerItems[i] = (ushort)trainerItemComboBoxes[i].SelectedIndex;
+            }
         }
 
         private void saveTrainerClassAll_btn_Click(object sender, EventArgs e)
         {
-            SaveTrainerClassName();
+            bool valid = ValidateTrainerClassName();
+            if (valid)
+            {
+                SaveTrainerClassName();
+
+                GetTrainerClasses();
+                SetupTrainerClassEditor();
+            }
         }
 
         private void undoTrainer_btn_Click(object sender, EventArgs e)
@@ -2110,32 +2249,6 @@ namespace VSMaker
             return (false, string.Empty);
         }
 
-        private void saveTrainerPoke_btn_Click(object sender, EventArgs e)
-        {
-            if (ValidateTrainerPokemon())
-            {
-                SetUnsavedChanges(false);
-                // Get any edited but unsaved values from other fields
-                string trainerName = trainer_Name.Text;
-                int trainerClass = trainer_Class_comboBox.SelectedIndex;
-
-                SaveTrainerPokemon();
-                GetTrainerInfo(selectedTrainer.TrainerId);
-                // Change other values to edited.
-                if (selectedTrainer.TrainerName != trainerName)
-                {
-                    trainer_Name.Text = trainerName;
-                    SetUnsavedChanges(true);
-                }
-                if (selectedTrainer.TrainerClassId != trainerClass)
-                {
-                    trainer_Class_comboBox.SelectedIndex = trainerClass;
-                    SetUnsavedChanges(true);
-                }
-                MessageBox.Show("Saved Trainer's Pokemon!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
-
         private void SaveTrainerPokemon()
         {
             trainerFile.trp.doubleBattle = trainer_Double_checkBox.Checked;
@@ -2148,10 +2261,6 @@ namespace VSMaker
                 trainerFile.party[i].level = (ushort)pokeLevels[i].Value;
                 trainerFile.party[i].heldItem = trainer_Poke_HeldItem_checkBox.Checked ? (ushort)pokeItemComboBoxes[i].SelectedIndex : null;
             }
-            /*Write to File*/
-            string indexStr = $"\\{selectedTrainer.TrainerId:D4}";
-            File.WriteAllBytes(gameDirs[DirNames.trainerProperties].unpackedDir + indexStr, trainerFile.trp.ToByteArray());
-            File.WriteAllBytes(gameDirs[DirNames.trainerParty].unpackedDir + indexStr, trainerFile.party.ToByteArray());
         }
 
         private bool ValidateTrainerPokemon()
@@ -2213,16 +2322,99 @@ namespace VSMaker
         private void trainer_Poke_HeldItem_checkBox_CheckedChanged(object sender, EventArgs e)
         {
             EnablePokemon();
+            SetUnsavedChanges(true);
+            undoTrainer_btn.Enabled = unsavedChanges;
         }
 
         private void trainer_Poke_Moves_checkBox_CheckedChanged(object sender, EventArgs e)
         {
             EnablePokemon();
+            SetUnsavedChanges(true);
+            undoTrainer_btn.Enabled = unsavedChanges;
         }
 
         private void trainer_Item4_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            SetUnsavedChanges(true);
+            undoTrainer_btn.Enabled = unsavedChanges;
+        }
 
+        private void trainer_ai_Basic_checkbox_CheckedChanged(object sender, EventArgs e)
+        {
+            SetUnsavedChanges(true);
+            undoTrainer_btn.Enabled = unsavedChanges;
+        }
+
+        private void trainer_ai_expert_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            SetUnsavedChanges(true);
+            undoTrainer_btn.Enabled = unsavedChanges;
+        }
+
+        private void trainer_ai_dmg_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            SetUnsavedChanges(true);
+            undoTrainer_btn.Enabled = unsavedChanges;
+        }
+
+        private void trainer_ai_evaluate_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            SetUnsavedChanges(true);
+            undoTrainer_btn.Enabled = unsavedChanges;
+        }
+
+        private void trainer_ai_status_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            SetUnsavedChanges(true);
+            undoTrainer_btn.Enabled = unsavedChanges;
+        }
+
+        private void trainer_ai_weather_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            SetUnsavedChanges(true);
+            undoTrainer_btn.Enabled = unsavedChanges;
+        }
+
+        private void trainer_ai_risk_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            SetUnsavedChanges(true);
+            undoTrainer_btn.Enabled = unsavedChanges;
+        }
+
+        private void trainer_ai_checkHp_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            SetUnsavedChanges(true);
+            undoTrainer_btn.Enabled = unsavedChanges;
+        }
+
+        private void trainer_ai_baton_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            SetUnsavedChanges(true);
+            undoTrainer_btn.Enabled = unsavedChanges;
+        }
+
+        private void trainer_ai_tag_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            SetUnsavedChanges(true);
+            undoTrainer_btn.Enabled = unsavedChanges;
+        }
+
+        private void trainer_Item1_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SetUnsavedChanges(true);
+            undoTrainer_btn.Enabled = unsavedChanges;
+        }
+
+        private void trainer_Item2_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SetUnsavedChanges(true);
+            undoTrainer_btn.Enabled = unsavedChanges;
+        }
+
+        private void trainer_Item3_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SetUnsavedChanges(true);
+            undoTrainer_btn.Enabled = unsavedChanges;
         }
     }
 }

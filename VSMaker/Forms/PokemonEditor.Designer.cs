@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             toolStrip1 = new ToolStrip();
-            pokeStat_Save_tooltip = new ToolStripButton();
             panel1 = new Panel();
             label11 = new Label();
             label10 = new Label();
@@ -48,7 +47,6 @@
             label1 = new Label();
             label4 = new Label();
             pokeSprite = new PictureBox();
-            toolStrip1.SuspendLayout();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pokeStat_Dv_slider).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pokeStat_Dv_num).BeginInit();
@@ -57,20 +55,11 @@
             // 
             // toolStrip1
             // 
-            toolStrip1.Items.AddRange(new ToolStripItem[] { pokeStat_Save_tooltip });
             toolStrip1.Location = new Point(0, 0);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.Size = new Size(388, 25);
             toolStrip1.TabIndex = 0;
             toolStrip1.Text = "toolStrip1";
-            // 
-            // pokeStat_Save_tooltip
-            // 
-            pokeStat_Save_tooltip.Image = Properties.Resources.saveIconSm;
-            pokeStat_Save_tooltip.ImageTransparentColor = Color.Magenta;
-            pokeStat_Save_tooltip.Name = "pokeStat_Save_tooltip";
-            pokeStat_Save_tooltip.Size = new Size(51, 22);
-            pokeStat_Save_tooltip.Text = "Save";
             // 
             // panel1
             // 
@@ -136,7 +125,6 @@
             pokeStat_Dv_slider.Location = new Point(12, 175);
             pokeStat_Dv_slider.Margin = new Padding(15);
             pokeStat_Dv_slider.Maximum = 255;
-            pokeStat_Dv_slider.Minimum = 1;
             pokeStat_Dv_slider.Name = "pokeStat_Dv_slider";
             pokeStat_Dv_slider.Size = new Size(188, 45);
             pokeStat_Dv_slider.TabIndex = 45;
@@ -203,7 +191,6 @@
             // 
             pokeStat_Dv_num.Location = new Point(140, 142);
             pokeStat_Dv_num.Maximum = new decimal(new int[] { 255, 0, 0, 0 });
-            pokeStat_Dv_num.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             pokeStat_Dv_num.Name = "pokeStat_Dv_num";
             pokeStat_Dv_num.Size = new Size(50, 23);
             pokeStat_Dv_num.TabIndex = 34;
@@ -298,8 +285,6 @@
             Name = "PokemonEditor";
             Text = "Pokemon Stats";
             TopMost = true;
-            toolStrip1.ResumeLayout(false);
-            toolStrip1.PerformLayout();
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pokeStat_Dv_slider).EndInit();
@@ -312,7 +297,6 @@
         #endregion
 
         private ToolStrip toolStrip1;
-        private ToolStripButton pokeStat_Save_tooltip;
         private Panel panel1;
         private PictureBox pokeSprite;
         private Label label4;
