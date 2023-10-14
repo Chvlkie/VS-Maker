@@ -33,7 +33,7 @@ namespace VSMaker
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Mainform));
             main_toolstrip = new MenuStrip();
             mainToolStrip_file = new ToolStripMenuItem();
@@ -47,8 +47,6 @@ namespace VSMaker
             mainContent = new TabControl();
             mainContent_trainerClass = new TabPage();
             panel4 = new Panel();
-            trainerClass_EyeContact_Alt_num = new NumericUpDown();
-            trainerClass_EyeContactMain_num = new NumericUpDown();
             trainerClass_eyecontact_alt_label = new Label();
             label20 = new Label();
             trainerClass_Gender_label = new Label();
@@ -235,13 +233,13 @@ namespace VSMaker
             saveFileDialog1 = new SaveFileDialog();
             trainerMessageBindingSource1 = new BindingSource(components);
             trainerMessageBindingSource3 = new BindingSource(components);
+            trainerClass_EyeContact_Day_comboBox = new ComboBox();
+            trainerClass_EyeContact_Night_comboBox = new ComboBox();
             main_toolstrip.SuspendLayout();
             statusStrip1.SuspendLayout();
             mainContent.SuspendLayout();
             mainContent_trainerClass.SuspendLayout();
             panel4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)trainerClass_EyeContact_Alt_num).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)trainerClass_EyeContactMain_num).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trainerClass_PrizeMoney_num).BeginInit();
             panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trainerClass_vsGfx_box).BeginInit();
@@ -413,8 +411,8 @@ namespace VSMaker
             // panel4
             // 
             panel4.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            panel4.Controls.Add(trainerClass_EyeContact_Alt_num);
-            panel4.Controls.Add(trainerClass_EyeContactMain_num);
+            panel4.Controls.Add(trainerClass_EyeContact_Night_comboBox);
+            panel4.Controls.Add(trainerClass_EyeContact_Day_comboBox);
             panel4.Controls.Add(trainerClass_eyecontact_alt_label);
             panel4.Controls.Add(label20);
             panel4.Controls.Add(trainerClass_Gender_label);
@@ -427,24 +425,6 @@ namespace VSMaker
             panel4.Name = "panel4";
             panel4.Size = new Size(473, 109);
             panel4.TabIndex = 7;
-            // 
-            // trainerClass_EyeContact_Alt_num
-            // 
-            trainerClass_EyeContact_Alt_num.Enabled = false;
-            trainerClass_EyeContact_Alt_num.Location = new Point(167, 72);
-            trainerClass_EyeContact_Alt_num.Maximum = new decimal(new int[] { 65535, 0, 0, 0 });
-            trainerClass_EyeContact_Alt_num.Name = "trainerClass_EyeContact_Alt_num";
-            trainerClass_EyeContact_Alt_num.Size = new Size(58, 23);
-            trainerClass_EyeContact_Alt_num.TabIndex = 42;
-            // 
-            // trainerClass_EyeContactMain_num
-            // 
-            trainerClass_EyeContactMain_num.Enabled = false;
-            trainerClass_EyeContactMain_num.Location = new Point(167, 40);
-            trainerClass_EyeContactMain_num.Maximum = new decimal(new int[] { 65535, 0, 0, 0 });
-            trainerClass_EyeContactMain_num.Name = "trainerClass_EyeContactMain_num";
-            trainerClass_EyeContactMain_num.Size = new Size(58, 23);
-            trainerClass_EyeContactMain_num.TabIndex = 38;
             // 
             // trainerClass_eyecontact_alt_label
             // 
@@ -2314,8 +2294,8 @@ namespace VSMaker
             // Message
             // 
             Message.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
-            Message.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+            Message.DefaultCellStyle = dataGridViewCellStyle1;
             Message.HeaderText = "Text";
             Message.MinimumWidth = 8;
             Message.Name = "Message";
@@ -2664,6 +2644,28 @@ namespace VSMaker
             panel2.Size = new Size(899, 517);
             panel2.TabIndex = 5;
             // 
+            // trainerClass_EyeContact_Day_comboBox
+            // 
+            trainerClass_EyeContact_Day_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            trainerClass_EyeContact_Day_comboBox.Enabled = false;
+            trainerClass_EyeContact_Day_comboBox.FlatStyle = FlatStyle.Popup;
+            trainerClass_EyeContact_Day_comboBox.FormattingEnabled = true;
+            trainerClass_EyeContact_Day_comboBox.Location = new Point(176, 41);
+            trainerClass_EyeContact_Day_comboBox.Name = "trainerClass_EyeContact_Day_comboBox";
+            trainerClass_EyeContact_Day_comboBox.Size = new Size(80, 23);
+            trainerClass_EyeContact_Day_comboBox.TabIndex = 42;
+            // 
+            // trainerClass_EyeContact_Night_comboBox
+            // 
+            trainerClass_EyeContact_Night_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            trainerClass_EyeContact_Night_comboBox.Enabled = false;
+            trainerClass_EyeContact_Night_comboBox.FlatStyle = FlatStyle.Popup;
+            trainerClass_EyeContact_Night_comboBox.FormattingEnabled = true;
+            trainerClass_EyeContact_Night_comboBox.Location = new Point(176, 72);
+            trainerClass_EyeContact_Night_comboBox.Name = "trainerClass_EyeContact_Night_comboBox";
+            trainerClass_EyeContact_Night_comboBox.Size = new Size(80, 23);
+            trainerClass_EyeContact_Night_comboBox.TabIndex = 43;
+            // 
             // Mainform
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -2686,8 +2688,6 @@ namespace VSMaker
             mainContent_trainerClass.ResumeLayout(false);
             panel4.ResumeLayout(false);
             panel4.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)trainerClass_EyeContact_Alt_num).EndInit();
-            ((System.ComponentModel.ISupportInitialize)trainerClass_EyeContactMain_num).EndInit();
             ((System.ComponentModel.ISupportInitialize)trainerClass_PrizeMoney_num).EndInit();
             panel3.ResumeLayout(false);
             panel3.PerformLayout();
@@ -2963,8 +2963,6 @@ namespace VSMaker
         private CheckBox trainer_ai_evaluate_checkBox;
         private CheckBox trainer_ai_Basic_checkbox;
         private Label label14;
-        private NumericUpDown trainerClass_EyeContact_Alt_num;
-        private NumericUpDown trainerClass_EyeContactMain_num;
         private Panel panel23;
         private Panel panel22;
         private DataGridViewTextBoxColumn MessageId;
@@ -2972,5 +2970,7 @@ namespace VSMaker
         private DataGridViewComboBoxColumn MessageTriggerId;
         private DataGridViewTextBoxColumn Message;
         private Panel panel15;
+        private ComboBox trainerClass_EyeContact_Night_comboBox;
+        private ComboBox trainerClass_EyeContact_Day_comboBox;
     }
 }
