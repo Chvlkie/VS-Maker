@@ -19,8 +19,8 @@ namespace VSMaker.Data
         #endregion TrainerClassInfo
 
         #region TrainerClassMusic
-        public int EyeContactMusic { get; set; }
-        public int EyeContactAltMusic { get; set; }
+        public int EyeContactDay { get; set; }
+        public int EyeContactNight { get; set; }
         public int TrainerClassThemeId { get; set; }
         public int VsIntroId { get; set; }
         public int BattleMusic { get; set; }

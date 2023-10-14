@@ -5,6 +5,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using NarcAPI;
 using System.Data;
 using System.Diagnostics;
+using System.Formats.Asn1;
 using VSMaker.CommonFunctions;
 using VSMaker.Data;
 using VSMaker.Fonts;
@@ -56,8 +57,8 @@ namespace VSMaker
         private List<ComboBox> trainerItemComboBoxes;
         private List<NumericUpDown> pokeLevels;
         private bool unsavedChanges;
-        private Dictionary<byte, (uint entryOffset, ushort musicD, ushort? musicN)> trainerClassEncounterMusicDict;
-
+        //   private List<EyeContactMusic> eyeContactMusics = new();
+      
         #endregion Editor Data
 
         #region Forms
@@ -73,7 +74,7 @@ namespace VSMaker
             InitializeComponent();
             vsMakerFont.InitializePokemonDsFont();
             trainer_Message.Text = string.Empty;
-            trainerTextTable_help_label.Text = "";
+            //trainerTextTable_help_label.Text = "";
 
             pokeComboBoxes = new List<ComboBox>
             {
@@ -364,29 +365,30 @@ namespace VSMaker
 
         private void GetTrainerClassEncounterMusic()
         {
-            SetEncounterMusicTableOffsetToRAMAddress();
-            trainerClassEncounterMusicDict = new Dictionary<byte, (uint entryOffset, ushort musicD, ushort? musicN)>();
+            //RomInfo.SetEncounterMusicTableOffsetToRAMAddress();
+          
+            //uint encounterMusicTableTableStartAddress = BitConverter.ToUInt32(DSUtils.ARM9.ReadBytes(RomInfo.encounterMusicTableOffsetToRAMAddress, 4), 0) - DSUtils.ARM9.address;
 
-            uint encounterMusicTableTableStartAddress = BitConverter.ToUInt32(DSUtils.ARM9.ReadBytes(encounterMusicTableOffsetToRAMAddress, 4), 0) - DSUtils.ARM9.address;
+            ////     uint entrySize = 4;
+            //uint tableSizeOffset = 10;
+            //if (gameFamily == gFamEnum.HGSS)
+            //{
+            //    //        entrySize += 2;
+            //    tableSizeOffset += 2;
+            //}
 
-            uint entrySize = 4;
-            uint tableSizeOffset = 10;
-            if (gameFamily == gFamEnum.HGSS)
-            {
-                entrySize += 2;
-                tableSizeOffset += 2;
-            }
-
-            byte tableEntriesCount = DSUtils.ARM9.ReadByte(encounterMusicTableOffsetToRAMAddress - tableSizeOffset);
-            using DSUtils.ARM9.Reader ar = new DSUtils.ARM9.Reader(encounterMusicTableTableStartAddress);
-            for (int i = 0; i < tableEntriesCount; i++)
-            {
-                uint entryOffset = (uint)ar.BaseStream.Position;
-                byte tclass = (byte)ar.ReadUInt16();
-                ushort musicD = ar.ReadUInt16();
-                ushort? musicN = gameFamily == gFamEnum.HGSS ? ar.ReadUInt16() : (ushort?)null;
-                trainerClassEncounterMusicDict[tclass] = (entryOffset, musicD, musicN);
-            }
+            //byte tableEntriesCount = DSUtils.ARM9.ReadByte(RomInfo.encounterMusicTableOffsetToRAMAddress - tableSizeOffset);
+            //using (DSUtils.ARM9.Reader ar = new DSUtils.ARM9.Reader(encounterMusicTableTableStartAddress))
+            //{
+            //    for (int i = 0; i < tableEntriesCount; i++)
+            //    {
+            //        uint entryOffset = (uint)ar.BaseStream.Position;
+            //        byte tclass = (byte)ar.ReadUInt16();
+            //        ushort musicD = ar.ReadUInt16();
+            //        ushort? musicN = gameFamily == gFamEnum.HGSS ? ar.ReadUInt16() : (ushort?)null;
+            //        trainerClassEncounterMusicDict[tclass] = (entryOffset, musicD, musicN);
+            //    }
+            //}
         }
 
         #endregion ROM
@@ -501,8 +503,6 @@ namespace VSMaker
 
             //Disable Fields
             trainerClassName.Enabled = false;
-            trainerClass_EyeContactMain_num.Enabled = false;
-            trainerClass_EyeContact_Alt_num.Enabled = false;
             trainerClass_PrizeMoney_num.Enabled = false;
             trainerClass_Gender_comboBox.Enabled = false;
             trainerClass_frames_num.Enabled = false;
@@ -604,10 +604,21 @@ namespace VSMaker
             trainerClass_Uses_list.Enabled = trainerClass.InUse;
             trainerClass_frames_num.Enabled = trainerClass.TrainerSpriteFrames > 0;
             trainerClass_frames_num.Maximum = trainerClass.TrainerSpriteFrames;
-            trainerClass_EyeContactMain_num.Value = trainerClass.EyeContactMusic;
-            trainerClass_EyeContactMain_num.Enabled = true;
-            trainerClass_EyeContact_Alt_num.Value = trainerClass.EyeContactAltMusic;
-            trainerClass_EyeContact_Alt_num.Enabled = gameFamily == gFamEnum.HGSS;
+
+            //if (trainerClassEncounterMusicDict.TryGetValue((byte)trainerClass.TrainerClassId, out (uint entryOffset, ushort musicD, ushort? musicN) output))
+            //{
+            //    trainerClass_EyeContactMain_num.Enabled = true;
+            //    trainerClass_EyeContactMain_num.Value = output.musicD;
+            //}
+            //else
+            //{
+            //    trainerClass_EyeContactMain_num.Enabled = false;
+            //    trainerClass_EyeContactMain_num.Value = 0;
+            //}
+            //trainerClass_EyeContact_Alt_num.Enabled = trainerClass_EyeContactMain_num.Enabled && gameFamily == gFamEnum.HGSS;
+            //trainerClass_EyeContact_Alt_num.Visible = gameFamily == gFamEnum.HGSS;
+            //trainerClass_eyecontact_alt_label.Visible = gameFamily == gFamEnum.HGSS;
+            //trainerClass_EyeContact_Alt_num.Value = output.musicN != null ? (ushort)output.musicN : 0;
         }
 
         private void SetupTrainerEditorInputs(Trainer trainer)
@@ -955,16 +966,22 @@ namespace VSMaker
                 };
                 item.UsedByTrainers.AddRange(trainers.Where(x => x.TrainerClassId == item.TrainerClassId && !x.IsPlayerTrainer));
 
-                if (trainerClassEncounterMusicDict.TryGetValue((byte)i, out (uint entryOffset, ushort musicD, ushort? musicN) output))
-                {
-                    item.EyeContactMusic = output.musicD;
-                }
-                else
-                {
-                    item.EyeContactMusic = 0;
-                }
+                //// Eye-Contact Music
+                //if (trainerClassEncounterMusicDict.TryGetValue((byte)i, out (uint entryOffset, ushort musicD, ushort? musicN) output))
+                //{
+                //    item.EyeContactDay = output.musicD;
 
-                item.EyeContactAltMusic = output.musicN != null ? (ushort)output.musicN : 0;
+                //    item.EyeContactNight = output.musicN != null ? (ushort)output.musicN : 0;
+                //}
+                //else
+                //{
+                //    item.EyeContactDay = 0;
+                //    item.EyeContactNight = 0;
+
+                //}
+
+                //trainerClass_EyeContact_Alt_num.Enabled = gameFamily == gFamEnum.HGSS && trainerClass_EyeContactMain_num.Enabled;
+
                 trainerClasses.Add(item);
             }
         }
@@ -1809,11 +1826,11 @@ namespace VSMaker
         {
             if (e.ColumnIndex == 3)
             {
-                trainerTextTable_help_label.Text = "Double click to open text editor.";
+                //trainerTextTable_help_label.Text = "Double click to open text editor.";
             }
             else
             {
-                trainerTextTable_help_label.Text = "";
+                //trainerTextTable_help_label.Text = "";
             }
         }
 
@@ -1900,11 +1917,33 @@ namespace VSMaker
             bool valid = ValidateTrainerClassName();
             if (valid)
             {
+                SaveTrainerClassEyeContact();
                 SaveTrainerClassName();
-
                 GetTrainerClasses();
                 SetupTrainerClassEditor();
             }
+        }
+
+        private void SaveTrainerClassEyeContact()
+        {
+            //byte trainerClassId = (byte)trainerClassListBox.SelectedIndex;
+            //ushort musicDay = (ushort)trainerClass_EyeContactMain_num.Value;
+            //ushort musicNight = (ushort)trainerClass_EyeContact_Alt_num.Value;
+
+            //if (trainerClassEncounterMusicDict.TryGetValue(trainerClassId, out var dictEntry))
+            //{
+            //    if (gameFamily == gFamEnum.HGSS)
+            //    {
+            //       DSUtils.ARM9.WriteBytes(bytes, dictEntry.entryOffset);
+            //        //DSUtils.ARM9.WriteBytes(BitConverter.GetBytes(musicNight), dictEntry.entryOffset + 2);
+            //        trainerClassEncounterMusicDict[trainerClassId] = (dictEntry.entryOffset, musicDay, musicNight);
+            //    }
+            //    else
+            //    {
+            //        DSUtils.ARM9.WriteBytes(BitConverter.GetBytes(musicDay), dictEntry.entryOffset);
+            //        trainerClassEncounterMusicDict[trainerClassId] = (dictEntry.entryOffset, musicDay, dictEntry.musicN);
+            //    }
+            //}
         }
 
         private void undoTrainer_btn_Click(object sender, EventArgs e)
@@ -2415,6 +2454,86 @@ namespace VSMaker
         {
             SetUnsavedChanges(true);
             undoTrainer_btn.Enabled = unsavedChanges;
+        }
+
+        private void trainreText_Import_btn_Click(object sender, EventArgs e)
+        {
+            DialogResult dialog = MessageBox.Show("Importing from a spreadsheet will clear the current table\n" +
+                "and you will lose any unsaved changes.\n\nDo you wish to continue?", "Import Spreadsheet", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (dialog == DialogResult.Yes)
+            {
+                ImportSpreadsheet();
+            }
+        }
+
+        public XLWorkbook OpenSpreadsheet()
+        {
+            OpenFileDialog file = new();
+            file.Filter = "Excel Files|*.xls;*.xlsx;*.xlsm";
+
+            if (file.ShowDialog(this) != DialogResult.OK)
+            {
+                MessageBox.Show("Unable to open file.");
+                return null;
+            }
+            else
+            {
+                string fileName = file.FileName;
+                return new XLWorkbook(fileName);
+            }
+        }
+
+        private void ImportSpreadsheet()
+        {
+            var workbook = OpenSpreadsheet();
+            if (workbook != null)
+            {
+                bool firstRow = false; ;
+                var worksheet = workbook.Worksheet(1);
+                try
+                {
+                    statusLabelMessage("Importing data from spreadhsheet");
+                    Update();
+                    trainerMessages = new();
+
+                    foreach (var row in worksheet.Rows())
+                    {
+                        if (!firstRow)
+                        {
+                            firstRow = true;
+                        }
+                        else
+                        {
+                            int messageId = int.Parse(row.Cell(1).Value.ToString());
+                            int trainerId = int.Parse(row.Cell(2).Value.ToString());
+                            int messageTriggerId = int.Parse(row.Cell(3).Value.ToString());
+                            string text = row.Cell(4).Value.ToString();
+                            TrainerMessage item = new TrainerMessage
+                            {
+                                MessageId = messageId,
+                                TrainerId = trainerId,
+                                MessageTriggerId = messageTriggerId - 1,
+                                MessageText = text
+                            };
+                            item.TrainerName = trainers[item.TrainerId].TrainerName;
+                            item.MessageTriggerText = messageTriggers.Find(x => x.MessageTriggerId == item.MessageTriggerId).MessageTriggerName;
+                            trainerMessages.Add(item);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Unable to open spreadsheet.\n\n" + ex.Message, "Unable to Open Spreadsheet", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                statusLabelMessage("Reloading Trainer Text data.");
+                Update();
+                trainerTextTable_dataGrid.Rows.Clear();
+                trainerText_toolstrip.Enabled = false;
+                StartGetTrainerTextData(false);
+            }
         }
     }
 }

@@ -7,7 +7,7 @@ namespace VSMaker.Forms
     {
         private readonly Mainform mainform;
         private int partyIndex;
-        private TrainerFile trainerFile
+        private TrainerFile trainerFile;
 
         public PokemonEditor(Mainform mainform, int partyIndex, TrainerFile trainerFile)
         {

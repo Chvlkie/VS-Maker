@@ -12,13 +12,27 @@
 
   <ItemGroup>
     <None Remove="Resources\Fonts\pokemon-ds-font.ttf" />
+    <None Remove="Resources\Graphics\Graphics\pokeballs0.png" />
+    <None Remove="Resources\Graphics\Graphics\pokeballs1.png" />
+    <None Remove="Resources\Graphics\Graphics\pokeballs2.png" />
+    <None Remove="Resources\Graphics\Graphics\pokeballs3.png" />
+    <None Remove="Resources\Graphics\Graphics\pokeballs4.png" />
+    <None Remove="Resources\Graphics\Graphics\pokeballs5.png" />
+    <None Remove="Resources\Graphics\Graphics\pokeballs6.png" />
     <None Remove="Resources\Graphics\Icons\exportIcon.png" />
+    <None Remove="Resources\Graphics\Icons\IconPokeball.png" />
     <None Remove="Resources\Graphics\Icons\importIcon.png" />
+    <None Remove="Resources\Graphics\Icons\minusIconSm.png" />
     <None Remove="Resources\Graphics\Icons\openFolderIcon.png" />
     <None Remove="Resources\Graphics\Icons\openRomIcon.png" />
+    <None Remove="Resources\Graphics\Icons\plusIconSm.png" />
+    <None Remove="Resources\Graphics\Icons\pokeItemIcon.png" />
+    <None Remove="Resources\Graphics\Icons\pokeItemIconSm.png" />
+    <None Remove="Resources\Graphics\Icons\redoIconSm.png" />
     <None Remove="Resources\Graphics\Icons\saveIcon.png" />
     <None Remove="Resources\Graphics\Icons\saveIconSm.png" />
     <None Remove="Resources\Graphics\Icons\searchIcon.png" />
+    <None Remove="Resources\Graphics\Icons\sortIconSm.png" />
     <None Remove="Resources\Graphics\Icons\undoIconSm.png" />
     <None Remove="Resources\Graphics\TextEditor\MessageBox.png" />
     <None Remove="Tools\apicula.exe" />
@@ -85,8 +99,25 @@
     <Content Include="Resources\Graphics\Icons\saveIcon.png" />
     <Content Include="Resources\Graphics\Icons\saveIconSm.png" />
     <Content Include="Resources\Graphics\Icons\searchIcon.png" />
+    <Content Include="Resources\Graphics\Icons\IconPokeball.png" />
+    <Content Include="Resources\Graphics\Icons\minusIconSm.png" />
+    <Content Include="Resources\Graphics\Icons\plusIconSm.png" />
+    <Content Include="Resources\Graphics\Icons\pokeItemIcon.png" />
+    <Content Include="Resources\Graphics\Icons\pokeItemIconSm.png" />
+    <Content Include="Resources\Graphics\Icons\redoIconSm.png" />
+    <Content Include="Resources\Graphics\Icons\sortIconSm.png" />
     <Content Include="Resources\Graphics\Icons\undoIconSm.png" />
     <Content Include="Resources\Graphics\TextEditor\MessageBox.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\Graphics\Graphics\pokeballs0.png" />
+    <Content Include="Resources\Graphics\Graphics\pokeballs1.png" />
+    <Content Include="Resources\Graphics\Graphics\pokeballs2.png" />
+    <Content Include="Resources\Graphics\Graphics\pokeballs3.png" />
+    <Content Include="Resources\Graphics\Graphics\pokeballs4.png" />
+    <Content Include="Resources\Graphics\Graphics\pokeballs5.png" />
+    <Content Include="Resources\Graphics\Graphics\pokeballs6.png" />
   </ItemGroup>
 
   <ItemGroup>

@@ -33,7 +33,7 @@ namespace VSMaker
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Mainform));
             main_toolstrip = new MenuStrip();
             mainToolStrip_file = new ToolStripMenuItem();
@@ -49,7 +49,7 @@ namespace VSMaker
             panel4 = new Panel();
             trainerClass_EyeContact_Alt_num = new NumericUpDown();
             trainerClass_EyeContactMain_num = new NumericUpDown();
-            label21 = new Label();
+            trainerClass_eyecontact_alt_label = new Label();
             label20 = new Label();
             trainerClass_Gender_label = new Label();
             trainerClass_PrizeMoney_btn = new Button();
@@ -190,16 +190,16 @@ namespace VSMaker
             trainers_Player_list = new ListBox();
             mainContent_trainerText = new TabPage();
             panel17 = new Panel();
-            panel16 = new Panel();
             panel15 = new Panel();
-            trainerTextTable_help_label = new Label();
+            panel23 = new Panel();
             trainerTextTable_dataGrid = new DataGridView();
             MessageId = new DataGridViewTextBoxColumn();
             TrainerId = new DataGridViewComboBoxColumn();
             MessageTriggerId = new DataGridViewComboBoxColumn();
             Message = new DataGridViewTextBoxColumn();
+            panel22 = new Panel();
             trainerText_toolstrip = new ToolStrip();
-            toolStripButton3 = new ToolStripButton();
+            saveTrainerTextTable_btn = new ToolStripButton();
             trainreText_Import_btn = new ToolStripButton();
             trainerText_Export_btn = new ToolStripButton();
             toolStripSeparator3 = new ToolStripSeparator();
@@ -285,9 +285,9 @@ namespace VSMaker
             panel5.SuspendLayout();
             mainContent_trainerText.SuspendLayout();
             panel17.SuspendLayout();
-            panel16.SuspendLayout();
-            panel15.SuspendLayout();
+            panel23.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trainerTextTable_dataGrid).BeginInit();
+            panel22.SuspendLayout();
             trainerText_toolstrip.SuspendLayout();
             mainContent_trainerTheme.SuspendLayout();
             panel14.SuspendLayout();
@@ -415,7 +415,7 @@ namespace VSMaker
             panel4.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             panel4.Controls.Add(trainerClass_EyeContact_Alt_num);
             panel4.Controls.Add(trainerClass_EyeContactMain_num);
-            panel4.Controls.Add(label21);
+            panel4.Controls.Add(trainerClass_eyecontact_alt_label);
             panel4.Controls.Add(label20);
             panel4.Controls.Add(trainerClass_Gender_label);
             panel4.Controls.Add(trainerClass_PrizeMoney_btn);
@@ -431,7 +431,7 @@ namespace VSMaker
             // trainerClass_EyeContact_Alt_num
             // 
             trainerClass_EyeContact_Alt_num.Enabled = false;
-            trainerClass_EyeContact_Alt_num.Location = new Point(142, 72);
+            trainerClass_EyeContact_Alt_num.Location = new Point(167, 72);
             trainerClass_EyeContact_Alt_num.Maximum = new decimal(new int[] { 65535, 0, 0, 0 });
             trainerClass_EyeContact_Alt_num.Name = "trainerClass_EyeContact_Alt_num";
             trainerClass_EyeContact_Alt_num.Size = new Size(58, 23);
@@ -440,23 +440,23 @@ namespace VSMaker
             // trainerClass_EyeContactMain_num
             // 
             trainerClass_EyeContactMain_num.Enabled = false;
-            trainerClass_EyeContactMain_num.Location = new Point(142, 41);
+            trainerClass_EyeContactMain_num.Location = new Point(167, 40);
             trainerClass_EyeContactMain_num.Maximum = new decimal(new int[] { 65535, 0, 0, 0 });
             trainerClass_EyeContactMain_num.Name = "trainerClass_EyeContactMain_num";
             trainerClass_EyeContactMain_num.Size = new Size(58, 23);
             trainerClass_EyeContactMain_num.TabIndex = 38;
             // 
-            // label21
+            // trainerClass_eyecontact_alt_label
             // 
-            label21.AutoSize = true;
-            label21.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label21.ImageAlign = ContentAlignment.MiddleLeft;
-            label21.Location = new Point(7, 75);
-            label21.Name = "label21";
-            label21.Size = new Size(104, 15);
-            label21.TabIndex = 41;
-            label21.Text = "Eye-Contact [Alt]:";
-            label21.TextAlign = ContentAlignment.MiddleLeft;
+            trainerClass_eyecontact_alt_label.AutoSize = true;
+            trainerClass_eyecontact_alt_label.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            trainerClass_eyecontact_alt_label.ImageAlign = ContentAlignment.MiddleLeft;
+            trainerClass_eyecontact_alt_label.Location = new Point(7, 75);
+            trainerClass_eyecontact_alt_label.Name = "trainerClass_eyecontact_alt_label";
+            trainerClass_eyecontact_alt_label.Size = new Size(154, 15);
+            trainerClass_eyecontact_alt_label.TabIndex = 41;
+            trainerClass_eyecontact_alt_label.Text = "Eye-Contact Music [Night]:";
+            trainerClass_eyecontact_alt_label.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // label20
             // 
@@ -465,9 +465,9 @@ namespace VSMaker
             label20.ImageAlign = ContentAlignment.MiddleLeft;
             label20.Location = new Point(7, 43);
             label20.Name = "label20";
-            label20.Size = new Size(112, 15);
+            label20.Size = new Size(144, 15);
             label20.TabIndex = 40;
-            label20.Text = "Eye-Contact [Main]";
+            label20.Text = "Eye-Contact Music [Day]:";
             label20.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // trainerClass_Gender_label
@@ -2231,41 +2231,31 @@ namespace VSMaker
             // 
             // panel17
             // 
-            panel17.Controls.Add(panel16);
-            panel17.Controls.Add(trainerText_toolstrip);
+            panel17.Controls.Add(panel15);
+            panel17.Controls.Add(panel23);
+            panel17.Controls.Add(panel22);
             panel17.Dock = DockStyle.Fill;
             panel17.Location = new Point(0, 0);
             panel17.Name = "panel17";
             panel17.Size = new Size(891, 489);
             panel17.TabIndex = 2;
             // 
-            // panel16
-            // 
-            panel16.Controls.Add(panel15);
-            panel16.Controls.Add(trainerTextTable_dataGrid);
-            panel16.Dock = DockStyle.Fill;
-            panel16.Location = new Point(0, 31);
-            panel16.Name = "panel16";
-            panel16.Size = new Size(891, 458);
-            panel16.TabIndex = 15;
-            // 
             // panel15
             // 
-            panel15.Controls.Add(trainerTextTable_help_label);
             panel15.Dock = DockStyle.Bottom;
-            panel15.Location = new Point(0, 433);
+            panel15.Location = new Point(0, 465);
             panel15.Name = "panel15";
-            panel15.Size = new Size(891, 25);
-            panel15.TabIndex = 1;
+            panel15.Size = new Size(891, 24);
+            panel15.TabIndex = 18;
             // 
-            // trainerTextTable_help_label
+            // panel23
             // 
-            trainerTextTable_help_label.AutoSize = true;
-            trainerTextTable_help_label.Location = new Point(3, 5);
-            trainerTextTable_help_label.Name = "trainerTextTable_help_label";
-            trainerTextTable_help_label.Size = new Size(135, 15);
-            trainerTextTable_help_label.TabIndex = 0;
-            trainerTextTable_help_label.Text = "Double click to edjt text.";
+            panel23.Controls.Add(trainerTextTable_dataGrid);
+            panel23.Dock = DockStyle.Fill;
+            panel23.Location = new Point(0, 24);
+            panel23.Name = "panel23";
+            panel23.Size = new Size(891, 465);
+            panel23.TabIndex = 17;
             // 
             // trainerTextTable_dataGrid
             // 
@@ -2281,7 +2271,7 @@ namespace VSMaker
             trainerTextTable_dataGrid.Name = "trainerTextTable_dataGrid";
             trainerTextTable_dataGrid.RowHeadersWidth = 62;
             trainerTextTable_dataGrid.RowTemplate.Height = 25;
-            trainerTextTable_dataGrid.Size = new Size(891, 458);
+            trainerTextTable_dataGrid.Size = new Size(891, 465);
             trainerTextTable_dataGrid.TabIndex = 0;
             trainerTextTable_dataGrid.CellClick += trainerTextTable_dataGrid_CellClick;
             trainerTextTable_dataGrid.CellContentDoubleClick += trainerTextTable_dataGrid_TextDblClick;
@@ -2323,87 +2313,111 @@ namespace VSMaker
             // 
             // Message
             // 
-            Message.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
-            Message.DefaultCellStyle = dataGridViewCellStyle1;
+            Message.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
+            Message.DefaultCellStyle = dataGridViewCellStyle2;
             Message.HeaderText = "Text";
             Message.MinimumWidth = 8;
             Message.Name = "Message";
-            Message.Width = 287;
+            // 
+            // panel22
+            // 
+            panel22.Controls.Add(trainerText_toolstrip);
+            panel22.Dock = DockStyle.Top;
+            panel22.Location = new Point(0, 0);
+            panel22.Name = "panel22";
+            panel22.Size = new Size(891, 24);
+            panel22.TabIndex = 16;
             // 
             // trainerText_toolstrip
             // 
+            trainerText_toolstrip.AutoSize = false;
+            trainerText_toolstrip.Dock = DockStyle.Fill;
             trainerText_toolstrip.ImageScalingSize = new Size(24, 24);
-            trainerText_toolstrip.Items.AddRange(new ToolStripItem[] { toolStripButton3, trainreText_Import_btn, trainerText_Export_btn, toolStripSeparator3, trainerTextTable_addRow_btn, trainerTextTable_delRow_btn, toolStripSeparator4, trainerText_sort });
+            trainerText_toolstrip.Items.AddRange(new ToolStripItem[] { saveTrainerTextTable_btn, trainreText_Import_btn, trainerText_Export_btn, toolStripSeparator3, trainerTextTable_addRow_btn, trainerTextTable_delRow_btn, toolStripSeparator4, trainerText_sort });
             trainerText_toolstrip.Location = new Point(0, 0);
             trainerText_toolstrip.Name = "trainerText_toolstrip";
             trainerText_toolstrip.Padding = new Padding(0, 0, 2, 0);
-            trainerText_toolstrip.Size = new Size(891, 31);
+            trainerText_toolstrip.Size = new Size(891, 24);
+            trainerText_toolstrip.Stretch = true;
             trainerText_toolstrip.TabIndex = 13;
             trainerText_toolstrip.Text = "toolStrip1";
             // 
-            // toolStripButton3
+            // saveTrainerTextTable_btn
             // 
-            toolStripButton3.Alignment = ToolStripItemAlignment.Right;
-            toolStripButton3.Image = Properties.Resources.saveIcon;
-            toolStripButton3.ImageTransparentColor = Color.Magenta;
-            toolStripButton3.Name = "toolStripButton3";
-            toolStripButton3.Size = new Size(108, 28);
-            toolStripButton3.Text = "Save Changes";
-            toolStripButton3.Click += trainerTextTable_SaveChanges_btn;
+            saveTrainerTextTable_btn.Alignment = ToolStripItemAlignment.Right;
+            saveTrainerTextTable_btn.AutoSize = false;
+            saveTrainerTextTable_btn.Image = Properties.Resources.saveIcon;
+            saveTrainerTextTable_btn.ImageTransparentColor = Color.Magenta;
+            saveTrainerTextTable_btn.Margin = new Padding(5, 1, 0, 5);
+            saveTrainerTextTable_btn.Name = "saveTrainerTextTable_btn";
+            saveTrainerTextTable_btn.Size = new Size(104, 24);
+            saveTrainerTextTable_btn.Text = "Save Changes";
+            saveTrainerTextTable_btn.Click += trainerTextTable_SaveChanges_btn;
             // 
             // trainreText_Import_btn
             // 
+            trainreText_Import_btn.AutoSize = false;
             trainreText_Import_btn.Image = Properties.Resources.importIcon;
             trainreText_Import_btn.ImageTransparentColor = Color.Magenta;
+            trainreText_Import_btn.Margin = new Padding(5, 1, 0, 5);
             trainreText_Import_btn.Name = "trainreText_Import_btn";
             trainreText_Import_btn.Padding = new Padding(0, 0, 2, 0);
-            trainreText_Import_btn.Size = new Size(140, 28);
+            trainreText_Import_btn.Size = new Size(136, 24);
             trainreText_Import_btn.Text = "Import Spreadsheet";
+            trainreText_Import_btn.Click += trainreText_Import_btn_Click;
             // 
             // trainerText_Export_btn
             // 
+            trainerText_Export_btn.AutoSize = false;
             trainerText_Export_btn.Image = Properties.Resources.exportIcon;
             trainerText_Export_btn.ImageTransparentColor = Color.Magenta;
+            trainerText_Export_btn.Margin = new Padding(5, 1, 0, 5);
             trainerText_Export_btn.Name = "trainerText_Export_btn";
-            trainerText_Export_btn.Size = new Size(136, 28);
+            trainerText_Export_btn.Size = new Size(132, 24);
             trainerText_Export_btn.Text = "Export Spreadsheet";
             trainerText_Export_btn.Click += trainerText_Export_btn_Click;
             // 
             // toolStripSeparator3
             // 
             toolStripSeparator3.Name = "toolStripSeparator3";
-            toolStripSeparator3.Size = new Size(6, 31);
+            toolStripSeparator3.Size = new Size(6, 24);
             // 
             // trainerTextTable_addRow_btn
             // 
+            trainerTextTable_addRow_btn.AutoSize = false;
             trainerTextTable_addRow_btn.Image = Properties.Resources.plusIconSm;
             trainerTextTable_addRow_btn.ImageTransparentColor = Color.Magenta;
+            trainerTextTable_addRow_btn.Margin = new Padding(5, 1, 0, 5);
             trainerTextTable_addRow_btn.Name = "trainerTextTable_addRow_btn";
-            trainerTextTable_addRow_btn.Size = new Size(94, 28);
+            trainerTextTable_addRow_btn.Size = new Size(90, 24);
             trainerTextTable_addRow_btn.Text = "Insert Entry";
             trainerTextTable_addRow_btn.Click += trainerTextTable_addRow_btn_Click;
             // 
             // trainerTextTable_delRow_btn
             // 
+            trainerTextTable_delRow_btn.AutoSize = false;
             trainerTextTable_delRow_btn.Image = Properties.Resources.minusIconSm;
             trainerTextTable_delRow_btn.ImageTransparentColor = Color.Magenta;
+            trainerTextTable_delRow_btn.Margin = new Padding(5, 1, 0, 5);
             trainerTextTable_delRow_btn.Name = "trainerTextTable_delRow_btn";
-            trainerTextTable_delRow_btn.Size = new Size(98, 28);
+            trainerTextTable_delRow_btn.Size = new Size(94, 24);
             trainerTextTable_delRow_btn.Text = "Delete Entry";
             trainerTextTable_delRow_btn.Click += trainerTextTable_delRow_btn_Click;
             // 
             // toolStripSeparator4
             // 
             toolStripSeparator4.Name = "toolStripSeparator4";
-            toolStripSeparator4.Size = new Size(6, 31);
+            toolStripSeparator4.Size = new Size(6, 24);
             // 
             // trainerText_sort
             // 
+            trainerText_sort.AutoSize = false;
             trainerText_sort.Image = Properties.Resources.sortIconSm;
             trainerText_sort.ImageTransparentColor = Color.Magenta;
+            trainerText_sort.Margin = new Padding(5, 1, 0, 5);
             trainerText_sort.Name = "trainerText_sort";
-            trainerText_sort.Size = new Size(111, 28);
+            trainerText_sort.Size = new Size(107, 24);
             trainerText_sort.Text = "Sort + Repoint";
             trainerText_sort.ToolTipText = "Arrange messages and repoint lookups";
             trainerText_sort.Click += trainerText_sort_Click;
@@ -2548,68 +2562,74 @@ namespace VSMaker
             // 
             // quick_toolstrip
             // 
+            quick_toolstrip.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            quick_toolstrip.AutoSize = false;
+            quick_toolstrip.Dock = DockStyle.None;
             quick_toolstrip.GripStyle = ToolStripGripStyle.Hidden;
             quick_toolstrip.ImageScalingSize = new Size(24, 24);
             quick_toolstrip.Items.AddRange(new ToolStripItem[] { openRom_btn, openFolder_btn, save_btn, toolStripSeparator1, languageLabel, versionLabel, romNameLabel, toolStripSeparator2 });
             quick_toolstrip.Location = new Point(0, 0);
             quick_toolstrip.Name = "quick_toolstrip";
             quick_toolstrip.Padding = new Padding(0, 0, 2, 0);
-            quick_toolstrip.Size = new Size(899, 31);
+            quick_toolstrip.Size = new Size(899, 24);
+            quick_toolstrip.Stretch = true;
             quick_toolstrip.TabIndex = 4;
             quick_toolstrip.Text = "toolStrip1";
             // 
             // openRom_btn
             // 
-            openRom_btn.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            openRom_btn.AutoSize = false;
             openRom_btn.Font = new Font("Segoe UI", 8F, FontStyle.Regular, GraphicsUnit.Point);
             openRom_btn.Image = Properties.Resources.openRomIcon;
             openRom_btn.ImageTransparentColor = Color.Magenta;
-            openRom_btn.Margin = new Padding(5, 1, 0, 2);
+            openRom_btn.Margin = new Padding(5, 1, 0, 5);
             openRom_btn.Name = "openRom_btn";
-            openRom_btn.Size = new Size(28, 28);
+            openRom_btn.Size = new Size(89, 24);
             openRom_btn.Text = "Open ROM";
             openRom_btn.Click += openRom_btn_Click;
             // 
             // openFolder_btn
             // 
-            openFolder_btn.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            openFolder_btn.AutoSize = false;
             openFolder_btn.Image = Properties.Resources.openFolderIcon;
             openFolder_btn.ImageTransparentColor = Color.Magenta;
-            openFolder_btn.Margin = new Padding(0, 1, 2, 2);
+            openFolder_btn.Margin = new Padding(5, 1, 0, 5);
             openFolder_btn.Name = "openFolder_btn";
-            openFolder_btn.Size = new Size(28, 28);
+            openFolder_btn.Size = new Size(148, 24);
             openFolder_btn.Text = "Open Extracted Folder";
             openFolder_btn.Click += openFolder_btn_Click;
             // 
             // save_btn
             // 
+            save_btn.AutoSize = false;
             save_btn.Enabled = false;
             save_btn.Font = new Font("Segoe UI", 8F, FontStyle.Regular, GraphicsUnit.Point);
             save_btn.Image = Properties.Resources.saveIcon;
             save_btn.ImageTransparentColor = Color.Magenta;
+            save_btn.Margin = new Padding(5, 1, 0, 5);
             save_btn.Name = "save_btn";
-            save_btn.Size = new Size(87, 28);
+            save_btn.Size = new Size(83, 24);
             save_btn.Text = "Save ROM";
             save_btn.Click += save_btn_Click;
             // 
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(6, 31);
+            toolStripSeparator1.Size = new Size(6, 24);
             // 
             // languageLabel
             // 
             languageLabel.Alignment = ToolStripItemAlignment.Right;
             languageLabel.Margin = new Padding(0, 1, 2, 2);
             languageLabel.Name = "languageLabel";
-            languageLabel.Size = new Size(22, 28);
+            languageLabel.Size = new Size(22, 21);
             languageLabel.Text = "     ";
             // 
             // versionLabel
             // 
             versionLabel.Alignment = ToolStripItemAlignment.Right;
             versionLabel.Name = "versionLabel";
-            versionLabel.Size = new Size(22, 28);
+            versionLabel.Size = new Size(22, 21);
             versionLabel.Text = "     ";
             // 
             // romNameLabel
@@ -2617,14 +2637,14 @@ namespace VSMaker
             romNameLabel.Alignment = ToolStripItemAlignment.Right;
             romNameLabel.Name = "romNameLabel";
             romNameLabel.RightToLeft = RightToLeft.No;
-            romNameLabel.Size = new Size(61, 28);
+            romNameLabel.Size = new Size(61, 21);
             romNameLabel.Text = "ROM Info:";
             // 
             // toolStripSeparator2
             // 
             toolStripSeparator2.Alignment = ToolStripItemAlignment.Right;
             toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new Size(6, 31);
+            toolStripSeparator2.Size = new Size(6, 24);
             // 
             // panel1
             // 
@@ -2724,11 +2744,9 @@ namespace VSMaker
             panel5.PerformLayout();
             mainContent_trainerText.ResumeLayout(false);
             panel17.ResumeLayout(false);
-            panel17.PerformLayout();
-            panel16.ResumeLayout(false);
-            panel15.ResumeLayout(false);
-            panel15.PerformLayout();
+            panel23.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)trainerTextTable_dataGrid).EndInit();
+            panel22.ResumeLayout(false);
             trainerText_toolstrip.ResumeLayout(false);
             trainerText_toolstrip.PerformLayout();
             mainContent_trainerTheme.ResumeLayout(false);
@@ -2742,7 +2760,6 @@ namespace VSMaker
             quick_toolstrip.ResumeLayout(false);
             quick_toolstrip.PerformLayout();
             panel1.ResumeLayout(false);
-            panel1.PerformLayout();
             panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)trainerMessageBindingSource1).EndInit();
             ((System.ComponentModel.ISupportInitialize)trainerMessageBindingSource3).EndInit();
@@ -2845,7 +2862,7 @@ namespace VSMaker
         private Label label18;
         private BindingSource trainerMessageBindingSource;
         private Button saveTrainerClassAll_btn;
-        private Label label21;
+        private Label trainerClass_eyecontact_alt_label;
         private Label label20;
         private Button undoTrainerClass_btn;
         private Button undoTrainer_btn;
@@ -2856,16 +2873,14 @@ namespace VSMaker
         private BindingSource trainerMessageBindingSource3;
         private Panel panel17;
         private ToolStrip trainerText_toolstrip;
-        private ToolStripButton toolStripButton3;
+        private ToolStripButton saveTrainerTextTable_btn;
         private ToolStripButton trainreText_Import_btn;
         private ToolStripButton trainerText_Export_btn;
         private DataGridView trainerTextTable_dataGrid;
-        private Panel panel16;
         private ToolStripSeparator toolStripSeparator3;
         private ToolStripButton trainerTextTable_addRow_btn;
         private ToolStripButton trainerTextTable_delRow_btn;
         private ToolStripSeparator toolStripSeparator4;
-        private Panel panel15;
         private Panel panel18;
         private TabPage trainerEditor_Pokemon;
         private Panel panel10;
@@ -2881,13 +2896,8 @@ namespace VSMaker
         private Panel panel21;
         private Label trainer_Message;
         private ComboBox trainer_MessageTrigger_list;
-        private Label trainerTextTable_help_label;
         private ToolStripButton trainerText_sort;
         private Button trainer_Player_help_btn;
-        private DataGridViewTextBoxColumn MessageId;
-        private DataGridViewComboBoxColumn TrainerId;
-        private DataGridViewComboBoxColumn MessageTriggerId;
-        private DataGridViewTextBoxColumn Message;
         private Label label8;
         private NumericUpDown trainer_Poke1_Level;
         private CheckBox trainer_Double_checkBox;
@@ -2955,5 +2965,12 @@ namespace VSMaker
         private Label label14;
         private NumericUpDown trainerClass_EyeContact_Alt_num;
         private NumericUpDown trainerClass_EyeContactMain_num;
+        private Panel panel23;
+        private Panel panel22;
+        private DataGridViewTextBoxColumn MessageId;
+        private DataGridViewComboBoxColumn TrainerId;
+        private DataGridViewComboBoxColumn MessageTriggerId;
+        private DataGridViewTextBoxColumn Message;
+        private Panel panel15;
     }
 }
