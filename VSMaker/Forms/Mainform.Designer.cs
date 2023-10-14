@@ -47,6 +47,7 @@ namespace VSMaker
             mainContent = new TabControl();
             mainContent_trainerClass = new TabPage();
             panel4 = new Panel();
+            eyeContact_help_btn = new Button();
             trainerClass_EyeContact_Night_comboBox = new ComboBox();
             trainerClass_EyeContact_Day_comboBox = new ComboBox();
             trainerClass_eyecontact_alt_label = new Label();
@@ -235,7 +236,6 @@ namespace VSMaker
             saveFileDialog1 = new SaveFileDialog();
             trainerMessageBindingSource1 = new BindingSource(components);
             trainerMessageBindingSource3 = new BindingSource(components);
-            eyeContact_help_btn = new Button();
             main_toolstrip.SuspendLayout();
             statusStrip1.SuspendLayout();
             mainContent.SuspendLayout();
@@ -427,6 +427,19 @@ namespace VSMaker
             panel4.Name = "panel4";
             panel4.Size = new Size(473, 109);
             panel4.TabIndex = 7;
+            // 
+            // eyeContact_help_btn
+            // 
+            eyeContact_help_btn.BackColor = SystemColors.Info;
+            eyeContact_help_btn.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            eyeContact_help_btn.Location = new Point(262, 41);
+            eyeContact_help_btn.Name = "eyeContact_help_btn";
+            eyeContact_help_btn.Size = new Size(23, 23);
+            eyeContact_help_btn.TabIndex = 44;
+            eyeContact_help_btn.Text = "?";
+            eyeContact_help_btn.UseVisualStyleBackColor = false;
+            eyeContact_help_btn.Visible = false;
+            eyeContact_help_btn.Click += eyeContact_help_btn_Click;
             // 
             // trainerClass_EyeContact_Night_comboBox
             // 
@@ -1068,6 +1081,7 @@ namespace VSMaker
             trainer_Poke6_Moves_btn.TabIndex = 129;
             trainer_Poke6_Moves_btn.Text = "Moves";
             trainer_Poke6_Moves_btn.UseVisualStyleBackColor = true;
+            trainer_Poke6_Moves_btn.Click += trainer_Poke6_Moves_btn_Click;
             // 
             // label11
             // 
@@ -1157,6 +1171,7 @@ namespace VSMaker
             trainer_Poke5_Moves_btn.TabIndex = 122;
             trainer_Poke5_Moves_btn.Text = "Moves";
             trainer_Poke5_Moves_btn.UseVisualStyleBackColor = true;
+            trainer_Poke5_Moves_btn.Click += trainer_Poke5_Moves_btn_Click;
             // 
             // label12
             // 
@@ -1246,6 +1261,7 @@ namespace VSMaker
             trainer_Poke4_Moves_btn.TabIndex = 115;
             trainer_Poke4_Moves_btn.Text = "Moves";
             trainer_Poke4_Moves_btn.UseVisualStyleBackColor = true;
+            trainer_Poke4_Moves_btn.Click += trainer_Poke4_Moves_btn_Click;
             // 
             // label13
             // 
@@ -1335,6 +1351,7 @@ namespace VSMaker
             trainer_Poke3_Moves_btn.TabIndex = 108;
             trainer_Poke3_Moves_btn.Text = "Moves";
             trainer_Poke3_Moves_btn.UseVisualStyleBackColor = true;
+            trainer_Poke3_Moves_btn.Click += trainer_Poke3_Moves_btn_Click;
             // 
             // label10
             // 
@@ -1424,6 +1441,7 @@ namespace VSMaker
             trainer_Poke2_Moves_btn.TabIndex = 101;
             trainer_Poke2_Moves_btn.Text = "Moves";
             trainer_Poke2_Moves_btn.UseVisualStyleBackColor = true;
+            trainer_Poke2_Moves_btn.Click += trainer_Poke2_Moves_btn_Click;
             // 
             // label9
             // 
@@ -1513,6 +1531,7 @@ namespace VSMaker
             trainer_Poke1_Moves_btn.TabIndex = 79;
             trainer_Poke1_Moves_btn.Text = "Moves";
             trainer_Poke1_Moves_btn.UseVisualStyleBackColor = true;
+            trainer_Poke1_Moves_btn.Click += trainer_Poke1_Moves_btn_Click;
             // 
             // label8
             // 
@@ -2667,19 +2686,6 @@ namespace VSMaker
             panel2.Name = "panel2";
             panel2.Size = new Size(899, 517);
             panel2.TabIndex = 5;
-            // 
-            // eyeContact_help_btn
-            // 
-            eyeContact_help_btn.BackColor = SystemColors.Info;
-            eyeContact_help_btn.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            eyeContact_help_btn.Location = new Point(262, 41);
-            eyeContact_help_btn.Name = "eyeContact_help_btn";
-            eyeContact_help_btn.Size = new Size(23, 23);
-            eyeContact_help_btn.TabIndex = 44;
-            eyeContact_help_btn.Text = "?";
-            eyeContact_help_btn.UseVisualStyleBackColor = false;
-            eyeContact_help_btn.Visible = false;
-            eyeContact_help_btn.Click += eyeContact_help_btn_Click;
             // 
             // Mainform
             // 

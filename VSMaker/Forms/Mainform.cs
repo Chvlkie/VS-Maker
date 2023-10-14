@@ -66,6 +66,7 @@ namespace VSMaker
 
         private PokemonEditor pokemonEditor;
         private TextEditor textEditor;
+        private ChooseMoves moveEditor;
 
         #endregion Forms
 
@@ -1428,6 +1429,11 @@ namespace VSMaker
             textEditor.ShowDialog();
         }
 
+        private void OpenMoveEditor(int partyIndex)
+        {
+            moveEditor = new ChooseMoves(this, partyIndex, trainerFile);
+            moveEditor.ShowDialog();
+        }
         private void save_btn_Click(object sender, EventArgs e)
         {
             SaveRomChanges();
@@ -2553,6 +2559,36 @@ namespace VSMaker
         private void eyeContact_help_btn_Click(object sender, EventArgs e)
         {
             MessageBox.Show("Selecting eye-contact music for this Trainer Class is disabled.\n\nThis is because it does not originally have an entry\nin the Eye-Contact Music Table located in ARM9.\nThe table needs to be expanded first, but this feature is not yet implemented.", "Eye-Contact Music", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void trainer_Poke1_Moves_btn_Click(object sender, EventArgs e)
+        {
+            OpenMoveEditor(0);
+        }
+
+        private void trainer_Poke2_Moves_btn_Click(object sender, EventArgs e)
+        {
+            OpenMoveEditor(1);
+        }
+
+        private void trainer_Poke3_Moves_btn_Click(object sender, EventArgs e)
+        {
+            OpenMoveEditor(2);
+        }
+
+        private void trainer_Poke4_Moves_btn_Click(object sender, EventArgs e)
+        {
+            OpenMoveEditor(3);
+        }
+
+        private void trainer_Poke5_Moves_btn_Click(object sender, EventArgs e)
+        {
+            OpenMoveEditor(4);
+        }
+
+        private void trainer_Poke6_Moves_btn_Click(object sender, EventArgs e)
+        {
+            OpenMoveEditor(5);
         }
     }
 }
