@@ -47,6 +47,8 @@ namespace VSMaker
             mainContent = new TabControl();
             mainContent_trainerClass = new TabPage();
             panel4 = new Panel();
+            trainerClass_EyeContact_Night_comboBox = new ComboBox();
+            trainerClass_EyeContact_Day_comboBox = new ComboBox();
             trainerClass_eyecontact_alt_label = new Label();
             label20 = new Label();
             trainerClass_Gender_label = new Label();
@@ -233,8 +235,7 @@ namespace VSMaker
             saveFileDialog1 = new SaveFileDialog();
             trainerMessageBindingSource1 = new BindingSource(components);
             trainerMessageBindingSource3 = new BindingSource(components);
-            trainerClass_EyeContact_Day_comboBox = new ComboBox();
-            trainerClass_EyeContact_Night_comboBox = new ComboBox();
+            eyeContact_help_btn = new Button();
             main_toolstrip.SuspendLayout();
             statusStrip1.SuspendLayout();
             mainContent.SuspendLayout();
@@ -411,6 +412,7 @@ namespace VSMaker
             // panel4
             // 
             panel4.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            panel4.Controls.Add(eyeContact_help_btn);
             panel4.Controls.Add(trainerClass_EyeContact_Night_comboBox);
             panel4.Controls.Add(trainerClass_EyeContact_Day_comboBox);
             panel4.Controls.Add(trainerClass_eyecontact_alt_label);
@@ -425,6 +427,28 @@ namespace VSMaker
             panel4.Name = "panel4";
             panel4.Size = new Size(473, 109);
             panel4.TabIndex = 7;
+            // 
+            // trainerClass_EyeContact_Night_comboBox
+            // 
+            trainerClass_EyeContact_Night_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            trainerClass_EyeContact_Night_comboBox.Enabled = false;
+            trainerClass_EyeContact_Night_comboBox.FlatStyle = FlatStyle.Popup;
+            trainerClass_EyeContact_Night_comboBox.FormattingEnabled = true;
+            trainerClass_EyeContact_Night_comboBox.Location = new Point(176, 72);
+            trainerClass_EyeContact_Night_comboBox.Name = "trainerClass_EyeContact_Night_comboBox";
+            trainerClass_EyeContact_Night_comboBox.Size = new Size(80, 23);
+            trainerClass_EyeContact_Night_comboBox.TabIndex = 43;
+            // 
+            // trainerClass_EyeContact_Day_comboBox
+            // 
+            trainerClass_EyeContact_Day_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            trainerClass_EyeContact_Day_comboBox.Enabled = false;
+            trainerClass_EyeContact_Day_comboBox.FlatStyle = FlatStyle.Popup;
+            trainerClass_EyeContact_Day_comboBox.FormattingEnabled = true;
+            trainerClass_EyeContact_Day_comboBox.Location = new Point(176, 41);
+            trainerClass_EyeContact_Day_comboBox.Name = "trainerClass_EyeContact_Day_comboBox";
+            trainerClass_EyeContact_Day_comboBox.Size = new Size(80, 23);
+            trainerClass_EyeContact_Day_comboBox.TabIndex = 42;
             // 
             // trainerClass_eyecontact_alt_label
             // 
@@ -455,7 +479,7 @@ namespace VSMaker
             trainerClass_Gender_label.AutoSize = true;
             trainerClass_Gender_label.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             trainerClass_Gender_label.ImageAlign = ContentAlignment.MiddleLeft;
-            trainerClass_Gender_label.Location = new Point(286, 75);
+            trainerClass_Gender_label.Location = new Point(291, 74);
             trainerClass_Gender_label.Name = "trainerClass_Gender_label";
             trainerClass_Gender_label.Size = new Size(52, 15);
             trainerClass_Gender_label.TabIndex = 38;
@@ -510,7 +534,7 @@ namespace VSMaker
             trainerClass_PrizeMoney_label.AutoSize = true;
             trainerClass_PrizeMoney_label.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             trainerClass_PrizeMoney_label.ImageAlign = ContentAlignment.MiddleLeft;
-            trainerClass_PrizeMoney_label.Location = new Point(286, 43);
+            trainerClass_PrizeMoney_label.Location = new Point(291, 43);
             trainerClass_PrizeMoney_label.Name = "trainerClass_PrizeMoney_label";
             trainerClass_PrizeMoney_label.Size = new Size(79, 15);
             trainerClass_PrizeMoney_label.TabIndex = 36;
@@ -2644,27 +2668,18 @@ namespace VSMaker
             panel2.Size = new Size(899, 517);
             panel2.TabIndex = 5;
             // 
-            // trainerClass_EyeContact_Day_comboBox
+            // eyeContact_help_btn
             // 
-            trainerClass_EyeContact_Day_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
-            trainerClass_EyeContact_Day_comboBox.Enabled = false;
-            trainerClass_EyeContact_Day_comboBox.FlatStyle = FlatStyle.Popup;
-            trainerClass_EyeContact_Day_comboBox.FormattingEnabled = true;
-            trainerClass_EyeContact_Day_comboBox.Location = new Point(176, 41);
-            trainerClass_EyeContact_Day_comboBox.Name = "trainerClass_EyeContact_Day_comboBox";
-            trainerClass_EyeContact_Day_comboBox.Size = new Size(80, 23);
-            trainerClass_EyeContact_Day_comboBox.TabIndex = 42;
-            // 
-            // trainerClass_EyeContact_Night_comboBox
-            // 
-            trainerClass_EyeContact_Night_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
-            trainerClass_EyeContact_Night_comboBox.Enabled = false;
-            trainerClass_EyeContact_Night_comboBox.FlatStyle = FlatStyle.Popup;
-            trainerClass_EyeContact_Night_comboBox.FormattingEnabled = true;
-            trainerClass_EyeContact_Night_comboBox.Location = new Point(176, 72);
-            trainerClass_EyeContact_Night_comboBox.Name = "trainerClass_EyeContact_Night_comboBox";
-            trainerClass_EyeContact_Night_comboBox.Size = new Size(80, 23);
-            trainerClass_EyeContact_Night_comboBox.TabIndex = 43;
+            eyeContact_help_btn.BackColor = SystemColors.Info;
+            eyeContact_help_btn.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            eyeContact_help_btn.Location = new Point(262, 41);
+            eyeContact_help_btn.Name = "eyeContact_help_btn";
+            eyeContact_help_btn.Size = new Size(23, 23);
+            eyeContact_help_btn.TabIndex = 44;
+            eyeContact_help_btn.Text = "?";
+            eyeContact_help_btn.UseVisualStyleBackColor = false;
+            eyeContact_help_btn.Visible = false;
+            eyeContact_help_btn.Click += eyeContact_help_btn_Click;
             // 
             // Mainform
             // 
@@ -2972,5 +2987,6 @@ namespace VSMaker
         private Panel panel15;
         private ComboBox trainerClass_EyeContact_Night_comboBox;
         private ComboBox trainerClass_EyeContact_Day_comboBox;
+        private Button eyeContact_help_btn;
     }
 }

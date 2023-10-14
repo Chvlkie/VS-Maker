@@ -621,6 +621,7 @@ namespace VSMaker
             trainerClass_EyeContact_Night_comboBox.Visible = gameFamily == gFamEnum.HGSS;
             trainerClass_eyecontact_alt_label.Visible = gameFamily == gFamEnum.HGSS;
             trainerClass_EyeContact_Night_comboBox.SelectedIndex = output.musicN != null ? eyeContactMusics.FindIndex(x => x.MusicId == (ushort)output.musicN) : 0;
+            eyeContact_help_btn.Visible = !trainerClass_EyeContact_Night_comboBox.Enabled;
         }
 
         private void SetupTrainerEditorInputs(Trainer trainer)
@@ -1672,7 +1673,7 @@ namespace VSMaker
                 foreach (var item in messageArray)
                 {
                     int numLines = item.Split('\n').Length;
-                    if (numLines == 3 && !string.IsNullOrEmpty(ReadLine(item, 3)))
+                    if (numLines >= 3 && !string.IsNullOrEmpty(ReadLine(item, 3)))
                     {
                         string text1 = ReadLine(item, 1) + Environment.NewLine + ReadLine(item, 2);
                         string text2 = ReadLine(item, 2) + Environment.NewLine + ReadLine(item, 3);
@@ -2547,6 +2548,11 @@ namespace VSMaker
                 trainerText_toolstrip.Enabled = false;
                 StartGetTrainerTextData(false);
             }
+        }
+
+        private void eyeContact_help_btn_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Selecting eye-contact music for this Trainer Class is disabled.\n\nThis is because it does not originally have an entry\nin the Eye-Contact Music Table located in ARM9.\nThe table needs to be expanded first, but this feature is not yet implemented.", "Eye-Contact Music", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

@@ -60,7 +60,7 @@ namespace VSMaker.Forms
             foreach (var item in trainerText.Split(new string[] { seperator }, StringSplitOptions.None))
             {
                 int numLines = item.Split('\n').Length;
-                if (numLines == 3 && !string.IsNullOrEmpty(ReadLine(item, 3)))
+                if (numLines >= 3 && !string.IsNullOrEmpty(ReadLine(item, 3)))
                 {
                     string text1 = ReadLine(item, 1) + Environment.NewLine + ReadLine(item, 2);
                     string text2 = ReadLine(item, 2) + Environment.NewLine + ReadLine(item, 3);
