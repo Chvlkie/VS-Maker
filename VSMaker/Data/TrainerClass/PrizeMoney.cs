@@ -11,5 +11,6 @@ namespace VSMaker.Data
     {
         public int TrainerClassId { get; set; }
         public int PrizeMoneyValue { get; set; }
+        public long Offset { get; set; }
     }
 }

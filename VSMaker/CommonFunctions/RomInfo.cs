@@ -1375,6 +1375,8 @@ namespace VSMaker.CommonFunctions
         {
             PreparePrizeMoneyData();
             PrizeMoneyData = new(); 
+            
+            // Decompress Overlay if game is HGSS
             if (DSUtils.OverlayIsCompressed(prizeMoneyTableOverlayNumber) && gameFamily == gFamEnum.HGSS)
             {
                 DSUtils.DecompressOverlay(prizeMoneyTableOverlayNumber);

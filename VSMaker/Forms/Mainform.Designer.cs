@@ -451,6 +451,7 @@ namespace VSMaker
             trainerClass_EyeContact_Night_comboBox.Name = "trainerClass_EyeContact_Night_comboBox";
             trainerClass_EyeContact_Night_comboBox.Size = new Size(80, 23);
             trainerClass_EyeContact_Night_comboBox.TabIndex = 43;
+            trainerClass_EyeContact_Night_comboBox.SelectedIndexChanged += trainerClass_EyeContact_Night_comboBox_SelectedIndexChanged;
             // 
             // trainerClass_EyeContact_Day_comboBox
             // 
@@ -462,6 +463,7 @@ namespace VSMaker
             trainerClass_EyeContact_Day_comboBox.Name = "trainerClass_EyeContact_Day_comboBox";
             trainerClass_EyeContact_Day_comboBox.Size = new Size(80, 23);
             trainerClass_EyeContact_Day_comboBox.TabIndex = 42;
+            trainerClass_EyeContact_Day_comboBox.SelectedIndexChanged += trainerClass_EyeContact_Day_comboBox_SelectedIndexChanged;
             // 
             // trainerClass_eyecontact_alt_label
             // 
@@ -529,6 +531,8 @@ namespace VSMaker
             trainerClass_PrizeMoney_num.Name = "trainerClass_PrizeMoney_num";
             trainerClass_PrizeMoney_num.Size = new Size(51, 23);
             trainerClass_PrizeMoney_num.TabIndex = 37;
+            trainerClass_PrizeMoney_num.ValueChanged += trainerClass_PrizeMoney_num_ValueChanged;
+            trainerClass_PrizeMoney_num.KeyUp += trainerClass_PrizeMoney_num_KeyUp;
             // 
             // trainerClass_EyeContactMusic_Main_label
             // 
@@ -707,6 +711,7 @@ namespace VSMaker
             // 
             // saveTrainerClassAll_btn
             // 
+            saveTrainerClassAll_btn.Enabled = false;
             saveTrainerClassAll_btn.Image = Properties.Resources.saveIconSm;
             saveTrainerClassAll_btn.Location = new Point(337, 3);
             saveTrainerClassAll_btn.Name = "saveTrainerClassAll_btn";

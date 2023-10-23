@@ -401,7 +401,7 @@ namespace VSMaker
         }
 
         private void GetPrizeMoneyData()
-        { 
+        {
             prizeMoneyList = new();
 
             foreach (var item in PrizeMoneyData)
@@ -409,7 +409,8 @@ namespace VSMaker
                 var prizeMoney = new PrizeMoney
                 {
                     TrainerClassId = (int)item.trainerClassId,
-                    PrizeMoneyValue = (int)item.prizeMoney
+                    PrizeMoneyValue = (int)item.prizeMoney,
+                    Offset = item.Offset
                 };
                 prizeMoneyList.Add(prizeMoney);
             }
@@ -1017,8 +1018,6 @@ namespace VSMaker
         /// <param name="trainerClassId"></param>
         private void GetTrainerClassInfo(int trainerClassId)
         {
-            SetUnsavedChanges(false);
-            undoTrainerClass_btn.Enabled = false;
             selectedTrainerClass = trainerClasses.Single(x => x.TrainerClassId == trainerClassId);
 
             trainerClassName.Text = selectedTrainerClass.TrainerClassName;
@@ -1036,6 +1035,8 @@ namespace VSMaker
 
             SetupTrainerClassEditorInputs(selectedTrainerClass);
             saveTrainerClassAll_btn.Enabled = true;
+            SetUnsavedChanges(false);
+            undoTrainerClass_btn.Enabled = false;
         }
 
         /// <summary>
@@ -1533,6 +1534,12 @@ namespace VSMaker
                 }
             }
 
+            // Compress Overlay for HGSS
+            if (!DSUtils.OverlayIsCompressed(prizeMoneyTableOverlayNumber) && gameFamily == gFamEnum.HGSS)
+            {
+                DSUtils.CompressOverlay(prizeMoneyTableOverlayNumber);
+            }
+
             if (DSUtils.CheckOverlayHasCompressionFlag(RomInfo.initialMoneyOverlayNumber) && !DSUtils.OverlayIsCompressed(RomInfo.initialMoneyOverlayNumber))
             {
                 DSUtils.CompressOverlay(RomInfo.initialMoneyOverlayNumber);
@@ -1949,10 +1956,34 @@ namespace VSMaker
             {
                 SaveTrainerClassEyeContact();
                 SaveTrainerClassName();
+                SaveTrainerClassPrizeMoney();
                 GetTrainerClassEncounterMusic();
                 GetTrainerClasses();
+                GetPrizeMoneyData();
                 SetupTrainerClassEditor();
             }
+        }
+
+        private void SaveTrainerClassPrizeMoney()
+        {
+            int trainerClassId = selectedTrainerClass.TrainerClassId;
+            long offset = prizeMoneyList.Find(x => x.TrainerClassId == trainerClassId).Offset;
+
+            // Decompress Overlay for HGSS if not already
+            if (DSUtils.OverlayIsCompressed(prizeMoneyTableOverlayNumber) && gameFamily == gFamEnum.HGSS)
+            {
+                DSUtils.DecompressOverlay(prizeMoneyTableOverlayNumber);
+            }
+
+            var overlayPath = DSUtils.GetOverlayPath(prizeMoneyTableOverlayNumber);
+            using (DSUtils.EasyWriter wr = new DSUtils.EasyWriter(overlayPath, offset))
+            {
+                wr.Write((ushort)trainerClassId);
+                wr.Write((ushort)trainerClass_PrizeMoney_num.Value);
+            };
+
+            prizeMoneyList = new();
+            ReadPrizeMoneyTable();
         }
 
         private void SaveTrainerClassEyeContact()
@@ -2623,6 +2654,42 @@ namespace VSMaker
         private void trainer_Poke6_Moves_btn_Click(object sender, EventArgs e)
         {
             OpenMoveEditor(5);
+        }
+
+        private void trainerClass_PrizeMoney_num_ValueChanged(object sender, EventArgs e)
+        {
+            if (!unsavedChanges)
+            {
+                undoTrainerClass_btn.Enabled = true;
+            }
+            SetUnsavedChanges(undoTrainerClass_btn.Enabled);
+        }
+
+        private void trainerClass_PrizeMoney_num_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (!unsavedChanges)
+            {
+                undoTrainerClass_btn.Enabled = true;
+            }
+            SetUnsavedChanges(undoTrainerClass_btn.Enabled);
+        }
+
+        private void trainerClass_EyeContact_Day_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!unsavedChanges)
+            {
+                undoTrainerClass_btn.Enabled = true;
+            }
+            SetUnsavedChanges(undoTrainerClass_btn.Enabled);
+        }
+
+        private void trainerClass_EyeContact_Night_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!unsavedChanges)
+            {
+                undoTrainerClass_btn.Enabled = true;
+            }
+            SetUnsavedChanges(undoTrainerClass_btn.Enabled);
         }
     }
 }
