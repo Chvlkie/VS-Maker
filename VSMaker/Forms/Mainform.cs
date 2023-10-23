@@ -416,6 +416,24 @@ namespace VSMaker
             }
         }
 
+        private void GetTrainerClassGenders()
+        {
+            PrepareTrainerClassGenderData();
+            TrainerClassGender = new();
+
+            using (DSUtils.ARM9.Reader ar = new DSUtils.ARM9.Reader(classGenderOffsetToRAMAddress))
+            {
+                for (int i = 0; i < trainerClasses.Count(); i++)
+                {
+                    long offset = ar.BaseStream.Position;
+                    ushort trainerClassId = (byte)ar.ReadUInt16();
+                    ushort gender = ar.ReadUInt16();
+                    TrainerClassGender.Add((offset, trainerClassId, gender));
+                }
+            }
+            var test = TrainerClassGender;
+
+        }
         #endregion ROM
 
         #region Main Editor
@@ -880,6 +898,7 @@ namespace VSMaker
             {
                 GetPrizeMoneyData();
             }
+            GetTrainerClassGenders();
         }
 
         private void GetItems()

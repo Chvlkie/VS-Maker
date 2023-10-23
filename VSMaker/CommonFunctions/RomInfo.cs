@@ -34,6 +34,7 @@ namespace VSMaker.CommonFunctions
         public static uint prizeMoneyTableOffset { get; private set; }
         public static int prizeMoneyTableSize { get; private set; }
 
+        public static uint classGenderOffsetToRAMAddress { get; internal set; }
 
         public static uint headerTableOffset { get; private set; }
 
@@ -88,6 +89,8 @@ namespace VSMaker.CommonFunctions
 
         public static SortedDictionary<uint, (uint trainerId, ushort messageTriggerId)> TrainerTable { get; private set; }
         public static List<(long Offset, uint trainerClassId, uint prizeMoney)> PrizeMoneyData { get; set; }
+
+        public static List<(long Offset, ushort trainerClassId, ushort gender)> TrainerClassGender { get; set; }
         public static uint[] TrainerMessageIds { get; private set; }
 
         public enum gVerEnum : byte
@@ -587,6 +590,72 @@ namespace VSMaker.CommonFunctions
 
                         case gLangEnum.Japanese:
                             prizeMoneyTableOffset = 0x34C04;
+                            break;
+                    }
+                    break;
+            }
+        }
+
+        public static void PrepareTrainerClassGenderData()
+        {
+            switch (gameFamily)
+            {
+                case gFamEnum.HGSS:
+                    switch (gameLanguage)
+                    {
+                        case gLangEnum.Spanish:
+                            classGenderOffsetToRAMAddress = gameVersion == gVerEnum.HeartGold ? (uint)0x0735f8 : 0x073600;
+                            break;
+                        case gLangEnum.English:
+                        case gLangEnum.Italian:
+                        case gLangEnum.French:
+                        case gLangEnum.German:
+                            classGenderOffsetToRAMAddress = 0x073600;
+                            break;
+
+                        case gLangEnum.Japanese:
+                            classGenderOffsetToRAMAddress = 0x073098;
+                            break;
+                    }
+                    break;
+
+                case gFamEnum.Plat:
+                    switch (gameLanguage)
+                    {
+                        case gLangEnum.English:
+                            classGenderOffsetToRAMAddress = 0x793b4;
+                            break;
+
+                        case gLangEnum.Italian:
+                        case gLangEnum.French:
+                        case gLangEnum.Spanish:
+                        case gLangEnum.German:
+                            classGenderOffsetToRAMAddress = 0x079454;
+                            break;
+
+                        case gLangEnum.Japanese:
+                            classGenderOffsetToRAMAddress = 0x078c8c;
+                            break;
+
+                    }
+                    break;
+
+                case gFamEnum.DP:
+                    switch (gameLanguage)
+                    {
+                        case gLangEnum.English:
+                            classGenderOffsetToRAMAddress = 0x00;
+                            break;
+
+                        case gLangEnum.Italian:
+                        case gLangEnum.French:
+                        case gLangEnum.Spanish:
+                        case gLangEnum.German:
+                            classGenderOffsetToRAMAddress = 0x00;
+                            break;
+
+                        case gLangEnum.Japanese:
+                            classGenderOffsetToRAMAddress = 0x00;
                             break;
                     }
                     break;
@@ -1394,7 +1463,6 @@ namespace VSMaker.CommonFunctions
                 PrizeMoneyData.Add((offset, trainerClassId, prizeMoney));
             }
         }
-
         #endregion System Methods
     }
 }
