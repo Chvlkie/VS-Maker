@@ -4,6 +4,7 @@ using Images;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using NarcAPI;
 using OpenTK.Graphics.OpenGL;
+using System;
 using System.Data;
 using System.Diagnostics;
 using System.Formats.Asn1;
@@ -12,6 +13,7 @@ using VSMaker.Data;
 using VSMaker.Fonts;
 using VSMaker.Forms;
 using VSMaker.ROMFiles;
+using static VSMaker.CommonFunctions.DSUtils;
 using static VSMaker.CommonFunctions.RomInfo;
 using Application = System.Windows.Forms.Application;
 using Font = System.Drawing.Font;
@@ -60,6 +62,10 @@ namespace VSMaker
         private bool unsavedChanges;
         private List<EyeContactMusic> eyeContactMusics = new();
         private Dictionary<byte, (uint entryOffset, ushort musicD, ushort? musicN)> trainerClassEncounterMusicDict;
+        private Dictionary<byte, (uint entryOffset, ushort trainerClass, ushort prizeMoney)> prizeMoneyTable;
+        private Dictionary<byte, (uint entryOffset, uint trainerClass, uint prizeMoney)> prizeMoneyTableHGSS;
+
+        private List<PrizeMoney> prizeMoneyList = new();
         #endregion Editor Data
 
         #region Forms
@@ -394,6 +400,21 @@ namespace VSMaker
             }
         }
 
+        private void GetPrizeMoneyData()
+        { 
+            prizeMoneyList = new();
+
+            foreach (var item in PrizeMoneyData)
+            {
+                var prizeMoney = new PrizeMoney
+                {
+                    TrainerClassId = (int)item.trainerClassId,
+                    PrizeMoneyValue = (int)item.prizeMoney
+                };
+                prizeMoneyList.Add(prizeMoney);
+            }
+        }
+
         #endregion ROM
 
         #region Main Editor
@@ -623,6 +644,8 @@ namespace VSMaker
             trainerClass_eyecontact_alt_label.Visible = gameFamily == gFamEnum.HGSS;
             trainerClass_EyeContact_Night_comboBox.SelectedIndex = output.musicN != null ? eyeContactMusics.FindIndex(x => x.MusicId == (ushort)output.musicN) : 0;
             eyeContact_help_btn.Visible = !trainerClass_EyeContact_Night_comboBox.Enabled;
+            trainerClass_PrizeMoney_num.Value = prizeMoneyList.Find(x => x.TrainerClassId == trainerClass.TrainerClassId).PrizeMoneyValue;
+            trainerClass_PrizeMoney_num.Enabled = true;
         }
 
         private void SetupTrainerEditorInputs(Trainer trainer)
@@ -785,11 +808,18 @@ namespace VSMaker
                 DirNames.trainerTextOffset,
             });
             GetTrainerClassEncounterMusic();
-
-            SetTrainerTable();
             try
             {
                 ReadTrainerTable();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+            try
+            {
+                ReadPrizeMoneyTable();
             }
             catch (Exception ex)
             {
@@ -844,6 +874,10 @@ namespace VSMaker
             if (pokemons.Count == 0)
             {
                 GetPokemon();
+            }
+            if (prizeMoneyList.Count == 0)
+            {
+                GetPrizeMoneyData();
             }
         }
 

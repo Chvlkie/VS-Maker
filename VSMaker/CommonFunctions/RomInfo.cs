@@ -30,6 +30,11 @@ namespace VSMaker.CommonFunctions
         public static int cameraTblOverlayNumber { get; private set; }
         public static uint[] cameraTblOffsetsToRAMaddress { get; private set; }
 
+        public static int prizeMoneyTableOverlayNumber { get; private set; }
+        public static uint prizeMoneyTableOffset { get; private set; }
+        public static int prizeMoneyTableSize { get; private set; }
+
+
         public static uint headerTableOffset { get; private set; }
 
         public static uint conditionalMusicTableOffsetToRAMAddress { get; internal set; }
@@ -82,6 +87,7 @@ namespace VSMaker.CommonFunctions
         public static Dictionary<string, ushort> ScriptComparisonOperatorsReverseDict { get; private set; }
 
         public static SortedDictionary<uint, (uint trainerId, ushort messageTriggerId)> TrainerTable { get; private set; }
+        public static List<(long Offset, uint trainerClassId, uint prizeMoney)> PrizeMoneyData { get; set; }
         public static uint[] TrainerMessageIds { get; private set; }
 
         public enum gVerEnum : byte
@@ -550,6 +556,42 @@ namespace VSMaker.CommonFunctions
             }
         }
 
+        public static void PreparePrizeMoneyData()
+        {
+            switch (gameFamily)
+            {
+                case gFamEnum.DP:
+                    prizeMoneyTableOverlayNumber = 11;
+                    prizeMoneyTableOffset = gameLanguage.Equals(gLangEnum.Japanese) ? (uint)0x32960 : 0x32960;
+                    prizeMoneyTableSize = 98;
+                    break;
+
+                case gFamEnum.Plat:
+                     prizeMoneyTableOverlayNumber = 16;
+                    prizeMoneyTableOffset = 0x359E0;
+                    prizeMoneyTableSize = 105;
+                    break;
+
+                case gFamEnum.HGSS:
+                    prizeMoneyTableOverlayNumber = 12;
+                    prizeMoneyTableSize = 516;
+                    switch (gameLanguage)
+                    {
+                        case gLangEnum.English:
+                        case gLangEnum.Spanish:
+                        case gLangEnum.French:
+                        case gLangEnum.German:
+                        case gLangEnum.Italian:
+                            prizeMoneyTableOffset = 0x34C04;
+                            break;
+
+                        case gLangEnum.Japanese:
+                            prizeMoneyTableOffset = 0x34C04;
+                            break;
+                    }
+                    break;
+            }
+        }
         public static void SetTrainerTable()
         {
             TrainerTablePath = workDir + "\\unpacked\\trainerTextTable\\0000";
@@ -1311,6 +1353,7 @@ namespace VSMaker.CommonFunctions
 
         public static void ReadTrainerTable()
         {
+            SetTrainerTable();
             TrainerTable = new SortedDictionary<uint, (uint trainerId, ushort messageTriggerId)>();
             using BinaryReader idReader = new(new FileStream(TrainerTablePath, FileMode.Open));
             idReader.BaseStream.Position = 0;
@@ -1326,6 +1369,28 @@ namespace VSMaker.CommonFunctions
             }
 
             TrainerMessageIds = TrainerTable.Keys.ToArray();
+        }
+
+        public static void ReadPrizeMoneyTable()
+        {
+            PreparePrizeMoneyData();
+            PrizeMoneyData = new(); 
+            if (DSUtils.OverlayIsCompressed(prizeMoneyTableOverlayNumber) && gameFamily == gFamEnum.HGSS)
+            {
+                DSUtils.DecompressOverlay(prizeMoneyTableOverlayNumber);
+            }
+            using BinaryReader idReader = new(new FileStream(DSUtils.GetOverlayPath(prizeMoneyTableOverlayNumber), FileMode.Open));
+            idReader.BaseStream.Position = prizeMoneyTableOffset;
+
+            long streamSize = (idReader.BaseStream.Position + prizeMoneyTableSize);
+            
+            while (idReader.BaseStream.Position <= streamSize)
+            {
+                long offset = idReader.BaseStream.Position;
+                uint trainerClassId = idReader.ReadUInt16();
+                uint prizeMoney = idReader.ReadUInt16();
+                PrizeMoneyData.Add((offset, trainerClassId, prizeMoney));
+            }
         }
 
         #endregion System Methods
