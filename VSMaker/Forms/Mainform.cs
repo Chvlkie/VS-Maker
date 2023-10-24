@@ -62,8 +62,7 @@ namespace VSMaker
         private bool unsavedChanges;
         private List<EyeContactMusic> eyeContactMusics = new();
         private Dictionary<byte, (uint entryOffset, ushort musicD, ushort? musicN)> trainerClassEncounterMusicDict;
-        private Dictionary<byte, (uint entryOffset, ushort trainerClass, ushort prizeMoney)> prizeMoneyTable;
-        private Dictionary<byte, (uint entryOffset, uint trainerClass, uint prizeMoney)> prizeMoneyTableHGSS;
+        private List<ClassGender> classGenderList = new();
 
         private List<PrizeMoney> prizeMoneyList = new();
         #endregion Editor Data
@@ -419,19 +418,32 @@ namespace VSMaker
         private void GetTrainerClassGenders()
         {
             PrepareTrainerClassGenderData();
-            TrainerClassGender = new();
+            classGenderList = new();
 
-            using (DSUtils.ARM9.Reader ar = new DSUtils.ARM9.Reader(classGenderOffsetToRAMAddress))
+            int trainerClassLength = trainerClasses.Count();
+
+            uint tableStartAddress = BitConverter.ToUInt32(DSUtils.ARM9.ReadBytes(RomInfo.encounterMusicTableOffsetToRAMAddress, 4), 0) - DSUtils.ARM9.address;
+
+            int count = 0;
+            using (ARM9.Reader ar = new(tableStartAddress))
             {
-                for (int i = 0; i < trainerClasses.Count(); i++)
+
+                while (count != trainerClassLength)
                 {
                     long offset = ar.BaseStream.Position;
-                    ushort trainerClassId = (byte)ar.ReadUInt16();
                     ushort gender = ar.ReadUInt16();
-                    TrainerClassGender.Add((offset, trainerClassId, gender));
+                    var item = new ClassGender
+                    {
+                        Offset = offset,
+                        GenderId = (int)gender,
+                        TrainerClassId = count
+                    };
+
+                    classGenderList.Add(item);
+                    count++;
                 }
             }
-            var test = TrainerClassGender;
+            var test = classGenderList;
 
         }
         #endregion ROM
@@ -898,7 +910,10 @@ namespace VSMaker
             {
                 GetPrizeMoneyData();
             }
-            GetTrainerClassGenders();
+            if (classGenderList.Count == 0)
+            {
+                GetTrainerClassGenders();
+            }
         }
 
         private void GetItems()

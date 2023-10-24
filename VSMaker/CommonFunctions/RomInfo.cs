@@ -89,8 +89,6 @@ namespace VSMaker.CommonFunctions
 
         public static SortedDictionary<uint, (uint trainerId, ushort messageTriggerId)> TrainerTable { get; private set; }
         public static List<(long Offset, uint trainerClassId, uint prizeMoney)> PrizeMoneyData { get; set; }
-
-        public static List<(long Offset, ushort trainerClassId, ushort gender)> TrainerClassGender { get; set; }
         public static uint[] TrainerMessageIds { get; private set; }
 
         public enum gVerEnum : byte
