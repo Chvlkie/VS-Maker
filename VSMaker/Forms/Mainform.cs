@@ -983,7 +983,14 @@ namespace VSMaker
             {
                 pokemonSpecies[i] = new SpeciesFile(new FileStream($"{gameDirs[DirNames.personalPokeData].unpackedDir}\\{i:D4}", FileMode.Open));
             }
-            pokeNames = GetPokemonNames(2).ToList();
+            if (gameFamily == gFamEnum.DP)
+            {
+                pokeNames = GetPokemonNames(0).ToList();
+            }
+            else
+            {
+                pokeNames = GetPokemonNames(2).ToList();
+            }
             pokemonSpeciesAbilities = GetPokemonAbilities(numberOfPokemon);
 
             for (int i = 0; i < pokeNames.Count; i++)

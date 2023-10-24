@@ -568,7 +568,7 @@ namespace VSMaker.CommonFunctions
                     break;
 
                 case gFamEnum.Plat:
-                     prizeMoneyTableOverlayNumber = 16;
+                    prizeMoneyTableOverlayNumber = 16;
                     prizeMoneyTableOffset = 0x359E0;
                     prizeMoneyTableSize = 105;
                     break;
@@ -1453,13 +1453,24 @@ namespace VSMaker.CommonFunctions
 
             long streamSize = (idReader.BaseStream.Position + prizeMoneyTableSize);
             
+            uint count = 0; // trainerId counter for DP and platinum table
             while (idReader.BaseStream.Position <= streamSize)
             {
                 long offset = idReader.BaseStream.Position;
-                uint trainerClassId = idReader.ReadUInt16();
-                uint prizeMoney = idReader.ReadUInt16();
-                PrizeMoneyData.Add((offset, trainerClassId, prizeMoney));
+                if (gameFamily == gFamEnum.HGSS)
+                {
+                    uint trainerClassId = idReader.ReadUInt16();
+                    uint prizeMoney = idReader.ReadUInt16();
+                    PrizeMoneyData.Add((offset, trainerClassId, prizeMoney));
+                }
+                else
+                {    
+                    uint prizeMoney = idReader.ReadByte();
+                    PrizeMoneyData.Add((offset, count, prizeMoney));
+                    count++;
+                }            
             }
+            var test = PrizeMoneyData;
         }
         #endregion System Methods
     }
