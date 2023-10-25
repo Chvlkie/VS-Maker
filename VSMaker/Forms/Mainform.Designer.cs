@@ -484,9 +484,9 @@ namespace VSMaker
             label20.ImageAlign = ContentAlignment.MiddleLeft;
             label20.Location = new Point(7, 43);
             label20.Name = "label20";
-            label20.Size = new Size(144, 15);
+            label20.Size = new Size(112, 15);
             label20.TabIndex = 40;
-            label20.Text = "Eye-Contact Music [Day]:";
+            label20.Text = "Eye-Contact Music:";
             label20.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // trainerClass_Gender_label

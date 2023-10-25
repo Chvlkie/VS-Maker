@@ -3,11 +3,8 @@ using Ekona.Images;
 using Images;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using NarcAPI;
-using OpenTK.Graphics.OpenGL;
-using System;
 using System.Data;
 using System.Diagnostics;
-using System.Formats.Asn1;
 using VSMaker.CommonFunctions;
 using VSMaker.Data;
 using VSMaker.Fonts;
@@ -65,6 +62,7 @@ namespace VSMaker
         private List<ClassGender> classGenderList = new();
 
         private List<PrizeMoney> prizeMoneyList = new();
+
         #endregion Editor Data
 
         #region Forms
@@ -372,10 +370,10 @@ namespace VSMaker
 
         private void GetTrainerClassEncounterMusic()
         {
-            RomInfo.SetEncounterMusicTableOffsetToRAMAddress();
+            SetEncounterMusicTableOffsetToRAMAddress();
             trainerClassEncounterMusicDict = new Dictionary<byte, (uint entryOffset, ushort musicD, ushort? musicN)>();
 
-            uint encounterMusicTableTableStartAddress = BitConverter.ToUInt32(DSUtils.ARM9.ReadBytes(RomInfo.encounterMusicTableOffsetToRAMAddress, 4), 0) - DSUtils.ARM9.address;
+            uint encounterMusicTableTableStartAddress = BitConverter.ToUInt32(ARM9.ReadBytes(encounterMusicTableOffsetToRAMAddress, 4), 0) - DSUtils.ARM9.address;
 
             uint entrySize = 4;
             uint tableSizeOffset = 10;
@@ -384,18 +382,16 @@ namespace VSMaker
                 entrySize += 2;
                 tableSizeOffset += 2;
             }
-
-            byte tableEntriesCount = DSUtils.ARM9.ReadByte(RomInfo.encounterMusicTableOffsetToRAMAddress - tableSizeOffset);
-            using (DSUtils.ARM9.Reader ar = new DSUtils.ARM9.Reader(encounterMusicTableTableStartAddress))
+            var test = new List<ushort>();
+            byte tableEntriesCount = ARM9.ReadByte(encounterMusicTableOffsetToRAMAddress - tableSizeOffset);
+            using ARM9.Reader ar = new(encounterMusicTableTableStartAddress);
+            for (int i = 0; i < tableEntriesCount; i++)
             {
-                for (int i = 0; i < tableEntriesCount; i++)
-                {
-                    uint entryOffset = (uint)ar.BaseStream.Position;
-                    byte tclass = (byte)ar.ReadUInt16();
-                    ushort musicD = ar.ReadUInt16();
-                    ushort? musicN = gameFamily == gFamEnum.HGSS ? ar.ReadUInt16() : (ushort?)null;
-                    trainerClassEncounterMusicDict[tclass] = (entryOffset, musicD, musicN);
-                }
+                uint entryOffset = (uint)ar.BaseStream.Position;
+                byte tclass = (byte)ar.ReadUInt16();
+                ushort musicD = ar.ReadUInt16();
+                ushort? musicN = gameFamily == gFamEnum.HGSS ? ar.ReadUInt16() : null;
+                trainerClassEncounterMusicDict[tclass] = (entryOffset, musicD, musicN);
             }
         }
 
@@ -427,7 +423,6 @@ namespace VSMaker
             int count = 0;
             using (ARM9.Reader ar = new(tableStartAddress))
             {
-
                 while (count != trainerClassLength)
                 {
                     long offset = ar.BaseStream.Position;
@@ -444,8 +439,8 @@ namespace VSMaker
                 }
             }
             var test = classGenderList;
-
         }
+
         #endregion ROM
 
         #region Main Editor
@@ -602,6 +597,22 @@ namespace VSMaker
             return true;
         }
 
+        private bool ValidateEyeContactMusic()
+        {
+            if (trainerClass_EyeContact_Day_comboBox.Enabled && trainerClass_EyeContact_Day_comboBox.SelectedIndex == 0)
+            {
+                MessageBox.Show($"Please select Eye Contact music", "Eye Contact Music Not Set", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            if (trainerClass_EyeContact_Night_comboBox.Enabled && trainerClass_EyeContact_Night_comboBox.SelectedIndex == 0)
+            {
+                MessageBox.Show($"Please select Eye Contact music", "Eye Contact Music Not Set", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            return true;
+        }
+
         private void SaveTrainerClassName()
         {
             RomFileSystem.UpdateCurrentTrainerClassName(trainerClassName.Text, selectedTrainerClass.TrainerClassId);
@@ -674,7 +685,7 @@ namespace VSMaker
             trainerClass_EyeContact_Night_comboBox.Visible = gameFamily == gFamEnum.HGSS;
             trainerClass_eyecontact_alt_label.Visible = gameFamily == gFamEnum.HGSS;
             trainerClass_EyeContact_Night_comboBox.SelectedIndex = output.musicN != null ? eyeContactMusics.FindIndex(x => x.MusicId == (ushort)output.musicN) : 0;
-            eyeContact_help_btn.Visible = !trainerClass_EyeContact_Night_comboBox.Enabled;
+            eyeContact_help_btn.Visible = !trainerClass_EyeContact_Day_comboBox.Enabled;
             trainerClass_PrizeMoney_num.Value = prizeMoneyList.Find(x => x.TrainerClassId == trainerClass.TrainerClassId).PrizeMoneyValue;
             trainerClass_PrizeMoney_num.Enabled = true;
         }
@@ -1510,6 +1521,7 @@ namespace VSMaker
             moveEditor = new ChooseMoves(this, partyIndex, trainerFile);
             moveEditor.ShowDialog();
         }
+
         private void save_btn_Click(object sender, EventArgs e)
         {
             SaveRomChanges();
@@ -1992,7 +2004,7 @@ namespace VSMaker
 
         private void saveTrainerClassAll_btn_Click(object sender, EventArgs e)
         {
-            bool valid = ValidateTrainerClassName();
+            bool valid = ValidateTrainerClassName() && ValidateEyeContactMusic();
             if (valid)
             {
                 SaveTrainerClassEyeContact();
@@ -2009,20 +2021,29 @@ namespace VSMaker
         {
             int trainerClassId = selectedTrainerClass.TrainerClassId;
             long offset = prizeMoneyList.Find(x => x.TrainerClassId == trainerClassId).Offset;
-
-            // Decompress Overlay for HGSS if not already
-            if (DSUtils.OverlayIsCompressed(prizeMoneyTableOverlayNumber) && gameFamily == gFamEnum.HGSS)
-            {
-                DSUtils.DecompressOverlay(prizeMoneyTableOverlayNumber);
-            }
-
             var overlayPath = DSUtils.GetOverlayPath(prizeMoneyTableOverlayNumber);
-            using (DSUtils.EasyWriter wr = new DSUtils.EasyWriter(overlayPath, offset))
-            {
-                wr.Write((ushort)trainerClassId);
-                wr.Write((ushort)trainerClass_PrizeMoney_num.Value);
-            };
 
+            if (gameFamily == gFamEnum.HGSS)
+            {
+                // Decompress Overlay for HGSS if not already
+                if (OverlayIsCompressed(prizeMoneyTableOverlayNumber))
+                {
+                    DecompressOverlay(prizeMoneyTableOverlayNumber);
+
+                    using (EasyWriter wr = new EasyWriter(overlayPath, offset))
+                    {
+                        wr.Write((ushort)trainerClassId);
+                        wr.Write((ushort)trainerClass_PrizeMoney_num.Value);
+                    };
+                }
+            }
+            else
+            {
+                using (EasyWriter wr = new EasyWriter(overlayPath, offset))
+                {
+                    wr.Write((byte)trainerClass_PrizeMoney_num.Value);
+                };
+            }
             prizeMoneyList = new();
             ReadPrizeMoneyTable();
         }
@@ -2039,21 +2060,24 @@ namespace VSMaker
                 if (gameFamily == gFamEnum.HGSS)
                 {
                     trainerClassEncounterMusicDict[trainerClassId] = (dictEntry.entryOffset, musicDay, musicNight);
-                    DSUtils.ARM9.WriteBytes(BitConverter.GetBytes(musicDay), dictEntry.entryOffset + 2);
-                    DSUtils.ARM9.WriteBytes(BitConverter.GetBytes(musicNight), dictEntry.entryOffset + 4);
+                    ARM9.WriteBytes(BitConverter.GetBytes(musicDay), dictEntry.entryOffset + 2);
+                    ARM9.WriteBytes(BitConverter.GetBytes(musicNight), dictEntry.entryOffset + 4);
                 }
                 else
                 {
                     trainerClassEncounterMusicDict[trainerClassId] = (dictEntry.entryOffset, musicDay, dictEntry.musicN);
-                    DSUtils.ARM9.WriteBytes(BitConverter.GetBytes(musicDay), dictEntry.entryOffset + 2);
+                    ARM9.WriteBytes(BitConverter.GetBytes(musicDay), dictEntry.entryOffset + 2);
                 }
             }
         }
 
         private void GetEyeContactMusicLists()
         {
-            eyeContactMusics = new List<EyeContactMusic>
+            if (gameFamily == gFamEnum.HGSS)
             {
+                eyeContactMusics = new List<EyeContactMusic>
+            {
+                new EyeContactMusic { MusicId = (ushort)0 },
                 new EyeContactMusic { MusicId = (ushort)1107 },
                 new EyeContactMusic { MusicId = (ushort)1108 },
                 new EyeContactMusic { MusicId = (ushort)1109 },
@@ -2064,7 +2088,29 @@ namespace VSMaker
                 new EyeContactMusic { MusicId = (ushort)1114 },
                 new EyeContactMusic { MusicId = (ushort)1115 },
             };
-
+            }
+            else
+            {
+                eyeContactMusics = new List<EyeContactMusic>
+            {
+                   new EyeContactMusic { MusicId = (ushort)0 },
+                new EyeContactMusic { MusicId = (ushort)1100 },
+                new EyeContactMusic { MusicId = (ushort)1101 },
+                new EyeContactMusic { MusicId = (ushort)1102 },
+                new EyeContactMusic { MusicId = (ushort)1103 },
+                new EyeContactMusic { MusicId = (ushort)1104 },
+                new EyeContactMusic { MusicId = (ushort)1105 },
+                new EyeContactMusic { MusicId = (ushort)1106 },
+                new EyeContactMusic { MusicId = (ushort)1107 },
+                new EyeContactMusic { MusicId = (ushort)1108 },
+                new EyeContactMusic { MusicId = (ushort)1109 },
+                new EyeContactMusic { MusicId = (ushort)1110 },
+                new EyeContactMusic { MusicId = (ushort)1111 },
+                new EyeContactMusic { MusicId = (ushort)1112 },
+                new EyeContactMusic { MusicId = (ushort)1113 },
+                new EyeContactMusic { MusicId = (ushort)1114 },
+            };
+            }
             foreach (var item in eyeContactMusics)
             {
                 trainerClass_EyeContact_Day_comboBox.Items.Add(item.Name);

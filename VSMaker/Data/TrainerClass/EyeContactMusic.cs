@@ -17,6 +17,13 @@ namespace VSMaker.Data
 
     public static class EyeMusicIdNames
     {
+        public const string Id_1100 = "1100";
+        public const string Id_1101 = "1101";
+        public const string Id_1102 = "1102";
+        public const string Id_1103 = "1103";
+        public const string Id_1104 = "1104";
+        public const string Id_1105 = "1105";
+        public const string Id_1106 = "1106";
         public const string Id_1107 = "1107";
         public const string Id_1108 = "1108";
         public const string Id_1109 = "1109";
@@ -26,59 +33,54 @@ namespace VSMaker.Data
         public const string Id_1113 = "1113";
         public const string Id_1114 = "1114";
         public const string Id_1115 = "1115";
+        public const string NoEntry = "-----";
 
         public static string GetNameFromId(uint musicId)
         {
-            switch (musicId)
+            return musicId switch
             {
-                case 1107:
-                    return Id_1107;
-                case 1108:
-                    return Id_1108;
-                case 1109:
-                    return Id_1109;
-                case 1110:
-                    return Id_1110;
-                case 1111:
-                    return Id_1111;
-                case 1112:
-                    return Id_1112;
-                case 1113:
-                    return Id_1113;
-                case 1114:
-                    return Id_1114;
-                case 1115:
-                    return Id_1115;
-                default:
-                    return musicId.ToString();
-            }
+                1100 => Id_1100,
+                1101 => Id_1101,
+                1102 => Id_1102,
+                1103 => Id_1103,
+                1104 => Id_1104,
+                1105 => Id_1105,
+                1106 => Id_1106,
+                1107 => Id_1107,
+                1108 => Id_1108,
+                1109 => Id_1109,
+                1110 => Id_1110,
+                1111 => Id_1111,
+                1112 => Id_1112,
+                1113 => Id_1113,
+                1114 => Id_1114,
+                1115 => Id_1115,
+                _ => NoEntry,
+            };
         }
 
         public static ushort GetIdFromName(string name)
         {
-            switch (name)
+            return name switch
             {
-                case Id_1107:
-                    return 1107;
-                case Id_1108:
-                    return 1108;
-                case Id_1109:
-                    return 1109;
-                case Id_1110:
-                    return 1110;
-                case Id_1111:
-                    return 1111;
-                case Id_1112:
-                    return 1112;
-                case Id_1113:
-                    return 1113;
-                case Id_1114:
-                    return 1114;
-                case Id_1115:
-                    return 1115;
-                default:
-                    return 0;
-            }
+                Id_1100 => 1100,
+                Id_1101 => 1101,
+                Id_1102 => 1102,
+                Id_1103 => 1103,
+                Id_1104 => 1104,
+                Id_1105 => 1105,
+                Id_1106 => 1106,
+                Id_1107 => 1107,
+                Id_1108 => 1108,
+                Id_1109 => 1109,
+                Id_1110 => 1110,
+                Id_1111 => 1111,
+                Id_1112 => 1112,
+                Id_1113 => 1113,
+                Id_1114 => 1114,
+                Id_1115 => 1115,
+                _ => 0,
+            };
         }
     }
 }
