@@ -415,30 +415,29 @@ namespace VSMaker
         {
             PrepareTrainerClassGenderData();
             classGenderList = new();
-
+            trainerClass_Gender_comboBox.Items.Clear();
             int trainerClassLength = trainerClasses.Count();
 
-            uint tableStartAddress = BitConverter.ToUInt32(DSUtils.ARM9.ReadBytes(RomInfo.encounterMusicTableOffsetToRAMAddress, 4), 0) - DSUtils.ARM9.address;
+            uint tableStartAddress = BitConverter.ToUInt32(DSUtils.ARM9.ReadBytes(RomInfo.classGenderOffsetToRAMAddress, 4), 0) - DSUtils.ARM9.address;
 
-            int count = 0;
-            using (ARM9.Reader ar = new(tableStartAddress))
+            using ARM9.Reader ar = new(tableStartAddress);
+            for (int i = 0; i < trainerClassLength; i++)
             {
-                while (count != trainerClassLength)
+                long offset = ar.BaseStream.Position;
+                ushort gender = ar.ReadByte();
+                var item = new ClassGender
                 {
-                    long offset = ar.BaseStream.Position;
-                    ushort gender = ar.ReadUInt16();
-                    var item = new ClassGender
-                    {
-                        Offset = offset,
-                        GenderId = (int)gender,
-                        TrainerClassId = count
-                    };
+                    Offset = offset,
+                    GenderId = (int)gender,
+                    TrainerClassId = i
+                };
 
-                    classGenderList.Add(item);
-                    count++;
-                }
+                classGenderList.Add(item);
             }
-            var test = classGenderList;
+
+            trainerClass_Gender_comboBox.Items.Add(Gender.Descriptions.Male);
+            trainerClass_Gender_comboBox.Items.Add(Gender.Descriptions.Female);
+            trainerClass_Gender_comboBox.Items.Add(Gender.Descriptions.None);
         }
 
         #endregion ROM
@@ -688,6 +687,20 @@ namespace VSMaker
             eyeContact_help_btn.Visible = !trainerClass_EyeContact_Day_comboBox.Enabled;
             trainerClass_PrizeMoney_num.Value = prizeMoneyList.Find(x => x.TrainerClassId == trainerClass.TrainerClassId).PrizeMoneyValue;
             trainerClass_PrizeMoney_num.Enabled = true;
+            if (gameFamily != gFamEnum.DP)
+            {
+                trainerClass_Gender_label.Visible = true;
+                trainerClass_Gender_comboBox.Visible = true;
+                trainerClass_Gender_comboBox.SelectedIndex = classGenderList.Find(x => x.TrainerClassId == trainerClass.TrainerClassId).GenderId;
+                trainerClass_Gender_comboBox.Enabled = true;
+            }
+            else
+            {
+                trainerClass_Gender_label.Visible = false;
+                trainerClass_Gender_comboBox.Visible = false;
+                trainerClass_Gender_comboBox.Enabled = true;
+            }
+
         }
 
         private void SetupTrainerEditorInputs(Trainer trainer)
@@ -921,7 +934,7 @@ namespace VSMaker
             {
                 GetPrizeMoneyData();
             }
-            if (classGenderList.Count == 0)
+            if (gameFamily != gFamEnum.DP && classGenderList.Count == 0)
             {
                 GetTrainerClassGenders();
             }

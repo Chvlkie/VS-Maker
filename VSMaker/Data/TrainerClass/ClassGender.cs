@@ -12,6 +12,6 @@ namespace VSMaker.Data
         public int TrainerClassId { get; set; }
         public int GenderId { get; set; }
         public long Offset { get; set; }
-        public string GenderDescription { get; set; }
+        public string GenderDescription => Gender.GetDescriptionById(GenderId);
     }
 }

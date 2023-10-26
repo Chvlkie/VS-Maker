@@ -637,26 +637,6 @@ namespace VSMaker.CommonFunctions
 
                     }
                     break;
-
-                case gFamEnum.DP:
-                    switch (gameLanguage)
-                    {
-                        case gLangEnum.English:
-                            classGenderOffsetToRAMAddress = 0x00;
-                            break;
-
-                        case gLangEnum.Italian:
-                        case gLangEnum.French:
-                        case gLangEnum.Spanish:
-                        case gLangEnum.German:
-                            classGenderOffsetToRAMAddress = 0x00;
-                            break;
-
-                        case gLangEnum.Japanese:
-                            classGenderOffsetToRAMAddress = 0x00;
-                            break;
-                    }
-                    break;
             }
         }
         public static void SetTrainerTable()

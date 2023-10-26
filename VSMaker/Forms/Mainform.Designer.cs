@@ -451,6 +451,7 @@ namespace VSMaker
             trainerClass_EyeContact_Night_comboBox.Name = "trainerClass_EyeContact_Night_comboBox";
             trainerClass_EyeContact_Night_comboBox.Size = new Size(80, 23);
             trainerClass_EyeContact_Night_comboBox.TabIndex = 43;
+            trainerClass_EyeContact_Night_comboBox.Visible = false;
             trainerClass_EyeContact_Night_comboBox.SelectedIndexChanged += trainerClass_EyeContact_Night_comboBox_SelectedIndexChanged;
             // 
             // trainerClass_EyeContact_Day_comboBox
@@ -476,6 +477,7 @@ namespace VSMaker
             trainerClass_eyecontact_alt_label.TabIndex = 41;
             trainerClass_eyecontact_alt_label.Text = "Eye-Contact Music [Night]:";
             trainerClass_eyecontact_alt_label.TextAlign = ContentAlignment.MiddleLeft;
+            trainerClass_eyecontact_alt_label.Visible = false;
             // 
             // label20
             // 
@@ -500,6 +502,7 @@ namespace VSMaker
             trainerClass_Gender_label.TabIndex = 38;
             trainerClass_Gender_label.Text = "Gender:";
             trainerClass_Gender_label.TextAlign = ContentAlignment.MiddleLeft;
+            trainerClass_Gender_label.Visible = false;
             // 
             // trainerClass_PrizeMoney_btn
             // 
@@ -523,6 +526,7 @@ namespace VSMaker
             trainerClass_Gender_comboBox.Name = "trainerClass_Gender_comboBox";
             trainerClass_Gender_comboBox.Size = new Size(80, 23);
             trainerClass_Gender_comboBox.TabIndex = 33;
+            trainerClass_Gender_comboBox.Visible = false;
             // 
             // trainerClass_PrizeMoney_num
             // 
