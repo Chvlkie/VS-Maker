@@ -1976,7 +1976,14 @@ namespace VSMaker
 
         private void trainerTextTable_dataGrid_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-
+            if (e.ColumnIndex == 3)
+            {
+                textTable_help_lbl.Text = "Double click to open text editor.";
+            }
+            else
+            {
+                textTable_help_lbl.Text = "";
+            }
         }
 
         private void trainerTextTable_dataGrid_TextDblClick(object sender, DataGridViewCellEventArgs e)

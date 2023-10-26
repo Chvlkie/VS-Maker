@@ -235,6 +235,7 @@ namespace VSMaker
             trainerMessageBindingSource1 = new BindingSource(components);
             trainerMessageBindingSource3 = new BindingSource(components);
             statusStrip2 = new StatusStrip();
+            textTable_help_lbl = new ToolStripStatusLabel();
             main_toolstrip.SuspendLayout();
             statusStrip1.SuspendLayout();
             mainContent.SuspendLayout();
@@ -297,6 +298,7 @@ namespace VSMaker
             panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trainerMessageBindingSource1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trainerMessageBindingSource3).BeginInit();
+            statusStrip2.SuspendLayout();
             SuspendLayout();
             // 
             // main_toolstrip
@@ -2680,11 +2682,17 @@ namespace VSMaker
             // 
             // statusStrip2
             // 
+            statusStrip2.Items.AddRange(new ToolStripItem[] { textTable_help_lbl });
             statusStrip2.Location = new Point(0, 467);
             statusStrip2.Name = "statusStrip2";
             statusStrip2.Size = new Size(891, 22);
             statusStrip2.TabIndex = 17;
             statusStrip2.Text = "statusStrip2";
+            // 
+            // textTable_help_lbl
+            // 
+            textTable_help_lbl.Name = "textTable_help_lbl";
+            textTable_help_lbl.Size = new Size(0, 17);
             // 
             // Mainform
             // 
@@ -2783,6 +2791,8 @@ namespace VSMaker
             panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)trainerMessageBindingSource1).EndInit();
             ((System.ComponentModel.ISupportInitialize)trainerMessageBindingSource3).EndInit();
+            statusStrip2.ResumeLayout(false);
+            statusStrip2.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -2992,5 +3002,6 @@ namespace VSMaker
         private ComboBox trainerClass_EyeContact_Day_comboBox;
         private Button eyeContact_help_btn;
         private StatusStrip statusStrip2;
+        private ToolStripStatusLabel textTable_help_lbl;
     }
 }
