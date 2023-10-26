@@ -527,6 +527,7 @@ namespace VSMaker
             trainerClass_Gender_comboBox.Size = new Size(80, 23);
             trainerClass_Gender_comboBox.TabIndex = 33;
             trainerClass_Gender_comboBox.Visible = false;
+            trainerClass_Gender_comboBox.SelectedIndexChanged += trainerClass_Gender_comboBox_SelectedIndexChanged;
             // 
             // trainerClass_PrizeMoney_num
             // 

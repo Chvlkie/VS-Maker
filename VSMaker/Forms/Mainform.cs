@@ -57,10 +57,10 @@ namespace VSMaker
         private List<ComboBox> trainerItemComboBoxes;
         private List<NumericUpDown> pokeLevels;
         private bool unsavedChanges;
+        private bool loadingData = false;
         private List<EyeContactMusic> eyeContactMusics = new();
         private Dictionary<byte, (uint entryOffset, ushort musicD, ushort? musicN)> trainerClassEncounterMusicDict;
         private List<ClassGender> classGenderList = new();
-
         private List<PrizeMoney> prizeMoneyList = new();
 
         #endregion Editor Data
@@ -147,13 +147,14 @@ namespace VSMaker
         {
             OpenFileDialog openRom = new()
             {
-                Filter = DSUtils.NDSRomFilter
+                Filter = NDSRomFilter
             };
             if (openRom.ShowDialog(this) != DialogResult.OK)
             {
                 return;
             }
 
+            loadingData = true;
             RomFileSystem.SetupROMLanguage(openRom.FileName);
             /* Set ROM gameVersion and language */
             romInfo = new RomInfo(RomFileSystem.gameCode, openRom.FileName, useSuffix: true);
@@ -239,6 +240,7 @@ namespace VSMaker
             {
                 return;
             }
+            loadingData = true;
 
             try
             {
@@ -428,7 +430,7 @@ namespace VSMaker
                 var item = new ClassGender
                 {
                     Offset = offset,
-                    GenderId = (int)gender,
+                    GenderId = gender,
                     TrainerClassId = i
                 };
 
@@ -478,10 +480,12 @@ namespace VSMaker
             try
             {
                 OpenRomFolder();
+                loadingData = false;
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"The extracted folder is not setup correctly.\nEssential files are missing.\n\n{ex.Message}", "Error Opening Folder", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                loadingData = false;
                 throw;
             }
         }
@@ -489,11 +493,13 @@ namespace VSMaker
         private void openRom_btn_Click(object sender, EventArgs e)
         {
             OpenRom();
+            loadingData = false;
         }
 
         private void openRom_toolstrip_Click(object sender, EventArgs e)
         {
             OpenRom();
+            loadingData = false;
         }
 
         private static void SafeWriteLabel(ToolStripStatusLabel label, string text, Font font, Color color)
@@ -700,7 +706,6 @@ namespace VSMaker
                 trainerClass_Gender_comboBox.Visible = false;
                 trainerClass_Gender_comboBox.Enabled = true;
             }
-
         }
 
         private void SetupTrainerEditorInputs(Trainer trainer)
@@ -834,13 +839,16 @@ namespace VSMaker
 
         private void trainer_Class_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int trainerId = trainer_Class_comboBox.SelectedIndex;
-            selectedTrainer.TrainerSpriteFrames = LoadTrainerClassPic(trainerId);
-            UpdateTrainerClassPic(trainerPicBox);
-            trainer_frames_num.Maximum = selectedTrainer.TrainerSpriteFrames;
-            trainer_frames_num.Enabled = selectedTrainer.TrainerSpriteFrames > 0;
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                int trainerId = trainer_Class_comboBox.SelectedIndex;
+                selectedTrainer.TrainerSpriteFrames = LoadTrainerClassPic(trainerId);
+                UpdateTrainerClassPic(trainerPicBox);
+                trainer_frames_num.Maximum = selectedTrainer.TrainerSpriteFrames;
+                trainer_frames_num.Enabled = selectedTrainer.TrainerSpriteFrames > 0;
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         #endregion Trainer Editor
@@ -894,6 +902,7 @@ namespace VSMaker
 
         private void GetData()
         {
+            loadingData = true;
             if (eyeContactMusics.Count == 0)
             {
                 GetEyeContactMusicLists();
@@ -938,6 +947,7 @@ namespace VSMaker
             {
                 GetTrainerClassGenders();
             }
+            loadingData = false;
         }
 
         private void GetItems()
@@ -1083,6 +1093,9 @@ namespace VSMaker
         /// <param name="trainerClassId"></param>
         private void GetTrainerClassInfo(int trainerClassId)
         {
+            loadingData = true;
+            statusLabelMessage("Loading Trainer Class Info...");
+            Update();
             selectedTrainerClass = trainerClasses.Single(x => x.TrainerClassId == trainerClassId);
 
             trainerClassName.Text = selectedTrainerClass.TrainerClassName;
@@ -1102,6 +1115,9 @@ namespace VSMaker
             saveTrainerClassAll_btn.Enabled = true;
             SetUnsavedChanges(false);
             undoTrainerClass_btn.Enabled = false;
+            loadingData = false;
+            statusLabelMessage();
+            Update();
         }
 
         /// <summary>
@@ -1110,6 +1126,10 @@ namespace VSMaker
         /// <param name="trainerId"></param>
         private void GetTrainerInfo(int trainerId)
         {
+            statusLabelMessage("Loading Trainer Info...");
+            Update();
+            loadingData = true;
+
             trainer_Message.Text = string.Empty;
             trainer_Class_comboBox.Items.Clear();
             trainer_MessageTrigger_list.Items.Clear();
@@ -1240,6 +1260,9 @@ namespace VSMaker
             EnableTrainerButtons();
             SetUnsavedChanges(false);
             undoTrainer_btn.Enabled = false;
+            loadingData = false;
+            statusLabelMessage();
+            Update();
         }
 
         private void EnableTrainerButtons()
@@ -1503,7 +1526,7 @@ namespace VSMaker
 
         private void mainContent_Selecting(object sender, TabControlCancelEventArgs e)
         {
-            if (unsavedChanges)
+            if (unsavedChanges && !loadingData)
             {
                 var choice = MessageBox.Show("You have unsaved changes.\nDo you wish to discard these changes?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (choice == DialogResult.Yes)
@@ -1694,24 +1717,28 @@ namespace VSMaker
 
         private void trainer_Double_checkBox_CheckedChanged(object sender, EventArgs e)
         {
-            if (trainer_Double_checkBox.Checked)
+            if (!loadingData)
             {
-                trainer_NumPoke_num.Minimum = 2;
-                if (trainer_NumPoke_num.Value < 2)
+                if (trainer_Double_checkBox.Checked)
                 {
-                    trainer_NumPoke_num.Value = 2;
+                    trainer_NumPoke_num.Minimum = 2;
+                    if (trainer_NumPoke_num.Value < 2)
+                    {
+                        trainer_NumPoke_num.Value = 2;
+                    }
                 }
+                else
+                {
+                    trainer_NumPoke_num.Minimum = 1;
+                }
+
+                if (!unsavedChanges)
+                {
+                    undoTrainer_btn.Enabled = selectedTrainer.IsDouble != trainer_Double_checkBox.Checked;
+                }
+                SetUnsavedChanges(undoTrainer_btn.Enabled);
+                EnablePokemon();
             }
-            else
-            {
-                trainer_NumPoke_num.Minimum = 1;
-            }
-            if (!unsavedChanges)
-            {
-                undoTrainer_btn.Enabled = selectedTrainer.IsDouble != trainer_Double_checkBox.Checked;
-            }
-            SetUnsavedChanges(undoTrainer_btn.Enabled);
-            EnablePokemon();
         }
 
         private void trainer_EditMessage_btn_Click(object sender, EventArgs e)
@@ -1770,60 +1797,63 @@ namespace VSMaker
 
         private void trainer_MessageTrigger_list_SelectedIndexChanged(object sender, EventArgs e)
         {
-            currentTrainerMessageIndex = 0;
-            displayTrainerMessage = new List<string>();
-            if (trainer_MessageTrigger_list.SelectedIndex > -1)
-            {
-                trainer_EditMessage_btn.Enabled = true;
-                const string seperator1 = @"\r";
-                string selectedMessageTriggerName = trainer_MessageTrigger_list.SelectedItem.ToString();
-                int messageTriggerId = messageTriggers.Find(x => x.MessageTriggerName == selectedMessageTriggerName).MessageTriggerId;
-                string trainerText = selectedTrainer.TrainerMessages.Single(x => x.MessageTriggerId == messageTriggerId).MessageText;
-
-                trainerText = trainerText.Replace("\\n", Environment.NewLine);
-                trainerText = trainerText.Replace("\\f", Environment.NewLine);
-                var messageArray = trainerText.Split(new string[] { seperator1 }, StringSplitOptions.None);
-                foreach (var item in messageArray)
+                currentTrainerMessageIndex = 0;
+                displayTrainerMessage = new List<string>();
+                if (trainer_MessageTrigger_list.SelectedIndex > -1)
                 {
-                    int numLines = item.Split('\n').Length;
-                    if (numLines >= 3 && !string.IsNullOrEmpty(ReadLine(item, 3)))
-                    {
-                        string text1 = ReadLine(item, 1) + Environment.NewLine + ReadLine(item, 2);
-                        string text2 = ReadLine(item, 2) + Environment.NewLine + ReadLine(item, 3);
+                    trainer_EditMessage_btn.Enabled = true;
+                    const string seperator1 = @"\r";
+                    string selectedMessageTriggerName = trainer_MessageTrigger_list.SelectedItem.ToString();
+                    int messageTriggerId = messageTriggers.Find(x => x.MessageTriggerName == selectedMessageTriggerName).MessageTriggerId;
+                    string trainerText = selectedTrainer.TrainerMessages.Single(x => x.MessageTriggerId == messageTriggerId).MessageText;
 
-                        displayTrainerMessage.Add(text1);
-                        displayTrainerMessage.Add(text2);
-                    }
-                    else
+                    trainerText = trainerText.Replace("\\n", Environment.NewLine);
+                    trainerText = trainerText.Replace("\\f", Environment.NewLine);
+                    var messageArray = trainerText.Split(new string[] { seperator1 }, StringSplitOptions.None);
+                    foreach (var item in messageArray)
                     {
-                        displayTrainerMessage.Add(item);
+                        int numLines = item.Split('\n').Length;
+                        if (numLines >= 3 && !string.IsNullOrEmpty(ReadLine(item, 3)))
+                        {
+                            string text1 = ReadLine(item, 1) + Environment.NewLine + ReadLine(item, 2);
+                            string text2 = ReadLine(item, 2) + Environment.NewLine + ReadLine(item, 3);
+
+                            displayTrainerMessage.Add(text1);
+                            displayTrainerMessage.Add(text2);
+                        }
+                        else
+                        {
+                            displayTrainerMessage.Add(item);
+                        }
                     }
+                    // Remove last item if blank line - is the case as trainer text formatted as ending with \n.
+                    if (string.IsNullOrEmpty(displayTrainerMessage.Last()))
+                    {
+                        displayTrainerMessage.Remove(displayTrainerMessage.Last());
+                    }
+                    trainer_Message.Font = new Font(vsMakerFont.VsMakerFontCollection.Families[0], trainer_Message.Font.Size);
+                    trainer_Message.Text = displayTrainerMessage[0];
+                    trainer_Message_Next_btn.Enabled = displayTrainerMessage.Count() > 1;
+                    trainer_Message_Back_btn.Enabled = false;
                 }
-                // Remove last item if blank line - is the case as trainer text formatted as ending with \n.
-                if (string.IsNullOrEmpty(displayTrainerMessage.Last()))
+                else
                 {
-                    displayTrainerMessage.Remove(displayTrainerMessage.Last());
+                    trainer_EditMessage_btn.Enabled = false;
+                    trainer_MessageTrigger_list.Enabled = false;
                 }
-                trainer_Message.Font = new Font(vsMakerFont.VsMakerFontCollection.Families[0], trainer_Message.Font.Size);
-                trainer_Message.Text = displayTrainerMessage[0];
-                trainer_Message_Next_btn.Enabled = displayTrainerMessage.Count() > 1;
-                trainer_Message_Back_btn.Enabled = false;
             }
-            else
-            {
-                trainer_EditMessage_btn.Enabled = false;
-                trainer_MessageTrigger_list.Enabled = false;
-            }
-        }
 
         private void trainer_NumPoke_num_ValueChanged(object sender, EventArgs e)
         {
-            if (!unsavedChanges)
+            if (!loadingData)
             {
-                undoTrainer_btn.Enabled = selectedTrainer.Pokemon.Count != trainer_NumPoke_num.Value;
+                if (!unsavedChanges)
+                {
+                    undoTrainer_btn.Enabled = selectedTrainer.Pokemon.Count != trainer_NumPoke_num.Value;
+                }
+                SetUnsavedChanges(undoTrainer_btn.Enabled);
+                EnablePokemon();
             }
-            SetUnsavedChanges(undoTrainer_btn.Enabled);
-            EnablePokemon();
         }
 
         private void trainer_Player_help_btn_Click(object sender, EventArgs e)
@@ -1868,11 +1898,14 @@ namespace VSMaker
 
         private void trainerClassName_TextChanged(object sender, EventArgs e)
         {
-            if (!unsavedChanges)
+            if (!loadingData)
             {
-                undoTrainerClass_btn.Enabled = selectedTrainerClass.TrainerClassName != trainerClassName.Text;
+                if (!unsavedChanges)
+                {
+                    undoTrainerClass_btn.Enabled = selectedTrainerClass.TrainerClassName != trainerClassName.Text;
+                }
+                SetUnsavedChanges(undoTrainerClass_btn.Enabled);
             }
-            SetUnsavedChanges(undoTrainerClass_btn.Enabled);
         }
 
         private void trainerEditor_tab_SelectedIndexChanged(object sender, EventArgs e)
@@ -1885,6 +1918,8 @@ namespace VSMaker
 
         private void trainers_list_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (!loadingData)
+            {
             int index = trainers_list.SelectedIndex;
 
             if (selectedTrainerIndex == -1)
@@ -1924,17 +1959,11 @@ namespace VSMaker
                 GetTrainerInfo(trainerId);
             }
         }
+        }
 
         private void trainerTextTable_dataGrid_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.ColumnIndex == 3)
-            {
-                //trainerTextTable_help_label.Text = "Double click to open text editor.";
-            }
-            else
-            {
-                //trainerTextTable_help_label.Text = "";
-            }
+           
         }
 
         private void trainerTextTable_dataGrid_TextDblClick(object sender, DataGridViewCellEventArgs e)
@@ -2023,9 +2052,9 @@ namespace VSMaker
                 SaveTrainerClassEyeContact();
                 SaveTrainerClassName();
                 SaveTrainerClassPrizeMoney();
+                SaveTrainerClassGender();
                 GetTrainerClassEncounterMusic();
                 GetTrainerClasses();
-                GetPrizeMoneyData();
                 SetupTrainerClassEditor();
             }
         }
@@ -2033,7 +2062,9 @@ namespace VSMaker
         private void SaveTrainerClassPrizeMoney()
         {
             int trainerClassId = selectedTrainerClass.TrainerClassId;
-            long offset = prizeMoneyList.Find(x => x.TrainerClassId == trainerClassId).Offset;
+            int prizeMoneyValue = (int)trainerClass_PrizeMoney_num.Value;
+            var prizeMoney = prizeMoneyList.Find(x => x.TrainerClassId == trainerClassId);
+            long offset = prizeMoney.Offset;
             var overlayPath = DSUtils.GetOverlayPath(prizeMoneyTableOverlayNumber);
 
             if (gameFamily == gFamEnum.HGSS)
@@ -2046,7 +2077,7 @@ namespace VSMaker
                     using (EasyWriter wr = new EasyWriter(overlayPath, offset))
                     {
                         wr.Write((ushort)trainerClassId);
-                        wr.Write((ushort)trainerClass_PrizeMoney_num.Value);
+                        wr.Write((ushort)prizeMoneyValue);
                     };
                 }
             }
@@ -2057,8 +2088,7 @@ namespace VSMaker
                     wr.Write((byte)trainerClass_PrizeMoney_num.Value);
                 };
             }
-            prizeMoneyList = new();
-            ReadPrizeMoneyTable();
+            prizeMoney.PrizeMoneyValue = prizeMoneyValue;
         }
 
         private void SaveTrainerClassEyeContact()
@@ -2084,45 +2114,59 @@ namespace VSMaker
             }
         }
 
+        private void SaveTrainerClassGender()
+        {
+            if (gameFamily != gFamEnum.DP)
+            {
+                int trainerClassId = selectedTrainerClass.TrainerClassId;
+                var classGender = classGenderList.Find(x => x.TrainerClassId == trainerClassId);
+                uint offset = (uint)classGender.Offset;
+                int gender = trainerClass_Gender_comboBox.SelectedIndex;
+
+                ARM9.WriteByte((byte)gender, offset);
+                classGender.GenderId = gender;
+            }
+        }
+
         private void GetEyeContactMusicLists()
         {
             if (gameFamily == gFamEnum.HGSS)
             {
                 eyeContactMusics = new List<EyeContactMusic>
-            {
-                new EyeContactMusic { MusicId = (ushort)0 },
-                new EyeContactMusic { MusicId = (ushort)1107 },
-                new EyeContactMusic { MusicId = (ushort)1108 },
-                new EyeContactMusic { MusicId = (ushort)1109 },
-                new EyeContactMusic { MusicId = (ushort)1110 },
-                new EyeContactMusic { MusicId = (ushort)1111 },
-                new EyeContactMusic { MusicId = (ushort)1112 },
-                new EyeContactMusic { MusicId = (ushort)1113 },
-                new EyeContactMusic { MusicId = (ushort)1114 },
-                new EyeContactMusic { MusicId = (ushort)1115 },
-            };
+                {
+                    new EyeContactMusic { MusicId = (ushort)0 },
+                    new EyeContactMusic { MusicId = (ushort)1107 },
+                    new EyeContactMusic { MusicId = (ushort)1108 },
+                    new EyeContactMusic { MusicId = (ushort)1109 },
+                    new EyeContactMusic { MusicId = (ushort)1110 },
+                    new EyeContactMusic { MusicId = (ushort)1111 },
+                    new EyeContactMusic { MusicId = (ushort)1112 },
+                    new EyeContactMusic { MusicId = (ushort)1113 },
+                    new EyeContactMusic { MusicId = (ushort)1114 },
+                    new EyeContactMusic { MusicId = (ushort)1115 },
+                };
             }
             else
             {
                 eyeContactMusics = new List<EyeContactMusic>
-            {
-                   new EyeContactMusic { MusicId = (ushort)0 },
-                new EyeContactMusic { MusicId = (ushort)1100 },
-                new EyeContactMusic { MusicId = (ushort)1101 },
-                new EyeContactMusic { MusicId = (ushort)1102 },
-                new EyeContactMusic { MusicId = (ushort)1103 },
-                new EyeContactMusic { MusicId = (ushort)1104 },
-                new EyeContactMusic { MusicId = (ushort)1105 },
-                new EyeContactMusic { MusicId = (ushort)1106 },
-                new EyeContactMusic { MusicId = (ushort)1107 },
-                new EyeContactMusic { MusicId = (ushort)1108 },
-                new EyeContactMusic { MusicId = (ushort)1109 },
-                new EyeContactMusic { MusicId = (ushort)1110 },
-                new EyeContactMusic { MusicId = (ushort)1111 },
-                new EyeContactMusic { MusicId = (ushort)1112 },
-                new EyeContactMusic { MusicId = (ushort)1113 },
-                new EyeContactMusic { MusicId = (ushort)1114 },
-            };
+                {
+                    new EyeContactMusic { MusicId = (ushort)0 },
+                    new EyeContactMusic { MusicId = (ushort)1100 },
+                    new EyeContactMusic { MusicId = (ushort)1101 },
+                    new EyeContactMusic { MusicId = (ushort)1102 },
+                    new EyeContactMusic { MusicId = (ushort)1103 },
+                    new EyeContactMusic { MusicId = (ushort)1104 },
+                    new EyeContactMusic { MusicId = (ushort)1105 },
+                    new EyeContactMusic { MusicId = (ushort)1106 },
+                    new EyeContactMusic { MusicId = (ushort)1107 },
+                    new EyeContactMusic { MusicId = (ushort)1108 },
+                    new EyeContactMusic { MusicId = (ushort)1109 },
+                    new EyeContactMusic { MusicId = (ushort)1110 },
+                    new EyeContactMusic { MusicId = (ushort)1111 },
+                    new EyeContactMusic { MusicId = (ushort)1112 },
+                    new EyeContactMusic { MusicId = (ushort)1113 },
+                    new EyeContactMusic { MusicId = (ushort)1114 },
+                };
             }
             foreach (var item in eyeContactMusics)
             {
@@ -2139,11 +2183,14 @@ namespace VSMaker
 
         private void trainer_Name_TextChanged(object sender, EventArgs e)
         {
-            if (!unsavedChanges)
+            if (!loadingData)
             {
-                undoTrainer_btn.Enabled = selectedTrainer.TrainerName != trainer_Name.Text;
+                if (!unsavedChanges)
+                {
+                    undoTrainer_btn.Enabled = selectedTrainer.TrainerName != trainer_Name.Text;
+                }
+                SetUnsavedChanges(undoTrainer_btn.Enabled);
             }
-            SetUnsavedChanges(undoTrainer_btn.Enabled);
         }
 
         private void trainerTextTable_SaveChanges_btn(object sender, EventArgs e)
@@ -2180,7 +2227,7 @@ namespace VSMaker
                     var selectedTrainer = trainerTextTable_dataGrid.Rows[i].Cells[1].Value.ToString();
                     int trainerId = int.Parse(selectedTrainer.Remove(0, 1).Remove(3));
                     int messageTriggerId = messageTriggers.Find(x => x.MessageTriggerName == selectedMessageTrigger).MessageTriggerId;
-                    using (DSUtils.EasyWriter wr = new DSUtils.EasyWriter(filePath, 4 * i))
+                    using (EasyWriter wr = new EasyWriter(filePath, 4 * i))
                     {
                         wr.Write((ushort)trainerId);
                         wr.Write((ushort)messageTriggerId);
@@ -2190,7 +2237,7 @@ namespace VSMaker
                 statusLabelMessage("Trainer Texts saved successfully");
                 Update();
                 SetUnsavedChanges(false);
-                RomInfo.ReadTrainerTable();
+                ReadTrainerTable();
                 RefreshTrainerMessages();
             }
         }
@@ -2503,142 +2550,211 @@ namespace VSMaker
 
         private void trainer_Poke1_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainer_Poke2_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainer_Poke3_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainer_Poke4_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainer_Poke5_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainer_Poke6_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainer_Poke1_Level_ValueChanged(object sender, EventArgs e)
         {
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainer_Poke_HeldItem_checkBox_CheckedChanged(object sender, EventArgs e)
         {
-            EnablePokemon();
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                EnablePokemon();
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainer_Poke_Moves_checkBox_CheckedChanged(object sender, EventArgs e)
         {
-            EnablePokemon();
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                EnablePokemon();
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainer_Item4_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainer_ai_Basic_checkbox_CheckedChanged(object sender, EventArgs e)
         {
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainer_ai_expert_checkBox_CheckedChanged(object sender, EventArgs e)
         {
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainer_ai_dmg_checkBox_CheckedChanged(object sender, EventArgs e)
         {
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainer_ai_evaluate_checkBox_CheckedChanged(object sender, EventArgs e)
         {
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainer_ai_status_checkBox_CheckedChanged(object sender, EventArgs e)
         {
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainer_ai_weather_checkBox_CheckedChanged(object sender, EventArgs e)
         {
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainer_ai_risk_checkBox_CheckedChanged(object sender, EventArgs e)
         {
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainer_ai_checkHp_checkBox_CheckedChanged(object sender, EventArgs e)
         {
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainer_ai_baton_checkBox_CheckedChanged(object sender, EventArgs e)
         {
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainer_ai_tag_checkBox_CheckedChanged(object sender, EventArgs e)
         {
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainer_Item1_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainer_Item2_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainer_Item3_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            SetUnsavedChanges(true);
-            undoTrainer_btn.Enabled = unsavedChanges;
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainreText_Import_btn_Click(object sender, EventArgs e)
@@ -2758,38 +2874,62 @@ namespace VSMaker
 
         private void trainerClass_PrizeMoney_num_ValueChanged(object sender, EventArgs e)
         {
-            if (!unsavedChanges)
+            if (!loadingData)
             {
-                undoTrainerClass_btn.Enabled = true;
+                if (!unsavedChanges)
+                {
+                    undoTrainerClass_btn.Enabled = true;
+                }
+                SetUnsavedChanges(undoTrainerClass_btn.Enabled);
             }
-            SetUnsavedChanges(undoTrainerClass_btn.Enabled);
         }
 
         private void trainerClass_PrizeMoney_num_KeyUp(object sender, KeyEventArgs e)
         {
-            if (!unsavedChanges)
+            if (!loadingData)
             {
-                undoTrainerClass_btn.Enabled = true;
+                if (!unsavedChanges)
+                {
+                    undoTrainerClass_btn.Enabled = true;
+                }
+                SetUnsavedChanges(undoTrainerClass_btn.Enabled);
             }
-            SetUnsavedChanges(undoTrainerClass_btn.Enabled);
         }
 
         private void trainerClass_EyeContact_Day_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (!unsavedChanges)
+            if (!loadingData)
             {
-                undoTrainerClass_btn.Enabled = true;
+                if (!unsavedChanges)
+                {
+                    undoTrainerClass_btn.Enabled = true;
+                }
+                SetUnsavedChanges(undoTrainerClass_btn.Enabled);
             }
-            SetUnsavedChanges(undoTrainerClass_btn.Enabled);
         }
 
         private void trainerClass_EyeContact_Night_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (!unsavedChanges)
+            if (!loadingData)
             {
-                undoTrainerClass_btn.Enabled = true;
+                if (!unsavedChanges)
+                {
+                    undoTrainerClass_btn.Enabled = true;
+                }
+                SetUnsavedChanges(undoTrainerClass_btn.Enabled);
             }
-            SetUnsavedChanges(undoTrainerClass_btn.Enabled);
+        }
+
+        private void trainerClass_Gender_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                if (!unsavedChanges)
+                {
+                    undoTrainerClass_btn.Enabled = true;
+                }
+                SetUnsavedChanges(undoTrainerClass_btn.Enabled);
+            }
         }
     }
 }
