@@ -191,8 +191,6 @@ namespace VSMaker
             trainers_Player_list = new ListBox();
             mainContent_trainerText = new TabPage();
             panel17 = new Panel();
-            panel15 = new Panel();
-            panel23 = new Panel();
             trainerTextTable_dataGrid = new DataGridView();
             MessageId = new DataGridViewTextBoxColumn();
             TrainerId = new DataGridViewComboBoxColumn();
@@ -236,6 +234,7 @@ namespace VSMaker
             saveFileDialog1 = new SaveFileDialog();
             trainerMessageBindingSource1 = new BindingSource(components);
             trainerMessageBindingSource3 = new BindingSource(components);
+            statusStrip2 = new StatusStrip();
             main_toolstrip.SuspendLayout();
             statusStrip1.SuspendLayout();
             mainContent.SuspendLayout();
@@ -284,7 +283,6 @@ namespace VSMaker
             panel5.SuspendLayout();
             mainContent_trainerText.SuspendLayout();
             panel17.SuspendLayout();
-            panel23.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trainerTextTable_dataGrid).BeginInit();
             panel22.SuspendLayout();
             trainerText_toolstrip.SuspendLayout();
@@ -2264,31 +2262,14 @@ namespace VSMaker
             // 
             // panel17
             // 
-            panel17.Controls.Add(panel15);
-            panel17.Controls.Add(panel23);
+            panel17.Controls.Add(statusStrip2);
+            panel17.Controls.Add(trainerTextTable_dataGrid);
             panel17.Controls.Add(panel22);
             panel17.Dock = DockStyle.Fill;
             panel17.Location = new Point(0, 0);
             panel17.Name = "panel17";
             panel17.Size = new Size(891, 489);
             panel17.TabIndex = 2;
-            // 
-            // panel15
-            // 
-            panel15.Dock = DockStyle.Bottom;
-            panel15.Location = new Point(0, 465);
-            panel15.Name = "panel15";
-            panel15.Size = new Size(891, 24);
-            panel15.TabIndex = 18;
-            // 
-            // panel23
-            // 
-            panel23.Controls.Add(trainerTextTable_dataGrid);
-            panel23.Dock = DockStyle.Fill;
-            panel23.Location = new Point(0, 24);
-            panel23.Name = "panel23";
-            panel23.Size = new Size(891, 465);
-            panel23.TabIndex = 17;
             // 
             // trainerTextTable_dataGrid
             // 
@@ -2299,7 +2280,7 @@ namespace VSMaker
             trainerTextTable_dataGrid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             trainerTextTable_dataGrid.Columns.AddRange(new DataGridViewColumn[] { MessageId, TrainerId, MessageTriggerId, Message });
             trainerTextTable_dataGrid.Dock = DockStyle.Fill;
-            trainerTextTable_dataGrid.Location = new Point(0, 0);
+            trainerTextTable_dataGrid.Location = new Point(0, 24);
             trainerTextTable_dataGrid.MultiSelect = false;
             trainerTextTable_dataGrid.Name = "trainerTextTable_dataGrid";
             trainerTextTable_dataGrid.RowHeadersWidth = 62;
@@ -2697,6 +2678,14 @@ namespace VSMaker
             panel2.Size = new Size(899, 517);
             panel2.TabIndex = 5;
             // 
+            // statusStrip2
+            // 
+            statusStrip2.Location = new Point(0, 467);
+            statusStrip2.Name = "statusStrip2";
+            statusStrip2.Size = new Size(891, 22);
+            statusStrip2.TabIndex = 17;
+            statusStrip2.Text = "statusStrip2";
+            // 
             // Mainform
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -2775,7 +2764,7 @@ namespace VSMaker
             panel5.PerformLayout();
             mainContent_trainerText.ResumeLayout(false);
             panel17.ResumeLayout(false);
-            panel23.ResumeLayout(false);
+            panel17.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)trainerTextTable_dataGrid).EndInit();
             panel22.ResumeLayout(false);
             trainerText_toolstrip.ResumeLayout(false);
@@ -2994,15 +2983,14 @@ namespace VSMaker
         private CheckBox trainer_ai_evaluate_checkBox;
         private CheckBox trainer_ai_Basic_checkbox;
         private Label label14;
-        private Panel panel23;
         private Panel panel22;
         private DataGridViewTextBoxColumn MessageId;
         private DataGridViewComboBoxColumn TrainerId;
         private DataGridViewComboBoxColumn MessageTriggerId;
         private DataGridViewTextBoxColumn Message;
-        private Panel panel15;
         private ComboBox trainerClass_EyeContact_Night_comboBox;
         private ComboBox trainerClass_EyeContact_Day_comboBox;
         private Button eyeContact_help_btn;
+        private StatusStrip statusStrip2;
     }
 }

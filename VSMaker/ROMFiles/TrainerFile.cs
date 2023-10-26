@@ -325,7 +325,7 @@ namespace VSMaker.ROMFiles
         }
     }
     public class TrainerFile : RomFile {
-        public const int maxNameLen = 7;
+        public const int maxNameLen = 12;
         public const int maxClassNameLen = 16;
         public const int POKE_IN_PARTY = 6;
         public static readonly string NAME_NOT_FOUND = "NAME READ ERROR";

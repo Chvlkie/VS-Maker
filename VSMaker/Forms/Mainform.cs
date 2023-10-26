@@ -953,7 +953,14 @@ namespace VSMaker
         private void GetItems()
         {
             statusLabelMessage("Getting Item Names...");
-            Update(); itemNames = GetItemNames().ToList();
+            Update();
+            itemNames = GetItemNames().ToList();
+
+            foreach (var item in pokeItemComboBoxes)
+            {
+                item.Items.Clear();
+                itemNames.ForEach(x => item.Items.Add(x));
+            }
         }
 
         private static MessageTrigger GetMessageTriggerDetails(MessageTriggerEnum messageTrigger)
@@ -1023,7 +1030,7 @@ namespace VSMaker
             }
             else
             {
-                pokeNames = GetPokemonNames(2).ToList();
+                pokeNames = GetPokemonNames(0).ToList();
             }
             pokemonSpeciesAbilities = GetPokemonAbilities(numberOfPokemon);
 
@@ -1035,6 +1042,15 @@ namespace VSMaker
                     PokemonName = pokeNames[i],
                 };
                 pokemons.Add(pokemon);
+            }
+
+            foreach (var item in pokeComboBoxes)
+            {
+                item.Items.Clear();
+                item.Items.Add("-----");
+                pokemons.Where(x => x.PokemonName != "-----"
+                && !x.PokemonName.Equals("egg", StringComparison.InvariantCultureIgnoreCase)
+                && !x.PokemonName.Equals("bad egg", StringComparison.InvariantCultureIgnoreCase)).ToList().ForEach(x => item.Items.Add(x.PokemonName));
             }
         }
 
@@ -1192,17 +1208,6 @@ namespace VSMaker
             trainer_Message_Next_btn.Enabled = displayTrainerMessage.Count > 1;
 
             // Setup Trainer Pokemon
-            foreach (var item in pokeComboBoxes)
-            {
-                item.Items.Clear();
-                pokemons.ForEach(x => item.Items.Add(x.PokemonName));
-            }
-
-            foreach (var item in pokeItemComboBoxes)
-            {
-                item.Items.Clear();
-                itemNames.ForEach(x => item.Items.Add(x));
-            }
             trainer_Double_checkBox.Enabled = true;
             trainer_NumPoke_num.Enabled = true;
             trainer_Poke_HeldItem_checkBox.Enabled = true;
@@ -1215,17 +1220,25 @@ namespace VSMaker
             for (int i = 0; i < 6; i++)
             {
                 var partyPokemon = trainerFile.party[i];
-                int heldItemId = partyPokemon.heldItem.HasValue ? (int)partyPokemon.heldItem.Value : 0;
-                pokeComboBoxes[i].SelectedIndex = partyPokemon.pokeID ?? 0;
+                int heldItemId = partyPokemon.heldItem.HasValue ? partyPokemon.heldItem.Value : 0;
+                int pokemonId = partyPokemon.pokeID ?? 0;
+                string pokeName = pokeNames[pokemonId];
+
+                int selectedIndex = pokeComboBoxes[i].FindString(pokeName);
+                if (selectedIndex < 0)
+                {
+                    selectedIndex = 0;
+                }
+                pokeComboBoxes[i].SelectedIndex = selectedIndex;
                 pokeItemComboBoxes[i].SelectedIndex = heldItemId;
                 pokeLevels[i].Value = (int?)partyPokemon.level ?? 0;
                 if (partyPokemon?.pokeID.HasValue == true)
                 {
                     var pokemon = new Pokemon
                     {
-                        PokemonId = partyPokemon.pokeID.Value,
+                        PokemonId = pokemonId,
                         FormId = partyPokemon.formID,
-                        PokemonName = pokeNames[partyPokemon.pokeID.Value],
+                        PokemonName = pokeName,
                         DV = partyPokemon.difficulty,
                         Level = (short)partyPokemon.level,
                         HeldItemId = heldItemId
@@ -1797,51 +1810,51 @@ namespace VSMaker
 
         private void trainer_MessageTrigger_list_SelectedIndexChanged(object sender, EventArgs e)
         {
-                currentTrainerMessageIndex = 0;
-                displayTrainerMessage = new List<string>();
-                if (trainer_MessageTrigger_list.SelectedIndex > -1)
-                {
-                    trainer_EditMessage_btn.Enabled = true;
-                    const string seperator1 = @"\r";
-                    string selectedMessageTriggerName = trainer_MessageTrigger_list.SelectedItem.ToString();
-                    int messageTriggerId = messageTriggers.Find(x => x.MessageTriggerName == selectedMessageTriggerName).MessageTriggerId;
-                    string trainerText = selectedTrainer.TrainerMessages.Single(x => x.MessageTriggerId == messageTriggerId).MessageText;
+            currentTrainerMessageIndex = 0;
+            displayTrainerMessage = new List<string>();
+            if (trainer_MessageTrigger_list.SelectedIndex > -1)
+            {
+                trainer_EditMessage_btn.Enabled = true;
+                const string seperator1 = @"\r";
+                string selectedMessageTriggerName = trainer_MessageTrigger_list.SelectedItem.ToString();
+                int messageTriggerId = messageTriggers.Find(x => x.MessageTriggerName == selectedMessageTriggerName).MessageTriggerId;
+                string trainerText = selectedTrainer.TrainerMessages.Single(x => x.MessageTriggerId == messageTriggerId).MessageText;
 
-                    trainerText = trainerText.Replace("\\n", Environment.NewLine);
-                    trainerText = trainerText.Replace("\\f", Environment.NewLine);
-                    var messageArray = trainerText.Split(new string[] { seperator1 }, StringSplitOptions.None);
-                    foreach (var item in messageArray)
-                    {
-                        int numLines = item.Split('\n').Length;
-                        if (numLines >= 3 && !string.IsNullOrEmpty(ReadLine(item, 3)))
-                        {
-                            string text1 = ReadLine(item, 1) + Environment.NewLine + ReadLine(item, 2);
-                            string text2 = ReadLine(item, 2) + Environment.NewLine + ReadLine(item, 3);
-
-                            displayTrainerMessage.Add(text1);
-                            displayTrainerMessage.Add(text2);
-                        }
-                        else
-                        {
-                            displayTrainerMessage.Add(item);
-                        }
-                    }
-                    // Remove last item if blank line - is the case as trainer text formatted as ending with \n.
-                    if (string.IsNullOrEmpty(displayTrainerMessage.Last()))
-                    {
-                        displayTrainerMessage.Remove(displayTrainerMessage.Last());
-                    }
-                    trainer_Message.Font = new Font(vsMakerFont.VsMakerFontCollection.Families[0], trainer_Message.Font.Size);
-                    trainer_Message.Text = displayTrainerMessage[0];
-                    trainer_Message_Next_btn.Enabled = displayTrainerMessage.Count() > 1;
-                    trainer_Message_Back_btn.Enabled = false;
-                }
-                else
+                trainerText = trainerText.Replace("\\n", Environment.NewLine);
+                trainerText = trainerText.Replace("\\f", Environment.NewLine);
+                var messageArray = trainerText.Split(new string[] { seperator1 }, StringSplitOptions.None);
+                foreach (var item in messageArray)
                 {
-                    trainer_EditMessage_btn.Enabled = false;
-                    trainer_MessageTrigger_list.Enabled = false;
+                    int numLines = item.Split('\n').Length;
+                    if (numLines >= 3 && !string.IsNullOrEmpty(ReadLine(item, 3)))
+                    {
+                        string text1 = ReadLine(item, 1) + Environment.NewLine + ReadLine(item, 2);
+                        string text2 = ReadLine(item, 2) + Environment.NewLine + ReadLine(item, 3);
+
+                        displayTrainerMessage.Add(text1);
+                        displayTrainerMessage.Add(text2);
+                    }
+                    else
+                    {
+                        displayTrainerMessage.Add(item);
+                    }
                 }
+                // Remove last item if blank line - is the case as trainer text formatted as ending with \n.
+                if (string.IsNullOrEmpty(displayTrainerMessage.Last()))
+                {
+                    displayTrainerMessage.Remove(displayTrainerMessage.Last());
+                }
+                trainer_Message.Font = new Font(vsMakerFont.VsMakerFontCollection.Families[0], trainer_Message.Font.Size);
+                trainer_Message.Text = displayTrainerMessage[0];
+                trainer_Message_Next_btn.Enabled = displayTrainerMessage.Count() > 1;
+                trainer_Message_Back_btn.Enabled = false;
             }
+            else
+            {
+                trainer_EditMessage_btn.Enabled = false;
+                trainer_MessageTrigger_list.Enabled = false;
+            }
+        }
 
         private void trainer_NumPoke_num_ValueChanged(object sender, EventArgs e)
         {
@@ -1920,50 +1933,50 @@ namespace VSMaker
         {
             if (!loadingData)
             {
-            int index = trainers_list.SelectedIndex;
+                int index = trainers_list.SelectedIndex;
 
-            if (selectedTrainerIndex == -1)
-            {
-                ChangeTrainer();
-            }
-
-            if (selectedTrainerIndex > -1 && selectedTrainerIndex != index)
-            {
-                if (unsavedChanges)
-                {
-                    var choice = MessageBox.Show("You have unsaved changes.\nDo you wish to discard these changes?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                    if (choice == DialogResult.Yes)
-                    {
-                        ChangeTrainer();
-                    }
-                    else
-                    {
-                        trainers_list.SelectedIndexChanged -= trainers_list_SelectedIndexChanged;
-                        trainers_list.SelectedIndex = selectedTrainerIndex;
-                        trainers_list.SelectedIndexChanged += trainers_list_SelectedIndexChanged;
-                    }
-                }
-                else
+                if (selectedTrainerIndex == -1)
                 {
                     ChangeTrainer();
                 }
-            }
 
-            void ChangeTrainer()
-            {
-                selectedTrainerIndex = index;
-                SetUnsavedChanges(false);
-                var text = trainers_list.Items[index].ToString();
-                int trainerId = int.Parse(text.Remove(0, 1).Remove(3));
-                trainer_MessageTrigger_list.SelectedIndex = -1;
-                GetTrainerInfo(trainerId);
+                if (selectedTrainerIndex > -1 && selectedTrainerIndex != index)
+                {
+                    if (unsavedChanges)
+                    {
+                        var choice = MessageBox.Show("You have unsaved changes.\nDo you wish to discard these changes?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                        if (choice == DialogResult.Yes)
+                        {
+                            ChangeTrainer();
+                        }
+                        else
+                        {
+                            trainers_list.SelectedIndexChanged -= trainers_list_SelectedIndexChanged;
+                            trainers_list.SelectedIndex = selectedTrainerIndex;
+                            trainers_list.SelectedIndexChanged += trainers_list_SelectedIndexChanged;
+                        }
+                    }
+                    else
+                    {
+                        ChangeTrainer();
+                    }
+                }
+
+                void ChangeTrainer()
+                {
+                    selectedTrainerIndex = index;
+                    SetUnsavedChanges(false);
+                    var text = trainers_list.Items[index].ToString();
+                    int trainerId = int.Parse(text.Remove(0, 1).Remove(3));
+                    trainer_MessageTrigger_list.SelectedIndex = -1;
+                    GetTrainerInfo(trainerId);
+                }
             }
-        }
         }
 
         private void trainerTextTable_dataGrid_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-           
+
         }
 
         private void trainerTextTable_dataGrid_TextDblClick(object sender, DataGridViewCellEventArgs e)
@@ -2526,9 +2539,11 @@ namespace VSMaker
             trainerFile.trp.chooseItems = trainer_Poke_HeldItem_checkBox.Checked;
             trainerFile.trp.chooseMoves = trainer_Poke_Moves_checkBox.Checked;
             trainerFile.trp.partyCount = (byte)trainer_NumPoke_num.Value;
+
             for (int i = 0; i < trainer_NumPoke_num.Value; i++)
             {
-                trainerFile.party[i].pokeID = (ushort)pokeComboBoxes[i].SelectedIndex;
+                ushort pokemonId = (ushort)pokeNames.FindIndex(x => x == pokeComboBoxes[i].SelectedItem.ToString());
+                trainerFile.party[i].pokeID = pokemonId;
                 trainerFile.party[i].level = (ushort)pokeLevels[i].Value;
                 trainerFile.party[i].heldItem = trainer_Poke_HeldItem_checkBox.Checked ? (ushort)pokeItemComboBoxes[i].SelectedIndex : null;
             }
@@ -2538,9 +2553,9 @@ namespace VSMaker
         {
             for (int i = 0; i < trainer_NumPoke_num.Value; i++)
             {
-                if (pokeComboBoxes[i].SelectedIndex == 0)
+                if (pokeComboBoxes[i].SelectedIndex == 0 || pokeComboBoxes[i].SelectedItem.ToString() == "-----" || pokeComboBoxes[i].SelectedItem.ToString().Equals("egg", StringComparison.InvariantCultureIgnoreCase) || pokeComboBoxes[i].SelectedItem.ToString().Equals("bad egg", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    MessageBox.Show("You must select a Pokemon!", "Unable to Save Pokemon", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("You must select a valid Pokemon!", "Unable to Save Pokemon", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
                 }
             }

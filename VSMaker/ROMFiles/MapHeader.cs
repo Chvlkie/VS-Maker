@@ -158,9 +158,7 @@ namespace VSMaker.ROMFiles
         public static MapHeader LoadFromARM9(ushort headerNumber, gFamEnum gameFamily = gFamEnum.NULL) {
             long headerOffset = RomInfo.headerTableOffset + MapHeader.length * headerNumber;
             return LoadFromFile(RomInfo.arm9Path, headerNumber, headerOffset, gameFamily);
-        }
-
-        
+        }     
         #endregion
     }
 
