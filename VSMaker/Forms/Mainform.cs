@@ -31,46 +31,44 @@ namespace VSMaker
         #region Editor Data
 
         private string[] abilityNames = Array.Empty<string>();
+        private List<ClassGender> classGenderList = new();
         private int currentTrainerMessageIndex;
         private List<string> displayTrainerMessage = new();
+        private List<EyeContactMusic> eyeContactMusics = new();
         private List<string> itemNames = new();
+        private bool loadingData = false;
         private List<MessageTrigger> messageTriggers = new();
         private string[] moveNames = Array.Empty<string>();
+        private List<ComboBox> pokeComboBoxes;
+        private List<ComboBox> pokeItemComboBoxes;
+        private List<NumericUpDown> pokeLevels;
         private List<Pokemon> pokemons = new();
         private SpeciesFile[] pokemonSpecies;
         private (int abi1, int abi2)[] pokemonSpeciesAbilities;
         private List<string> pokeNames = new();
+        private List<PrizeMoney> prizeMoneyList = new();
         private Trainer selectedTrainer;
         private TrainerClass selectedTrainerClass;
         private int selectedTrainerClassIndex = -1;
         private int selectedTrainerIndex = -1;
+        private Dictionary<byte, (uint entryOffset, ushort musicD, ushort? musicN)> trainerClassEncounterMusicDict;
         private List<TrainerClass> trainerClasses = new();
         private TrainerFile trainerFile;
+        private List<ComboBox> trainerItemComboBoxes;
         private List<TrainerMessage> trainerMessages = new();
         private PaletteBase trainerPal;
         private List<Trainer> trainers = new();
         private SpriteBase trainerSprite;
         private bool trainerSpriteMessage;
         private ImageBase trainerTile;
-        private List<ComboBox> pokeComboBoxes;
-        private List<ComboBox> pokeItemComboBoxes;
-        private List<ComboBox> trainerItemComboBoxes;
-        private List<NumericUpDown> pokeLevels;
         private bool unsavedChanges;
-        private bool loadingData = false;
-        private List<EyeContactMusic> eyeContactMusics = new();
-        private Dictionary<byte, (uint entryOffset, ushort musicD, ushort? musicN)> trainerClassEncounterMusicDict;
-        private List<ClassGender> classGenderList = new();
-        private List<PrizeMoney> prizeMoneyList = new();
-
         #endregion Editor Data
 
         #region Forms
 
+        private ChooseMoves moveEditor;
         private PokemonEditor pokemonEditor;
         private TextEditor textEditor;
-        private ChooseMoves moveEditor;
-
         #endregion Forms
 
         public Mainform(VsMakerFont vsMakerFont)
@@ -79,7 +77,6 @@ namespace VSMaker
             InitializeComponent();
             vsMakerFont.InitializePokemonDsFont();
             trainer_Message.Text = string.Empty;
-            //trainerTextTable_help_label.Text = "";
 
             pokeComboBoxes = new List<ComboBox>
             {
@@ -122,6 +119,44 @@ namespace VSMaker
 
         #region ROM
 
+        private static int UnpackRomCheckUserChoice()
+        {
+            // Check if extracted data for the ROM exists, and ask user if they want to load it.
+            // Returns true if user aborted the process
+            if (Directory.Exists(workDir))
+            {
+                DialogResult choice = MessageBox.Show("Extracted data of this ROM has been found.\n" +
+                    "Do you want to load it and unpack it?", "Data detected", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+
+                if (choice == DialogResult.Cancel)
+                {
+                    return -1; //user wants to abort loading
+                }
+                else if (choice == DialogResult.Yes)
+                {
+                    return 0; //user wants to load data
+                }
+                else
+                {
+                    DialogResult choice2 = MessageBox.Show("All data of this ROM will be re-extracted. Proceed?\n",
+                        "Existing data will be deleted", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                    if (choice2 == DialogResult.No)
+                    {
+                        return -1; //user wants to abort loading
+                    }
+                    else
+                    {
+                        return 1; //user wants to re-extract data
+                    }
+                }
+            }
+            else
+            {
+                return 2; //No data found
+            }
+        }
+
         private void CheckROMLanguage()
         {
             versionLabel.Visible = true;
@@ -141,6 +176,70 @@ namespace VSMaker
                     languageLabel.Text += " [America]";
                 }
             }
+        }
+
+        private void GetPrizeMoneyData()
+        {
+            prizeMoneyList = new();
+
+            foreach (var item in PrizeMoneyData)
+            {
+                var prizeMoney = new PrizeMoney
+                {
+                    TrainerClassId = (int)item.trainerClassId,
+                    PrizeMoneyValue = (int)item.prizeMoney,
+                    Offset = item.Offset
+                };
+                prizeMoneyList.Add(prizeMoney);
+            }
+        }
+
+        private void GetTrainerClassEncounterMusic()
+        {
+            SetEncounterMusicTableOffsetToRAMAddress();
+            trainerClassEncounterMusicDict = new Dictionary<byte, (uint entryOffset, ushort musicD, ushort? musicN)>();
+
+            uint encounterMusicTableTableStartAddress = BitConverter.ToUInt32(ARM9.ReadBytes(encounterMusicTableOffsetToRAMAddress, 4), 0) - DSUtils.ARM9.address;
+            uint tableSizeOffset = gameFamily == gFamEnum.HGSS ? (uint)12 : (uint)10;
+            byte tableEntriesCount = ARM9.ReadByte(encounterMusicTableOffsetToRAMAddress - tableSizeOffset);
+
+            using ARM9.Reader ar = new(encounterMusicTableTableStartAddress);
+            for (int i = 0; i < tableEntriesCount; i++)
+            {
+                uint entryOffset = (uint)ar.BaseStream.Position;
+                byte tclass = (byte)ar.ReadUInt16();
+                ushort musicD = ar.ReadUInt16();
+                ushort? musicN = gameFamily == gFamEnum.HGSS ? ar.ReadUInt16() : null;
+                trainerClassEncounterMusicDict[tclass] = (entryOffset, musicD, musicN);
+            }
+        }
+
+        private void GetTrainerClassGenders()
+        {
+            PrepareTrainerClassGenderData();
+            classGenderList = new();
+            trainerClass_Gender_comboBox.Items.Clear();
+            int trainerClassLength = trainerClasses.Count;
+            uint tableStartAddress = BitConverter.ToUInt32(ARM9.ReadBytes(classGenderOffsetToRAMAddress, 4), 0) - ARM9.address;
+
+            using ARM9.Reader ar = new(tableStartAddress);
+            for (int i = 0; i < trainerClassLength; i++)
+            {
+                long offset = ar.BaseStream.Position;
+                ushort gender = ar.ReadByte();
+                var item = new ClassGender
+                {
+                    Offset = offset,
+                    GenderId = gender,
+                    TrainerClassId = i
+                };
+
+                classGenderList.Add(item);
+            }
+
+            trainerClass_Gender_comboBox.Items.Add(Gender.Descriptions.Male);
+            trainerClass_Gender_comboBox.Items.Add(Gender.Descriptions.Female);
+            trainerClass_Gender_comboBox.Items.Add(Gender.Descriptions.None);
         }
 
         private void OpenRom()
@@ -271,13 +370,13 @@ namespace VSMaker
 
         private void ReadROMInitData()
         {
-            if (DSUtils.ARM9.CheckCompressionMark())
+            if (ARM9.CheckCompressionMark())
             {
                 if (!gameFamily.Equals(gFamEnum.HGSS))
                 {
                     MessageBox.Show("Unexpected compressed ARM9. It is advised that you double check the ARM9.");
                 }
-                if (!DSUtils.ARM9.Decompress(arm9Path))
+                if (!ARM9.Decompress(arm9Path))
                 {
                     MessageBox.Show("ARM9 decompression failed. The program can't proceed.\nAborting.",
                                 "Error with ARM9 decompression", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -331,120 +430,30 @@ namespace VSMaker
             }
             return true;
         }
-
-        private static int UnpackRomCheckUserChoice()
-        {
-            // Check if extracted data for the ROM exists, and ask user if they want to load it.
-            // Returns true if user aborted the process
-            if (Directory.Exists(workDir))
-            {
-                DialogResult d = MessageBox.Show("Extracted data of this ROM has been found.\n" +
-                    "Do you want to load it and unpack it?", "Data detected", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
-
-                if (d == DialogResult.Cancel)
-                {
-                    return -1; //user wants to abort loading
-                }
-                else if (d == DialogResult.Yes)
-                {
-                    return 0; //user wants to load data
-                }
-                else
-                {
-                    DialogResult nd = MessageBox.Show("All data of this ROM will be re-extracted. Proceed?\n",
-                        "Existing data will be deleted", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-                    if (nd == DialogResult.No)
-                    {
-                        return -1; //user wants to abort loading
-                    }
-                    else
-                    {
-                        return 1; //user wants to re-extract data
-                    }
-                }
-            }
-            else
-            {
-                return 2; //No data found
-            }
-        }
-
-        private void GetTrainerClassEncounterMusic()
-        {
-            SetEncounterMusicTableOffsetToRAMAddress();
-            trainerClassEncounterMusicDict = new Dictionary<byte, (uint entryOffset, ushort musicD, ushort? musicN)>();
-
-            uint encounterMusicTableTableStartAddress = BitConverter.ToUInt32(ARM9.ReadBytes(encounterMusicTableOffsetToRAMAddress, 4), 0) - DSUtils.ARM9.address;
-
-            uint entrySize = 4;
-            uint tableSizeOffset = 10;
-            if (gameFamily == gFamEnum.HGSS)
-            {
-                entrySize += 2;
-                tableSizeOffset += 2;
-            }
-            var test = new List<ushort>();
-            byte tableEntriesCount = ARM9.ReadByte(encounterMusicTableOffsetToRAMAddress - tableSizeOffset);
-            using ARM9.Reader ar = new(encounterMusicTableTableStartAddress);
-            for (int i = 0; i < tableEntriesCount; i++)
-            {
-                uint entryOffset = (uint)ar.BaseStream.Position;
-                byte tclass = (byte)ar.ReadUInt16();
-                ushort musicD = ar.ReadUInt16();
-                ushort? musicN = gameFamily == gFamEnum.HGSS ? ar.ReadUInt16() : null;
-                trainerClassEncounterMusicDict[tclass] = (entryOffset, musicD, musicN);
-            }
-        }
-
-        private void GetPrizeMoneyData()
-        {
-            prizeMoneyList = new();
-
-            foreach (var item in PrizeMoneyData)
-            {
-                var prizeMoney = new PrizeMoney
-                {
-                    TrainerClassId = (int)item.trainerClassId,
-                    PrizeMoneyValue = (int)item.prizeMoney,
-                    Offset = item.Offset
-                };
-                prizeMoneyList.Add(prizeMoney);
-            }
-        }
-
-        private void GetTrainerClassGenders()
-        {
-            PrepareTrainerClassGenderData();
-            classGenderList = new();
-            trainerClass_Gender_comboBox.Items.Clear();
-            int trainerClassLength = trainerClasses.Count();
-
-            uint tableStartAddress = BitConverter.ToUInt32(DSUtils.ARM9.ReadBytes(RomInfo.classGenderOffsetToRAMAddress, 4), 0) - DSUtils.ARM9.address;
-
-            using ARM9.Reader ar = new(tableStartAddress);
-            for (int i = 0; i < trainerClassLength; i++)
-            {
-                long offset = ar.BaseStream.Position;
-                ushort gender = ar.ReadByte();
-                var item = new ClassGender
-                {
-                    Offset = offset,
-                    GenderId = gender,
-                    TrainerClassId = i
-                };
-
-                classGenderList.Add(item);
-            }
-
-            trainerClass_Gender_comboBox.Items.Add(Gender.Descriptions.Male);
-            trainerClass_Gender_comboBox.Items.Add(Gender.Descriptions.Female);
-            trainerClass_Gender_comboBox.Items.Add(Gender.Descriptions.None);
-        }
-
         #endregion ROM
 
         #region Main Editor
+
+        private static void SafeWriteLabel(ToolStripStatusLabel label, string text, Font font, Color color)
+        {
+            if (label.GetCurrentParent().InvokeRequired)
+            {
+                label.GetCurrentParent().Invoke((MethodInvoker)delegate
+                {
+                    label.Text = text;
+                    label.Font = font;
+                    label.ForeColor = color;
+                    label.Invalidate();
+                });
+            }
+            else
+            {
+                label.Text = text;
+                label.Font = font;
+                label.ForeColor = color;
+                label.Invalidate();
+            }
+        }
 
         private void mainContent_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -501,28 +510,6 @@ namespace VSMaker
             OpenRom();
             loadingData = false;
         }
-
-        private static void SafeWriteLabel(ToolStripStatusLabel label, string text, Font font, Color color)
-        {
-            if (label.GetCurrentParent().InvokeRequired)
-            {
-                label.GetCurrentParent().Invoke((MethodInvoker)delegate
-                {
-                    label.Text = text;
-                    label.Font = font;
-                    label.ForeColor = color;
-                    label.Invalidate();
-                });
-            }
-            else
-            {
-                label.Text = text;
-                label.Font = font;
-                label.ForeColor = color;
-                label.Invalidate();
-            }
-        }
-
         private void statusLabelError(string errorMsg, bool severe = true)
         {
             SafeWriteLabel(statusLabel, errorMsg, new Font(statusLabel.Font, FontStyle.Bold), severe ? Color.Red : Color.DarkOrange);
@@ -587,58 +574,9 @@ namespace VSMaker
             mainContent.SelectedTab = mainContent_trainer;
         }
 
-        private void playerClass_help_btn_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("These Trainer Classes are \"Player Classes\".\n\nChanging these can cause errors.", "Player Classes", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        private bool ValidateTrainerClassName()
-        {
-            if (trainerClassName.Text.Length > TrainerFile.maxClassNameLen)
-            {
-                MessageBox.Show($"Trainer Class name cannot exceed {TrainerFile.maxClassNameLen} characters.", "Trainer Class Name Length", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-            return true;
-        }
-
-        private bool ValidateEyeContactMusic()
-        {
-            if (trainerClass_EyeContact_Day_comboBox.Enabled && trainerClass_EyeContact_Day_comboBox.SelectedIndex == 0)
-            {
-                MessageBox.Show($"Please select Eye Contact music", "Eye Contact Music Not Set", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-
-            if (trainerClass_EyeContact_Night_comboBox.Enabled && trainerClass_EyeContact_Night_comboBox.SelectedIndex == 0)
-            {
-                MessageBox.Show($"Please select Eye Contact music", "Eye Contact Music Not Set", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-            return true;
-        }
-
         private void SaveTrainerClassName()
         {
             RomFileSystem.UpdateCurrentTrainerClassName(trainerClassName.Text, selectedTrainerClass.TrainerClassId);
-        }
-
-        private void SaveTrainerName()
-        {
-            RomFileSystem.UpdateCurrentTrainerName(trainer_Name.Text, selectedTrainer.TrainerClassId);
-        }
-
-        private bool ValidateTrainerName()
-        {
-            if (trainer_Name.Text.Length > TrainerFile.maxNameLen)
-            {
-                MessageBox.Show($"Trainer name cannot exceed {TrainerFile.maxNameLen} characters.", "Trainer Name Length", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-            else
-            {
-                return true;
-            }
         }
 
         private void SetupTrainerClassEditor()
@@ -805,9 +743,39 @@ namespace VSMaker
             }
         }
 
+        private bool ValidateEyeContactMusic()
+        {
+            if (trainerClass_EyeContact_Day_comboBox.Enabled && trainerClass_EyeContact_Day_comboBox.SelectedIndex == 0)
+            {
+                MessageBox.Show($"Please select Eye Contact music", "Eye Contact Music Not Set", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            if (trainerClass_EyeContact_Night_comboBox.Enabled && trainerClass_EyeContact_Night_comboBox.SelectedIndex == 0)
+            {
+                MessageBox.Show($"Please select Eye Contact music", "Eye Contact Music Not Set", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            return true;
+        }
+
+        private bool ValidateTrainerClassName()
+        {
+            if (trainerClassName.Text.Length > TrainerFile.maxClassNameLen)
+            {
+                MessageBox.Show($"Trainer Class name cannot exceed {TrainerFile.maxClassNameLen} characters.", "Trainer Class Name Length", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            return true;
+        }
         #endregion Trainer Class Editor
 
         #region Trainer Editor
+
+        private void SaveTrainerName()
+        {
+            RomFileSystem.UpdateCurrentTrainerName(trainer_Name.Text, selectedTrainer.TrainerClassId);
+        }
 
         private void SetupTrainerEditor()
         {
@@ -851,6 +819,18 @@ namespace VSMaker
             }
         }
 
+        private bool ValidateTrainerName()
+        {
+            if (trainer_Name.Text.Length > TrainerFile.maxNameLen)
+            {
+                MessageBox.Show($"Trainer name cannot exceed {TrainerFile.maxNameLen} characters.", "Trainer Name Length", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
         #endregion Trainer Editor
 
         #region Unpack NARCs
@@ -893,6 +873,20 @@ namespace VSMaker
         #endregion Unpack NARCs
 
         #region Get
+
+        private static MessageTrigger GetMessageTriggerDetails(MessageTriggerEnum messageTrigger)
+        {
+            return new MessageTrigger
+            {
+                MessageTriggerId = (int)messageTrigger,
+                MessageTriggerName = messageTrigger.GetEnumDescription(),
+            };
+        }
+
+        private void EnableTrainerButtons()
+        {
+            saveTrainerAll_btn.Enabled = true;
+        }
 
         private void GetAbilities()
         {
@@ -962,16 +956,6 @@ namespace VSMaker
                 itemNames.ForEach(x => item.Items.Add(x));
             }
         }
-
-        private static MessageTrigger GetMessageTriggerDetails(MessageTriggerEnum messageTrigger)
-        {
-            return new MessageTrigger
-            {
-                MessageTriggerId = (int)messageTrigger,
-                MessageTriggerName = messageTrigger.GetEnumDescription(),
-            };
-        }
-
         private void GetMessageTriggers()
         {
             statusLabelMessage("Getting Messages Triggers...");
@@ -1277,12 +1261,6 @@ namespace VSMaker
             statusLabelMessage();
             Update();
         }
-
-        private void EnableTrainerButtons()
-        {
-            saveTrainerAll_btn.Enabled = true;
-        }
-
         private void GetTrainerMessages()
         {
             trainerMessages = new List<TrainerMessage>();
@@ -1403,6 +1381,35 @@ namespace VSMaker
 
         #endregion TrainerSprite
 
+        public XLWorkbook OpenSpreadsheet()
+        {
+            OpenFileDialog file = new();
+            file.Filter = "Excel Files|*.xls;*.xlsx;*.xlsm";
+
+            if (file.ShowDialog(this) != DialogResult.OK)
+            {
+                MessageBox.Show("Unable to open file.");
+                return null;
+            }
+            else
+            {
+                string fileName = file.FileName;
+                return new XLWorkbook(fileName);
+            }
+        }
+
+        public void RefreshTrainerMessages(bool repoint = false)
+        {
+            trainerTextTable_dataGrid.Rows.Clear();
+            trainerMessages = new List<TrainerMessage>();
+            GetData();
+            SetupTrainerTextTab(repoint);
+            if (selectedTrainer != default)
+            {
+                GetTrainerInfo(selectedTrainer.TrainerId);
+            }
+        }
+
         private static string ReadLine(string text, int lineNumber)
         {
             var reader = new StringReader(text);
@@ -1502,6 +1509,133 @@ namespace VSMaker
             }
         }
 
+        /// <summary>
+        /// Export given DataGridView to an Excel file.
+        /// </summary>
+        /// <param name="dataGrid"></param>
+        /// <returns>Success/Failure bool and File Path</returns>
+        private (bool Success, string FilePath) ExportToExcel(DataGridView dataGrid)
+        {
+            // Do nothing if no data.
+            if (dataGrid.Rows.Count > 0)
+            {
+                SaveFileDialog sfd = new()
+                {
+                    Filter = "Excel (.xlsx)|  *.xlsx",
+                    FileName = "Trainer Text Table.xlsx"
+                };
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    string filePath = sfd.FileName;
+
+                    // Setup DataTable for Export
+                    var dataTable = new DataTable();
+                    foreach (DataGridViewColumn col in dataGrid.Columns)
+                    {
+                        dataTable.Columns.Add(col.HeaderText);
+                    }
+                    foreach (DataGridViewRow row in dataGrid.Rows)
+                    {
+                        dataTable.Rows.Add(row);
+                        foreach (DataGridViewCell cell in row.Cells)
+                        {
+                            string value = cell.Value.ToString();
+                            if (cell.ColumnIndex == 1)
+                            {
+                                value = value.Remove(0, 1).Remove(3);
+                            }
+                            else if (cell.ColumnIndex == 2)
+                            {
+                                value = (messageTriggers.Find(x => x.MessageTriggerName == value).MessageTriggerId + 1).ToString();
+                            }
+                            dataTable.Rows[row.Index][cell.ColumnIndex] = value;
+                        }
+                    }
+
+                    // Setup Spreadsheet.
+                    using XLWorkbook workbook = new();
+                    var trainerText = workbook.Worksheets.Add(dataTable, "Trainer Text");
+                    // Add Message Trigger List to new Sheet
+                    var messageTriggerTypes = workbook.Worksheets.Add("Message Triggers");
+                    messageTriggerTypes.Cell("A1").Value = "Message Trigger ID";
+                    messageTriggerTypes.Cell("B1").Value = "Message Trigger Name";
+                    for (int i = 0; i < messageTriggers.Count; i++)
+                    {
+                        string cellNumber = (i + 2).ToString();
+                        messageTriggerTypes.Cell("A" + cellNumber).Value = (messageTriggers[i].MessageTriggerId + 1).ToString("D2");
+                        messageTriggerTypes.Cell("B" + cellNumber).Value = messageTriggers[i].MessageTriggerName;
+                    }
+                    trainerText.Columns().AdjustToContents();
+                    messageTriggerTypes.Columns().AdjustToContents();
+
+                    // Try save Spreadsheet
+                    try
+                    {
+                        workbook.SaveAs(filePath);
+                        return (true, filePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Speadsheet not exported.\n\n" + ex.Message, "Unable to Export", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return (false, filePath);
+                    }
+                }
+            }
+            return (false, string.Empty);
+        }
+
+        private void eyeContact_help_btn_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Selecting eye-contact music for this Trainer Class is disabled.\n\nThis is because it does not originally have an entry\nin the Eye-Contact Music Table located in ARM9.\nThe table needs to be expanded first, but this feature is not yet implemented.", "Eye-Contact Music", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void GetEyeContactMusicLists()
+        {
+            if (gameFamily == gFamEnum.HGSS)
+            {
+                eyeContactMusics = new List<EyeContactMusic>
+                {
+                    new EyeContactMusic { MusicId = (ushort)0 },
+                    new EyeContactMusic { MusicId = (ushort)1107 },
+                    new EyeContactMusic { MusicId = (ushort)1108 },
+                    new EyeContactMusic { MusicId = (ushort)1109 },
+                    new EyeContactMusic { MusicId = (ushort)1110 },
+                    new EyeContactMusic { MusicId = (ushort)1111 },
+                    new EyeContactMusic { MusicId = (ushort)1112 },
+                    new EyeContactMusic { MusicId = (ushort)1113 },
+                    new EyeContactMusic { MusicId = (ushort)1114 },
+                    new EyeContactMusic { MusicId = (ushort)1115 },
+                };
+            }
+            else
+            {
+                eyeContactMusics = new List<EyeContactMusic>
+                {
+                    new EyeContactMusic { MusicId = (ushort)0 },
+                    new EyeContactMusic { MusicId = (ushort)1100 },
+                    new EyeContactMusic { MusicId = (ushort)1101 },
+                    new EyeContactMusic { MusicId = (ushort)1102 },
+                    new EyeContactMusic { MusicId = (ushort)1103 },
+                    new EyeContactMusic { MusicId = (ushort)1104 },
+                    new EyeContactMusic { MusicId = (ushort)1105 },
+                    new EyeContactMusic { MusicId = (ushort)1106 },
+                    new EyeContactMusic { MusicId = (ushort)1107 },
+                    new EyeContactMusic { MusicId = (ushort)1108 },
+                    new EyeContactMusic { MusicId = (ushort)1109 },
+                    new EyeContactMusic { MusicId = (ushort)1110 },
+                    new EyeContactMusic { MusicId = (ushort)1111 },
+                    new EyeContactMusic { MusicId = (ushort)1112 },
+                    new EyeContactMusic { MusicId = (ushort)1113 },
+                    new EyeContactMusic { MusicId = (ushort)1114 },
+                };
+            }
+            foreach (var item in eyeContactMusics)
+            {
+                trainerClass_EyeContact_Day_comboBox.Items.Add(item.Name);
+                trainerClass_EyeContact_Night_comboBox.Items.Add(item.Name);
+            }
+        }
+
         private Task GetTrainerTextTableData()
         {
             if (trainerTextTable_dataGrid.RowCount <= 1)
@@ -1537,6 +1671,58 @@ namespace VSMaker
             return Task.CompletedTask;
         }
 
+        private void ImportSpreadsheet()
+        {
+            var workbook = OpenSpreadsheet();
+            if (workbook != null)
+            {
+                bool firstRow = false; ;
+                var worksheet = workbook.Worksheet(1);
+                try
+                {
+                    statusLabelMessage("Importing data from spreadhsheet");
+                    Update();
+                    trainerMessages = new();
+
+                    foreach (var row in worksheet.Rows())
+                    {
+                        if (!firstRow)
+                        {
+                            firstRow = true;
+                        }
+                        else
+                        {
+                            int messageId = int.Parse(row.Cell(1).Value.ToString());
+                            int trainerId = int.Parse(row.Cell(2).Value.ToString());
+                            int messageTriggerId = int.Parse(row.Cell(3).Value.ToString());
+                            string text = row.Cell(4).Value.ToString();
+                            TrainerMessage item = new TrainerMessage
+                            {
+                                MessageId = messageId,
+                                TrainerId = trainerId,
+                                MessageTriggerId = messageTriggerId - 1,
+                                MessageText = text
+                            };
+                            item.TrainerName = trainers[item.TrainerId].TrainerName;
+                            item.MessageTriggerText = messageTriggers.Find(x => x.MessageTriggerId == item.MessageTriggerId).MessageTriggerName;
+                            trainerMessages.Add(item);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Unable to open spreadsheet.\n\n" + ex.Message, "Unable to Open Spreadsheet", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                statusLabelMessage("Reloading Trainer Text data.");
+                Update();
+                trainerTextTable_dataGrid.Rows.Clear();
+                trainerText_toolstrip.Enabled = false;
+                StartGetTrainerTextData(false);
+            }
+        }
+
         private void mainContent_Selecting(object sender, TabControlCancelEventArgs e)
         {
             if (unsavedChanges && !loadingData)
@@ -1553,6 +1739,12 @@ namespace VSMaker
             }
         }
 
+        private void OpenMoveEditor(int partyIndex)
+        {
+            moveEditor = new ChooseMoves(this, partyIndex, trainerFile);
+            moveEditor.ShowDialog();
+        }
+
         private void OpenPokemonEditor(int partyIndex)
         {
             pokemonEditor = new PokemonEditor(this, partyIndex, trainerFile);
@@ -1564,11 +1756,49 @@ namespace VSMaker
             textEditor = new TextEditor(this, trainerMessageId, messageText, vsMakerFont);
             textEditor.ShowDialog();
         }
-
-        private void OpenMoveEditor(int partyIndex)
+        /// <summary>
+        /// Repoint Trainer Text Offset table.
+        /// </summary>
+        /// <param name="dataGrid"></param>
+        private void RepointTrainerOffsetTable(DataGridView dataGrid)
         {
-            moveEditor = new ChooseMoves(this, partyIndex, trainerFile);
-            moveEditor.ShowDialog();
+            List<uint> offset = new List<uint>();
+            statusLabelMessage("Getting Trainer Text offsets.");
+            Update();
+            foreach (var trainer in trainers)
+            {
+                string trainerListItem = $"[{trainer.DisplayTrainerId}] - {trainer.TrainerName}";
+                int index = -1;
+                bool search = true;
+                while (search)
+                {
+                    for (int i = 0; i < dataGrid.Rows.Count; i++)
+                    {
+                        if (dataGrid.Rows[i].Cells[1].Value.ToString() == trainerListItem)
+                        {
+                            index = i - 1;
+                            search = false;
+                            break;
+                        }
+                    }
+                    break;
+                }
+                index++;
+                index *= 4;
+                offset.Add((uint)index);
+            }
+            string filePath = $"{gameDirs[DirNames.trainerTextOffset].unpackedDir}\\{0.ToString("D4")}";
+
+            for (int i = 0; i < offset.Count; i++)
+            {
+                using (DSUtils.EasyWriter wr = new(filePath, 2 * i))
+                {
+                    wr.Write(offset[i]);
+                };
+            }
+            statusLabelMessage("Trainer Text offsets generated successfully...");
+            Update();
+            MessageBox.Show("Trainer Text offsets repointed!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void save_btn_Click(object sender, EventArgs e)
@@ -1663,6 +1893,148 @@ namespace VSMaker
             statusLabelMessage();
         }
 
+        private void saveTrainerAll_btn_Click(object sender, EventArgs e)
+        {
+            bool valid = ValidateTrainerName() && ValidateTrainerPokemon();
+            if (valid)
+            {
+                SaveTrainerName();
+                SaveTrainerPokemon();
+                SaveTrainerProperties();
+                SaveTrainerClass();
+                TrainerChangesCommit();
+                GetTrainers();
+                SetupTrainerEditor();
+            }
+        }
+
+        private void SaveTrainerClass()
+        {
+            trainerFile.trp.trainerClass = (byte)trainer_Class_comboBox.SelectedIndex;
+        }
+
+        private void saveTrainerClassAll_btn_Click(object sender, EventArgs e)
+        {
+            bool valid = ValidateTrainerClassName() && ValidateEyeContactMusic();
+            if (valid)
+            {
+                SaveTrainerClassEyeContact();
+                SaveTrainerClassName();
+                SaveTrainerClassPrizeMoney();
+                SaveTrainerClassGender();
+                GetTrainerClassEncounterMusic();
+                GetTrainerClasses();
+                SetupTrainerClassEditor();
+            }
+        }
+
+        private void SaveTrainerClassEyeContact()
+        {
+            byte trainerClassId = (byte)trainerClassListBox.SelectedIndex;
+
+            ushort musicDay = EyeMusicIdNames.GetIdFromName(trainerClass_EyeContact_Day_comboBox.SelectedItem.ToString());
+            ushort musicNight = EyeMusicIdNames.GetIdFromName(trainerClass_EyeContact_Night_comboBox.SelectedItem.ToString());
+
+            if (trainerClassEncounterMusicDict.TryGetValue(trainerClassId, out var dictEntry))
+            {
+                if (gameFamily == gFamEnum.HGSS)
+                {
+                    trainerClassEncounterMusicDict[trainerClassId] = (dictEntry.entryOffset, musicDay, musicNight);
+                    ARM9.WriteBytes(BitConverter.GetBytes(musicDay), dictEntry.entryOffset + 2);
+                    ARM9.WriteBytes(BitConverter.GetBytes(musicNight), dictEntry.entryOffset + 4);
+                }
+                else
+                {
+                    trainerClassEncounterMusicDict[trainerClassId] = (dictEntry.entryOffset, musicDay, dictEntry.musicN);
+                    ARM9.WriteBytes(BitConverter.GetBytes(musicDay), dictEntry.entryOffset + 2);
+                }
+            }
+        }
+
+        private void SaveTrainerClassGender()
+        {
+            if (gameFamily != gFamEnum.DP)
+            {
+                int trainerClassId = selectedTrainerClass.TrainerClassId;
+                var classGender = classGenderList.Find(x => x.TrainerClassId == trainerClassId);
+                uint offset = (uint)classGender.Offset;
+                int gender = trainerClass_Gender_comboBox.SelectedIndex;
+
+                ARM9.WriteByte((byte)gender, offset);
+                classGender.GenderId = gender;
+            }
+        }
+
+        private void SaveTrainerClassPrizeMoney()
+        {
+            int trainerClassId = selectedTrainerClass.TrainerClassId;
+            int prizeMoneyValue = (int)trainerClass_PrizeMoney_num.Value;
+            var prizeMoney = prizeMoneyList.Find(x => x.TrainerClassId == trainerClassId);
+            long offset = prizeMoney.Offset;
+            var overlayPath = DSUtils.GetOverlayPath(prizeMoneyTableOverlayNumber);
+
+            if (gameFamily == gFamEnum.HGSS)
+            {
+                // Decompress Overlay for HGSS if not already
+                if (OverlayIsCompressed(prizeMoneyTableOverlayNumber))
+                {
+                    DecompressOverlay(prizeMoneyTableOverlayNumber);
+
+                    using (EasyWriter wr = new EasyWriter(overlayPath, offset))
+                    {
+                        wr.Write((ushort)trainerClassId);
+                        wr.Write((ushort)prizeMoneyValue);
+                    };
+                }
+            }
+            else
+            {
+                using (EasyWriter wr = new EasyWriter(overlayPath, offset))
+                {
+                    wr.Write((byte)trainerClass_PrizeMoney_num.Value);
+                };
+            }
+            prizeMoney.PrizeMoneyValue = prizeMoneyValue;
+        }
+
+        private void SaveTrainerPokemon()
+        {
+            trainerFile.trp.doubleBattle = trainer_Double_checkBox.Checked;
+            trainerFile.trp.chooseItems = trainer_Poke_HeldItem_checkBox.Checked;
+            trainerFile.trp.chooseMoves = trainer_Poke_Moves_checkBox.Checked;
+            trainerFile.trp.partyCount = (byte)trainer_NumPoke_num.Value;
+
+            for (int i = 0; i < trainer_NumPoke_num.Value; i++)
+            {
+                ushort pokemonId = (ushort)pokeNames.FindIndex(x => x == pokeComboBoxes[i].SelectedItem.ToString());
+                trainerFile.party[i].pokeID = pokemonId;
+                trainerFile.party[i].level = (ushort)pokeLevels[i].Value;
+                trainerFile.party[i].heldItem = trainer_Poke_HeldItem_checkBox.Checked ? (ushort)pokeItemComboBoxes[i].SelectedIndex : null;
+            }
+        }
+
+        private void SaveTrainerProperties()
+        {
+            // Set Trainer AI Flags
+            trainerFile.trp.AI[0] = trainer_ai_Basic_checkbox.Checked;
+            trainerFile.trp.AI[1] = trainer_ai_evaluate_checkBox.Checked;
+            trainerFile.trp.AI[2] = trainer_ai_expert_checkBox.Checked;
+            trainerFile.trp.AI[3] = trainer_ai_status_checkBox.Checked;
+            trainerFile.trp.AI[4] = trainer_ai_risk_checkBox.Checked;
+            trainerFile.trp.AI[5] = trainer_ai_dmg_checkBox.Checked;
+            trainerFile.trp.AI[6] = trainer_ai_baton_checkBox.Checked;
+            trainerFile.trp.AI[7] = trainer_ai_tag_checkBox.Checked;
+            trainerFile.trp.AI[8] = trainer_ai_checkHp_checkBox.Checked;
+            trainerFile.trp.AI[9] = trainer_ai_weather_checkBox.Checked;
+            trainerFile.trp.AI[10] = trainer_ai_misc_checkBox.Checked;
+
+            // Set Trainer Items
+            for (int i = 0; i < trainerItemComboBoxes.Count; i++)
+            {
+                trainerFile.trp.trainerItems[i] = (ushort)trainerItemComboBoxes[i].SelectedIndex;
+            }
+        }
+
         private void SetUnsavedChanges(bool unsaved)
         {
             unsavedChanges = unsaved;
@@ -1700,7 +2072,6 @@ namespace VSMaker
                 Update();
             }
             loadingData = false;
-
         }
 
         private void ThreadSafeDataTable(DataGridViewRow row)
@@ -1730,6 +2101,96 @@ namespace VSMaker
             else
             {
                 trainerTextTable_dataGrid.Rows.Insert(index, row);
+            }
+        }
+
+        private void trainer_ai_Basic_checkbox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
+        }
+
+        private void trainer_ai_baton_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
+        }
+
+        private void trainer_ai_checkHp_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
+        }
+
+        private void trainer_ai_dmg_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
+        }
+
+        private void trainer_ai_evaluate_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
+        }
+
+        private void trainer_ai_expert_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
+        }
+
+        private void trainer_ai_risk_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
+        }
+
+        private void trainer_ai_status_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
+        }
+
+        private void trainer_ai_tag_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
+        }
+
+        private void trainer_ai_weather_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
             }
         }
 
@@ -1779,6 +2240,42 @@ namespace VSMaker
             int id = int.Parse(text.Remove(0, 1).Remove(3));
             selectedTrainerClass = trainerClasses.SingleOrDefault(x => x.TrainerClassId == id);
             mainContent.SelectedTab = mainContent_trainerClass;
+        }
+
+        private void trainer_Item1_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
+        }
+
+        private void trainer_Item2_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
+        }
+
+        private void trainer_Item3_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
+        }
+
+        private void trainer_Item4_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
         }
 
         private void trainer_Message_Back_btn_Click(object sender, EventArgs e)
@@ -1861,6 +2358,18 @@ namespace VSMaker
             }
         }
 
+        private void trainer_Name_TextChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                if (!unsavedChanges)
+                {
+                    undoTrainer_btn.Enabled = selectedTrainer.TrainerName != trainer_Name.Text;
+                }
+                SetUnsavedChanges(undoTrainer_btn.Enabled);
+            }
+        }
+
         private void trainer_NumPoke_num_ValueChanged(object sender, EventArgs e)
         {
             if (!loadingData)
@@ -1879,9 +2388,52 @@ namespace VSMaker
             MessageBox.Show("This is the \"Player\" trainer file.\n\nChanging this can cause errors.", "Player File", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
+        private void trainer_Poke_HeldItem_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                EnablePokemon();
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
+        }
+
+        private void trainer_Poke_Moves_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                EnablePokemon();
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
+        }
+
         private void trainer_Poke1_btn_Click(object sender, EventArgs e)
         {
             OpenPokemonEditor(0);
+        }
+
+        private void trainer_Poke1_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
+        }
+
+        private void trainer_Poke1_Level_ValueChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
+        }
+
+        private void trainer_Poke1_Moves_btn_Click(object sender, EventArgs e)
+        {
+            OpenMoveEditor(0);
         }
 
         private void trainer_Poke2_btn_Click(object sender, EventArgs e)
@@ -1889,9 +2441,37 @@ namespace VSMaker
             OpenPokemonEditor(1);
         }
 
+        private void trainer_Poke2_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
+        }
+
+        private void trainer_Poke2_Moves_btn_Click(object sender, EventArgs e)
+        {
+            OpenMoveEditor(1);
+        }
+
         private void trainer_Poke3_btn_Click(object sender, EventArgs e)
         {
             OpenPokemonEditor(2);
+        }
+
+        private void trainer_Poke3_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
+        }
+
+        private void trainer_Poke3_Moves_btn_Click(object sender, EventArgs e)
+        {
+            OpenMoveEditor(2);
         }
 
         private void trainer_Poke4_btn_Click(object sender, EventArgs e)
@@ -1899,9 +2479,37 @@ namespace VSMaker
             OpenPokemonEditor(3);
         }
 
+        private void trainer_Poke4_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
+        }
+
+        private void trainer_Poke4_Moves_btn_Click(object sender, EventArgs e)
+        {
+            OpenMoveEditor(3);
+        }
+
         private void trainer_Poke5_btn_Click(object sender, EventArgs e)
         {
             OpenPokemonEditor(4);
+        }
+
+        private void trainer_Poke5_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
+        }
+
+        private void trainer_Poke5_Moves_btn_Click(object sender, EventArgs e)
+        {
+            OpenMoveEditor(4);
         }
 
         private void trainer_Poke6_btn_Click(object sender, EventArgs e)
@@ -1909,9 +2517,91 @@ namespace VSMaker
             OpenPokemonEditor(5);
         }
 
+        private void trainer_Poke6_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
+        }
+
+        private void trainer_Poke6_Moves_btn_Click(object sender, EventArgs e)
+        {
+            OpenMoveEditor(5);
+        }
+
+        private void TrainerChangesCommit()
+        {
+            /*Write to File*/
+            string indexStr = $"\\{selectedTrainer.TrainerId:D4}";
+            File.WriteAllBytes(gameDirs[DirNames.trainerProperties].unpackedDir + indexStr, trainerFile.trp.ToByteArray());
+            File.WriteAllBytes(gameDirs[DirNames.trainerParty].unpackedDir + indexStr, trainerFile.party.ToByteArray());
+        }
+
+        private void trainerClass_EyeContact_Day_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                if (!unsavedChanges)
+                {
+                    undoTrainerClass_btn.Enabled = true;
+                }
+                SetUnsavedChanges(undoTrainerClass_btn.Enabled);
+            }
+        }
+
+        private void trainerClass_EyeContact_Night_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                if (!unsavedChanges)
+                {
+                    undoTrainerClass_btn.Enabled = true;
+                }
+                SetUnsavedChanges(undoTrainerClass_btn.Enabled);
+            }
+        }
+
         private void trainerClass_frames_num_ValueChanged(object sender, EventArgs e)
         {
             UpdateTrainerClassPic(trainerClassPicBox, (int)((NumericUpDown)sender).Value);
+        }
+
+        private void trainerClass_Gender_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                if (!unsavedChanges)
+                {
+                    undoTrainerClass_btn.Enabled = true;
+                }
+                SetUnsavedChanges(undoTrainerClass_btn.Enabled);
+            }
+        }
+
+        private void trainerClass_PrizeMoney_num_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (!loadingData)
+            {
+                if (!unsavedChanges)
+                {
+                    undoTrainerClass_btn.Enabled = true;
+                }
+                SetUnsavedChanges(undoTrainerClass_btn.Enabled);
+            }
+        }
+
+        private void trainerClass_PrizeMoney_num_ValueChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                if (!unsavedChanges)
+                {
+                    undoTrainerClass_btn.Enabled = true;
+                }
+                SetUnsavedChanges(undoTrainerClass_btn.Enabled);
+            }
         }
 
         private void trainerClassName_TextChanged(object sender, EventArgs e)
@@ -1979,380 +2669,13 @@ namespace VSMaker
             }
         }
 
-        private void trainerTextTable_dataGrid_CellClick(object sender, DataGridViewCellEventArgs e)
+        private void trainerText_Export_btn_Click(object sender, EventArgs e)
         {
-            if (e.ColumnIndex == 3)
+            var (success, filePath) = ExportToExcel(trainerTextTable_dataGrid);
+            if (success)
             {
-                statusLabelMessage("Double click to open text editor.");
-                Update();
+                MessageBox.Show("Speadsheet exported to\n\n" + filePath, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            else
-            {
-                statusLabelMessage();
-                Update();
-            }
-        }
-
-        private void trainerTextTable_dataGrid_TextDblClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.ColumnIndex == 3)
-            {
-                int trainerMessageId = e.RowIndex;
-                var trainerMessage = trainerMessages.Find(x => x.MessageId == trainerMessageId);
-                OpenTextEditor(trainerMessage.MessageId, trainerMessage.MessageText);
-            }
-        }
-
-        private void undoTrainerClass_btn_Click(object sender, EventArgs e)
-        {
-            SetUnsavedChanges(false);
-            GetTrainerClassInfo(selectedTrainerClass.TrainerClassId);
-        }
-
-        public void RefreshTrainerMessages(bool repoint = false)
-        {
-            trainerTextTable_dataGrid.Rows.Clear();
-            trainerMessages = new List<TrainerMessage>();
-            GetData();
-            SetupTrainerTextTab(repoint);
-            if (selectedTrainer != default)
-            {
-                GetTrainerInfo(selectedTrainer.TrainerId);
-            }
-        }
-
-        private void saveTrainerAll_btn_Click(object sender, EventArgs e)
-        {
-            bool valid = ValidateTrainerName() && ValidateTrainerPokemon();
-            if (valid)
-            {
-                SaveTrainerName();
-                SaveTrainerPokemon();
-                SaveTrainerProperties();
-                SaveTrainerClass();
-                TrainerChangesCommit();
-                GetTrainers();
-                SetupTrainerEditor();
-            }
-        }
-
-        private void TrainerChangesCommit()
-        {
-            /*Write to File*/
-            string indexStr = $"\\{selectedTrainer.TrainerId:D4}";
-            File.WriteAllBytes(gameDirs[DirNames.trainerProperties].unpackedDir + indexStr, trainerFile.trp.ToByteArray());
-            File.WriteAllBytes(gameDirs[DirNames.trainerParty].unpackedDir + indexStr, trainerFile.party.ToByteArray());
-        }
-
-        private void SaveTrainerClass()
-        {
-            trainerFile.trp.trainerClass = (byte)trainer_Class_comboBox.SelectedIndex;
-        }
-
-        private void SaveTrainerProperties()
-        {
-            // Set Trainer AI Flags
-            trainerFile.trp.AI[0] = trainer_ai_Basic_checkbox.Checked;
-            trainerFile.trp.AI[1] = trainer_ai_evaluate_checkBox.Checked;
-            trainerFile.trp.AI[2] = trainer_ai_expert_checkBox.Checked;
-            trainerFile.trp.AI[3] = trainer_ai_status_checkBox.Checked;
-            trainerFile.trp.AI[4] = trainer_ai_risk_checkBox.Checked;
-            trainerFile.trp.AI[5] = trainer_ai_dmg_checkBox.Checked;
-            trainerFile.trp.AI[6] = trainer_ai_baton_checkBox.Checked;
-            trainerFile.trp.AI[7] = trainer_ai_tag_checkBox.Checked;
-            trainerFile.trp.AI[8] = trainer_ai_checkHp_checkBox.Checked;
-            trainerFile.trp.AI[9] = trainer_ai_weather_checkBox.Checked;
-            trainerFile.trp.AI[10] = trainer_ai_misc_checkBox.Checked;
-
-            // Set Trainer Items
-            for (int i = 0; i < trainerItemComboBoxes.Count; i++)
-            {
-                trainerFile.trp.trainerItems[i] = (ushort)trainerItemComboBoxes[i].SelectedIndex;
-            }
-        }
-
-        private void saveTrainerClassAll_btn_Click(object sender, EventArgs e)
-        {
-            bool valid = ValidateTrainerClassName() && ValidateEyeContactMusic();
-            if (valid)
-            {
-                SaveTrainerClassEyeContact();
-                SaveTrainerClassName();
-                SaveTrainerClassPrizeMoney();
-                SaveTrainerClassGender();
-                GetTrainerClassEncounterMusic();
-                GetTrainerClasses();
-                SetupTrainerClassEditor();
-            }
-        }
-
-        private void SaveTrainerClassPrizeMoney()
-        {
-            int trainerClassId = selectedTrainerClass.TrainerClassId;
-            int prizeMoneyValue = (int)trainerClass_PrizeMoney_num.Value;
-            var prizeMoney = prizeMoneyList.Find(x => x.TrainerClassId == trainerClassId);
-            long offset = prizeMoney.Offset;
-            var overlayPath = DSUtils.GetOverlayPath(prizeMoneyTableOverlayNumber);
-
-            if (gameFamily == gFamEnum.HGSS)
-            {
-                // Decompress Overlay for HGSS if not already
-                if (OverlayIsCompressed(prizeMoneyTableOverlayNumber))
-                {
-                    DecompressOverlay(prizeMoneyTableOverlayNumber);
-
-                    using (EasyWriter wr = new EasyWriter(overlayPath, offset))
-                    {
-                        wr.Write((ushort)trainerClassId);
-                        wr.Write((ushort)prizeMoneyValue);
-                    };
-                }
-            }
-            else
-            {
-                using (EasyWriter wr = new EasyWriter(overlayPath, offset))
-                {
-                    wr.Write((byte)trainerClass_PrizeMoney_num.Value);
-                };
-            }
-            prizeMoney.PrizeMoneyValue = prizeMoneyValue;
-        }
-
-        private void SaveTrainerClassEyeContact()
-        {
-            byte trainerClassId = (byte)trainerClassListBox.SelectedIndex;
-
-            ushort musicDay = EyeMusicIdNames.GetIdFromName(trainerClass_EyeContact_Day_comboBox.SelectedItem.ToString());
-            ushort musicNight = EyeMusicIdNames.GetIdFromName(trainerClass_EyeContact_Night_comboBox.SelectedItem.ToString());
-
-            if (trainerClassEncounterMusicDict.TryGetValue(trainerClassId, out var dictEntry))
-            {
-                if (gameFamily == gFamEnum.HGSS)
-                {
-                    trainerClassEncounterMusicDict[trainerClassId] = (dictEntry.entryOffset, musicDay, musicNight);
-                    ARM9.WriteBytes(BitConverter.GetBytes(musicDay), dictEntry.entryOffset + 2);
-                    ARM9.WriteBytes(BitConverter.GetBytes(musicNight), dictEntry.entryOffset + 4);
-                }
-                else
-                {
-                    trainerClassEncounterMusicDict[trainerClassId] = (dictEntry.entryOffset, musicDay, dictEntry.musicN);
-                    ARM9.WriteBytes(BitConverter.GetBytes(musicDay), dictEntry.entryOffset + 2);
-                }
-            }
-        }
-
-        private void SaveTrainerClassGender()
-        {
-            if (gameFamily != gFamEnum.DP)
-            {
-                int trainerClassId = selectedTrainerClass.TrainerClassId;
-                var classGender = classGenderList.Find(x => x.TrainerClassId == trainerClassId);
-                uint offset = (uint)classGender.Offset;
-                int gender = trainerClass_Gender_comboBox.SelectedIndex;
-
-                ARM9.WriteByte((byte)gender, offset);
-                classGender.GenderId = gender;
-            }
-        }
-
-        private void GetEyeContactMusicLists()
-        {
-            if (gameFamily == gFamEnum.HGSS)
-            {
-                eyeContactMusics = new List<EyeContactMusic>
-                {
-                    new EyeContactMusic { MusicId = (ushort)0 },
-                    new EyeContactMusic { MusicId = (ushort)1107 },
-                    new EyeContactMusic { MusicId = (ushort)1108 },
-                    new EyeContactMusic { MusicId = (ushort)1109 },
-                    new EyeContactMusic { MusicId = (ushort)1110 },
-                    new EyeContactMusic { MusicId = (ushort)1111 },
-                    new EyeContactMusic { MusicId = (ushort)1112 },
-                    new EyeContactMusic { MusicId = (ushort)1113 },
-                    new EyeContactMusic { MusicId = (ushort)1114 },
-                    new EyeContactMusic { MusicId = (ushort)1115 },
-                };
-            }
-            else
-            {
-                eyeContactMusics = new List<EyeContactMusic>
-                {
-                    new EyeContactMusic { MusicId = (ushort)0 },
-                    new EyeContactMusic { MusicId = (ushort)1100 },
-                    new EyeContactMusic { MusicId = (ushort)1101 },
-                    new EyeContactMusic { MusicId = (ushort)1102 },
-                    new EyeContactMusic { MusicId = (ushort)1103 },
-                    new EyeContactMusic { MusicId = (ushort)1104 },
-                    new EyeContactMusic { MusicId = (ushort)1105 },
-                    new EyeContactMusic { MusicId = (ushort)1106 },
-                    new EyeContactMusic { MusicId = (ushort)1107 },
-                    new EyeContactMusic { MusicId = (ushort)1108 },
-                    new EyeContactMusic { MusicId = (ushort)1109 },
-                    new EyeContactMusic { MusicId = (ushort)1110 },
-                    new EyeContactMusic { MusicId = (ushort)1111 },
-                    new EyeContactMusic { MusicId = (ushort)1112 },
-                    new EyeContactMusic { MusicId = (ushort)1113 },
-                    new EyeContactMusic { MusicId = (ushort)1114 },
-                };
-            }
-            foreach (var item in eyeContactMusics)
-            {
-                trainerClass_EyeContact_Day_comboBox.Items.Add(item.Name);
-                trainerClass_EyeContact_Night_comboBox.Items.Add(item.Name);
-            }
-        }
-
-        private void undoTrainer_btn_Click(object sender, EventArgs e)
-        {
-            SetUnsavedChanges(false);
-            GetTrainerInfo(selectedTrainer.TrainerId);
-        }
-
-        private void trainer_Name_TextChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                if (!unsavedChanges)
-                {
-                    undoTrainer_btn.Enabled = selectedTrainer.TrainerName != trainer_Name.Text;
-                }
-                SetUnsavedChanges(undoTrainer_btn.Enabled);
-            }
-        }
-
-        private void trainerTextTable_SaveChanges_btn(object sender, EventArgs e)
-        {
-            trainerTextTable_dataGrid.EndEdit();
-            var verify = VerifyTrainerTextTable();
-            if (!verify.Valid)
-            {
-                MessageBox.Show("You must only use each Message Trigger once per Trainer.\n\nPlease review entry " + verify.Row, "Unable to Save Changes", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                trainerTextTable_dataGrid.FirstDisplayedScrollingRowIndex = verify.Row;
-                trainerTextTable_dataGrid.ClearSelection();
-                trainerTextTable_dataGrid.Rows[verify.Row].Selected = true;
-                return;
-            }
-
-            var dialogResult = MessageBox.Show("Save all changes to Trainer Text Table?\nThis might take some time...", "Save Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-            if (dialogResult == DialogResult.No)
-            {
-                return;
-            }
-            else if (dialogResult == DialogResult.Yes)
-            {
-                statusLabelMessage("Saving changes...");
-                Update();
-                string filePath = $"{gameDirs[DirNames.trainerTextTable].unpackedDir}\\{0.ToString("D4")}";
-                var trainerTextArchive = new TextArchive(trainerTextMessageNumber);
-                trainerTextArchive.Messages.Clear();
-                for (int i = 0; i < trainerTextTable_dataGrid.Rows.Count; i++)
-                {
-                    string messageText = trainerTextTable_dataGrid.Rows[i].Cells[3].Value.ToString();
-                    trainerTextArchive.Messages.Add(messageText);
-                    var selectedMessageTrigger = trainerTextTable_dataGrid.Rows[i].Cells[2].Value.ToString();
-                    var selectedTrainer = trainerTextTable_dataGrid.Rows[i].Cells[1].Value.ToString();
-                    int trainerId = int.Parse(selectedTrainer.Remove(0, 1).Remove(3));
-                    int messageTriggerId = messageTriggers.Find(x => x.MessageTriggerName == selectedMessageTrigger).MessageTriggerId;
-                    using (EasyWriter wr = new EasyWriter(filePath, 4 * i))
-                    {
-                        wr.Write((ushort)trainerId);
-                        wr.Write((ushort)messageTriggerId);
-                    };
-                }
-                trainerTextArchive.SaveToFileDefaultDir(trainerTextMessageNumber);
-                statusLabelMessage("Trainer Texts saved successfully");
-                Update();
-                SetUnsavedChanges(false);
-                ReadTrainerTable();
-                RefreshTrainerMessages();
-            }
-        }
-
-        private void trainerTextTable_addRow_btn_Click(object sender, EventArgs e)
-        {
-            int index = trainerTextTable_dataGrid.Rows.Count - 1;
-
-            // Get current selected row index - Can't multi-select
-            if (trainerTextTable_dataGrid.SelectedRows.Count > 0)
-            {
-                index = trainerTextTable_dataGrid.SelectedRows[0].Index;
-            }
-            else if (trainerTextTable_dataGrid.SelectedCells.Count > 0)
-            {
-                index = trainerTextTable_dataGrid.SelectedCells[0].RowIndex;
-            }
-            string[] currentTrainers = new string[trainers.Count];
-            string[] currentMessageTriggers = new string[messageTriggers.Count];
-
-            for (int i = 0; i < trainers.Count; i++)
-            {
-                currentTrainers[i] = $"[{trainers[i].DisplayTrainerId}] - {trainers[i].TrainerName}";
-            }
-
-            for (int i = 0; i < messageTriggers.Count; i++)
-            {
-                currentMessageTriggers[i] = $"{messageTriggers[i].MessageTriggerName}";
-            }
-
-            DataGridViewRow row = (DataGridViewRow)trainerTextTable_dataGrid.Rows[0].Clone();
-            row.Cells[0].Value = trainerTextTable_dataGrid.Rows.Count;
-            row.Cells[1] = new DataGridViewComboBoxCell { DataSource = currentTrainers, Value = currentTrainers[0] };
-            row.Cells[2] = new DataGridViewComboBoxCell { DataSource = currentMessageTriggers, Value = currentMessageTriggers[0] };
-            row.Cells[3].Value = "";
-            ThreadSafeDataTable(row, index + 1);
-            trainerTextTable_dataGrid.FirstDisplayedScrollingRowIndex = index > 0 ? index - 1 : index;
-            trainerTextTable_dataGrid.ClearSelection();
-            trainerTextTable_dataGrid.Rows[index + 1].Selected = true;
-            SetUnsavedChanges(true);
-        }
-
-        private void trainerTextTable_delRow_btn_Click(object sender, EventArgs e)
-        {
-            int index = trainerTextTable_dataGrid.Rows.Count - 1;
-
-            // Get current selected row index - Can't multi-select
-            if (trainerTextTable_dataGrid.SelectedRows.Count > 0)
-            {
-                index = trainerTextTable_dataGrid.SelectedRows[0].Index;
-            }
-            else if (trainerTextTable_dataGrid.SelectedCells.Count > 0)
-            {
-                index = trainerTextTable_dataGrid.SelectedCells[0].RowIndex;
-            }
-
-            trainerTextTable_dataGrid.Rows.RemoveAt(index);
-            trainerTextTable_dataGrid.FirstDisplayedScrollingRowIndex = index > 0 ? index - 1 : index;
-            trainerTextTable_dataGrid.ClearSelection();
-            trainerTextTable_dataGrid.Rows[index].Selected = true;
-            SetUnsavedChanges(true);
-        }
-
-        private (bool Valid, int Row) VerifyTrainerTextTable()
-        {
-            foreach (var trainer in trainers)
-            {
-                var checkMessages = new List<string>();
-                for (int i = 0; i < trainerTextTable_dataGrid.Rows.Count; i++)
-                {
-                    var selectedMessageTrigger = trainerTextTable_dataGrid.Rows[i].Cells[2].Value.ToString();
-                    var selectedTrainer = trainerTextTable_dataGrid.Rows[i].Cells[1].Value.ToString();
-                    int trainerId = int.Parse(selectedTrainer.Remove(0, 1).Remove(3));
-                    if (trainerId == trainer.TrainerId)
-                    {
-                        if (checkMessages.Contains(selectedMessageTrigger))
-                        {
-                            return (false, i);
-                        }
-                        else
-                        {
-                            checkMessages.Add(selectedMessageTrigger);
-                        }
-                    }
-                }
-            }
-
-            return (true, -1);
         }
 
         private void trainerText_sort_Click(object sender, EventArgs e)
@@ -2418,371 +2741,135 @@ namespace VSMaker
             }
         }
 
-        /// <summary>
-        /// Repoint Trainer Text Offset table.
-        /// </summary>
-        /// <param name="dataGrid"></param>
-        private void RepointTrainerOffsetTable(DataGridView dataGrid)
+        private void trainerTextTable_addRow_btn_Click(object sender, EventArgs e)
         {
-            List<uint> offset = new List<uint>();
-            statusLabelMessage("Getting Trainer Text offsets.");
-            Update();
-            foreach (var trainer in trainers)
+            int index = trainerTextTable_dataGrid.Rows.Count - 1;
+
+            // Get current selected row index - Can't multi-select
+            if (trainerTextTable_dataGrid.SelectedRows.Count > 0)
             {
-                string trainerListItem = $"[{trainer.DisplayTrainerId}] - {trainer.TrainerName}";
-                int index = -1;
-                bool search = true;
-                while (search)
+                index = trainerTextTable_dataGrid.SelectedRows[0].Index;
+            }
+            else if (trainerTextTable_dataGrid.SelectedCells.Count > 0)
+            {
+                index = trainerTextTable_dataGrid.SelectedCells[0].RowIndex;
+            }
+            string[] currentTrainers = new string[trainers.Count];
+            string[] currentMessageTriggers = new string[messageTriggers.Count];
+
+            for (int i = 0; i < trainers.Count; i++)
+            {
+                currentTrainers[i] = $"[{trainers[i].DisplayTrainerId}] - {trainers[i].TrainerName}";
+            }
+
+            for (int i = 0; i < messageTriggers.Count; i++)
+            {
+                currentMessageTriggers[i] = $"{messageTriggers[i].MessageTriggerName}";
+            }
+
+            DataGridViewRow row = (DataGridViewRow)trainerTextTable_dataGrid.Rows[0].Clone();
+            row.Cells[0].Value = trainerTextTable_dataGrid.Rows.Count;
+            row.Cells[1] = new DataGridViewComboBoxCell { DataSource = currentTrainers, Value = currentTrainers[0] };
+            row.Cells[2] = new DataGridViewComboBoxCell { DataSource = currentMessageTriggers, Value = currentMessageTriggers[0] };
+            row.Cells[3].Value = "";
+            ThreadSafeDataTable(row, index + 1);
+            trainerTextTable_dataGrid.FirstDisplayedScrollingRowIndex = index > 0 ? index - 1 : index;
+            trainerTextTable_dataGrid.ClearSelection();
+            trainerTextTable_dataGrid.Rows[index + 1].Selected = true;
+            SetUnsavedChanges(true);
+        }
+
+        private void trainerTextTable_dataGrid_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == 3)
+            {
+                statusLabelMessage("Double click to open text editor.");
+                Update();
+            }
+            else
+            {
+                statusLabelMessage();
+                Update();
+            }
+        }
+
+        private void trainerTextTable_dataGrid_TextDblClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == 3)
+            {
+                int trainerMessageId = e.RowIndex;
+                var trainerMessage = trainerMessages.Find(x => x.MessageId == trainerMessageId);
+                OpenTextEditor(trainerMessage.MessageId, trainerMessage.MessageText);
+            }
+        }
+
+        private void trainerTextTable_delRow_btn_Click(object sender, EventArgs e)
+        {
+            int index = trainerTextTable_dataGrid.Rows.Count - 1;
+
+            // Get current selected row index - Can't multi-select
+            if (trainerTextTable_dataGrid.SelectedRows.Count > 0)
+            {
+                index = trainerTextTable_dataGrid.SelectedRows[0].Index;
+            }
+            else if (trainerTextTable_dataGrid.SelectedCells.Count > 0)
+            {
+                index = trainerTextTable_dataGrid.SelectedCells[0].RowIndex;
+            }
+
+            trainerTextTable_dataGrid.Rows.RemoveAt(index);
+            trainerTextTable_dataGrid.FirstDisplayedScrollingRowIndex = index > 0 ? index - 1 : index;
+            trainerTextTable_dataGrid.ClearSelection();
+            trainerTextTable_dataGrid.Rows[index].Selected = true;
+            SetUnsavedChanges(true);
+        }
+
+        private void trainerTextTable_SaveChanges_btn(object sender, EventArgs e)
+        {
+            trainerTextTable_dataGrid.EndEdit();
+            var verify = VerifyTrainerTextTable();
+            if (!verify.Valid)
+            {
+                MessageBox.Show("You must only use each Message Trigger once per Trainer.\n\nPlease review entry " + verify.Row, "Unable to Save Changes", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                trainerTextTable_dataGrid.FirstDisplayedScrollingRowIndex = verify.Row;
+                trainerTextTable_dataGrid.ClearSelection();
+                trainerTextTable_dataGrid.Rows[verify.Row].Selected = true;
+                return;
+            }
+
+            var dialogResult = MessageBox.Show("Save all changes to Trainer Text Table?\nThis might take some time...", "Save Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (dialogResult == DialogResult.No)
+            {
+                return;
+            }
+            else if (dialogResult == DialogResult.Yes)
+            {
+                statusLabelMessage("Saving changes...");
+                Update();
+                string filePath = $"{gameDirs[DirNames.trainerTextTable].unpackedDir}\\{0.ToString("D4")}";
+                var trainerTextArchive = new TextArchive(trainerTextMessageNumber);
+                trainerTextArchive.Messages.Clear();
+                for (int i = 0; i < trainerTextTable_dataGrid.Rows.Count; i++)
                 {
-                    for (int i = 0; i < dataGrid.Rows.Count; i++)
+                    string messageText = trainerTextTable_dataGrid.Rows[i].Cells[3].Value.ToString();
+                    trainerTextArchive.Messages.Add(messageText);
+                    var selectedMessageTrigger = trainerTextTable_dataGrid.Rows[i].Cells[2].Value.ToString();
+                    var selectedTrainer = trainerTextTable_dataGrid.Rows[i].Cells[1].Value.ToString();
+                    int trainerId = int.Parse(selectedTrainer.Remove(0, 1).Remove(3));
+                    int messageTriggerId = messageTriggers.Find(x => x.MessageTriggerName == selectedMessageTrigger).MessageTriggerId;
+                    using (EasyWriter wr = new EasyWriter(filePath, 4 * i))
                     {
-                        if (dataGrid.Rows[i].Cells[1].Value.ToString() == trainerListItem)
-                        {
-                            index = i - 1;
-                            search = false;
-                            break;
-                        }
-                    }
-                    break;
+                        wr.Write((ushort)trainerId);
+                        wr.Write((ushort)messageTriggerId);
+                    };
                 }
-                index++;
-                index *= 4;
-                offset.Add((uint)index);
-            }
-            string filePath = $"{gameDirs[DirNames.trainerTextOffset].unpackedDir}\\{0.ToString("D4")}";
-
-            for (int i = 0; i < offset.Count; i++)
-            {
-                using (DSUtils.EasyWriter wr = new(filePath, 2 * i))
-                {
-                    wr.Write(offset[i]);
-                };
-            }
-            statusLabelMessage("Trainer Text offsets generated successfully...");
-            Update();
-            MessageBox.Show("Trainer Text offsets repointed!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        private void trainerText_Export_btn_Click(object sender, EventArgs e)
-        {
-            var (success, filePath) = ExportToExcel(trainerTextTable_dataGrid);
-            if (success)
-            {
-                MessageBox.Show("Speadsheet exported to\n\n" + filePath, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
-
-        /// <summary>
-        /// Export given DataGridView to an Excel file.
-        /// </summary>
-        /// <param name="dataGrid"></param>
-        /// <returns>Success/Failure bool and File Path</returns>
-        private (bool Success, string FilePath) ExportToExcel(DataGridView dataGrid)
-        {
-            // Do nothing if no data.
-            if (dataGrid.Rows.Count > 0)
-            {
-                SaveFileDialog sfd = new()
-                {
-                    Filter = "Excel (.xlsx)|  *.xlsx",
-                    FileName = "Trainer Text Table.xlsx"
-                };
-                if (sfd.ShowDialog() == DialogResult.OK)
-                {
-                    string filePath = sfd.FileName;
-
-                    // Setup DataTable for Export
-                    var dataTable = new DataTable();
-                    foreach (DataGridViewColumn col in dataGrid.Columns)
-                    {
-                        dataTable.Columns.Add(col.HeaderText);
-                    }
-                    foreach (DataGridViewRow row in dataGrid.Rows)
-                    {
-                        dataTable.Rows.Add(row);
-                        foreach (DataGridViewCell cell in row.Cells)
-                        {
-                            string value = cell.Value.ToString();
-                            if (cell.ColumnIndex == 1)
-                            {
-                                value = value.Remove(0, 1).Remove(3);
-                            }
-                            else if (cell.ColumnIndex == 2)
-                            {
-                                value = (messageTriggers.Find(x => x.MessageTriggerName == value).MessageTriggerId + 1).ToString();
-                            }
-                            dataTable.Rows[row.Index][cell.ColumnIndex] = value;
-                        }
-                    }
-
-                    // Setup Spreadsheet.
-                    using XLWorkbook workbook = new();
-                    var trainerText = workbook.Worksheets.Add(dataTable, "Trainer Text");
-                    // Add Message Trigger List to new Sheet
-                    var messageTriggerTypes = workbook.Worksheets.Add("Message Triggers");
-                    messageTriggerTypes.Cell("A1").Value = "Message Trigger ID";
-                    messageTriggerTypes.Cell("B1").Value = "Message Trigger Name";
-                    for (int i = 0; i < messageTriggers.Count; i++)
-                    {
-                        string cellNumber = (i + 2).ToString();
-                        messageTriggerTypes.Cell("A" + cellNumber).Value = (messageTriggers[i].MessageTriggerId + 1).ToString("D2");
-                        messageTriggerTypes.Cell("B" + cellNumber).Value = messageTriggers[i].MessageTriggerName;
-                    }
-                    trainerText.Columns().AdjustToContents();
-                    messageTriggerTypes.Columns().AdjustToContents();
-
-                    // Try save Spreadsheet
-                    try
-                    {
-                        workbook.SaveAs(filePath);
-                        return (true, filePath);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("Speadsheet not exported.\n\n" + ex.Message, "Unable to Export", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return (false, filePath);
-                    }
-                }
-            }
-            return (false, string.Empty);
-        }
-
-        private void SaveTrainerPokemon()
-        {
-            trainerFile.trp.doubleBattle = trainer_Double_checkBox.Checked;
-            trainerFile.trp.chooseItems = trainer_Poke_HeldItem_checkBox.Checked;
-            trainerFile.trp.chooseMoves = trainer_Poke_Moves_checkBox.Checked;
-            trainerFile.trp.partyCount = (byte)trainer_NumPoke_num.Value;
-
-            for (int i = 0; i < trainer_NumPoke_num.Value; i++)
-            {
-                ushort pokemonId = (ushort)pokeNames.FindIndex(x => x == pokeComboBoxes[i].SelectedItem.ToString());
-                trainerFile.party[i].pokeID = pokemonId;
-                trainerFile.party[i].level = (ushort)pokeLevels[i].Value;
-                trainerFile.party[i].heldItem = trainer_Poke_HeldItem_checkBox.Checked ? (ushort)pokeItemComboBoxes[i].SelectedIndex : null;
-            }
-        }
-
-        private bool ValidateTrainerPokemon()
-        {
-            for (int i = 0; i < trainer_NumPoke_num.Value; i++)
-            {
-                if (pokeComboBoxes[i].SelectedIndex == 0 || pokeComboBoxes[i].SelectedItem.ToString() == "-----" || pokeComboBoxes[i].SelectedItem.ToString().Equals("egg", StringComparison.InvariantCultureIgnoreCase) || pokeComboBoxes[i].SelectedItem.ToString().Equals("bad egg", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    MessageBox.Show("You must select a valid Pokemon!", "Unable to Save Pokemon", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
-                }
-            }
-            SetUnsavedChanges(false);
-            return true;
-        }
-
-        private void trainer_Poke1_comboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
-            }
-        }
-
-        private void trainer_Poke2_comboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
-            }
-        }
-
-        private void trainer_Poke3_comboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
-            }
-        }
-
-        private void trainer_Poke4_comboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
-            }
-        }
-
-        private void trainer_Poke5_comboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
-            }
-        }
-
-        private void trainer_Poke6_comboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
-            }
-        }
-
-        private void trainer_Poke1_Level_ValueChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
-            }
-        }
-
-        private void trainer_Poke_HeldItem_checkBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                EnablePokemon();
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
-            }
-        }
-
-        private void trainer_Poke_Moves_checkBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                EnablePokemon();
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
-            }
-        }
-
-        private void trainer_Item4_comboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
-            }
-        }
-
-        private void trainer_ai_Basic_checkbox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
-            }
-        }
-
-        private void trainer_ai_expert_checkBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
-            }
-        }
-
-        private void trainer_ai_dmg_checkBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
-            }
-        }
-
-        private void trainer_ai_evaluate_checkBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
-            }
-        }
-
-        private void trainer_ai_status_checkBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
-            }
-        }
-
-        private void trainer_ai_weather_checkBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
-            }
-        }
-
-        private void trainer_ai_risk_checkBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
-            }
-        }
-
-        private void trainer_ai_checkHp_checkBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
-            }
-        }
-
-        private void trainer_ai_baton_checkBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
-            }
-        }
-
-        private void trainer_ai_tag_checkBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
-            }
-        }
-
-        private void trainer_Item1_comboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
-            }
-        }
-
-        private void trainer_Item2_comboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
-            }
-        }
-
-        private void trainer_Item3_comboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
+                trainerTextArchive.SaveToFileDefaultDir(trainerTextMessageNumber);
+                statusLabelMessage("Trainer Texts saved successfully");
+                Update();
+                SetUnsavedChanges(false);
+                ReadTrainerTable();
+                RefreshTrainerMessages();
             }
         }
 
@@ -2797,168 +2884,56 @@ namespace VSMaker
             }
         }
 
-        public XLWorkbook OpenSpreadsheet()
+        private void undoTrainer_btn_Click(object sender, EventArgs e)
         {
-            OpenFileDialog file = new();
-            file.Filter = "Excel Files|*.xls;*.xlsx;*.xlsm";
-
-            if (file.ShowDialog(this) != DialogResult.OK)
-            {
-                MessageBox.Show("Unable to open file.");
-                return null;
-            }
-            else
-            {
-                string fileName = file.FileName;
-                return new XLWorkbook(fileName);
-            }
+            SetUnsavedChanges(false);
+            GetTrainerInfo(selectedTrainer.TrainerId);
         }
 
-        private void ImportSpreadsheet()
+        private void undoTrainerClass_btn_Click(object sender, EventArgs e)
         {
-            var workbook = OpenSpreadsheet();
-            if (workbook != null)
+            SetUnsavedChanges(false);
+            GetTrainerClassInfo(selectedTrainerClass.TrainerClassId);
+        }
+        private bool ValidateTrainerPokemon()
+        {
+            for (int i = 0; i < trainer_NumPoke_num.Value; i++)
             {
-                bool firstRow = false; ;
-                var worksheet = workbook.Worksheet(1);
-                try
+                if (pokeComboBoxes[i].SelectedIndex == 0 || pokeComboBoxes[i].SelectedItem.ToString() == "-----" || pokeComboBoxes[i].SelectedItem.ToString().Equals("egg", StringComparison.InvariantCultureIgnoreCase) || pokeComboBoxes[i].SelectedItem.ToString().Equals("bad egg", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    statusLabelMessage("Importing data from spreadhsheet");
-                    Update();
-                    trainerMessages = new();
+                    MessageBox.Show("You must select a valid Pokemon!", "Unable to Save Pokemon", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+            }
+            SetUnsavedChanges(false);
+            return true;
+        }
 
-                    foreach (var row in worksheet.Rows())
+        private (bool Valid, int Row) VerifyTrainerTextTable()
+        {
+            foreach (var trainer in trainers)
+            {
+                var checkMessages = new List<string>();
+                for (int i = 0; i < trainerTextTable_dataGrid.Rows.Count; i++)
+                {
+                    var selectedMessageTrigger = trainerTextTable_dataGrid.Rows[i].Cells[2].Value.ToString();
+                    var selectedTrainer = trainerTextTable_dataGrid.Rows[i].Cells[1].Value.ToString();
+                    int trainerId = int.Parse(selectedTrainer.Remove(0, 1).Remove(3));
+                    if (trainerId == trainer.TrainerId)
                     {
-                        if (!firstRow)
+                        if (checkMessages.Contains(selectedMessageTrigger))
                         {
-                            firstRow = true;
+                            return (false, i);
                         }
                         else
                         {
-                            int messageId = int.Parse(row.Cell(1).Value.ToString());
-                            int trainerId = int.Parse(row.Cell(2).Value.ToString());
-                            int messageTriggerId = int.Parse(row.Cell(3).Value.ToString());
-                            string text = row.Cell(4).Value.ToString();
-                            TrainerMessage item = new TrainerMessage
-                            {
-                                MessageId = messageId,
-                                TrainerId = trainerId,
-                                MessageTriggerId = messageTriggerId - 1,
-                                MessageText = text
-                            };
-                            item.TrainerName = trainers[item.TrainerId].TrainerName;
-                            item.MessageTriggerText = messageTriggers.Find(x => x.MessageTriggerId == item.MessageTriggerId).MessageTriggerName;
-                            trainerMessages.Add(item);
+                            checkMessages.Add(selectedMessageTrigger);
                         }
                     }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Unable to open spreadsheet.\n\n" + ex.Message, "Unable to Open Spreadsheet", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                statusLabelMessage("Reloading Trainer Text data.");
-                Update();
-                trainerTextTable_dataGrid.Rows.Clear();
-                trainerText_toolstrip.Enabled = false;
-                StartGetTrainerTextData(false);
             }
-        }
 
-        private void eyeContact_help_btn_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("Selecting eye-contact music for this Trainer Class is disabled.\n\nThis is because it does not originally have an entry\nin the Eye-Contact Music Table located in ARM9.\nThe table needs to be expanded first, but this feature is not yet implemented.", "Eye-Contact Music", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        private void trainer_Poke1_Moves_btn_Click(object sender, EventArgs e)
-        {
-            OpenMoveEditor(0);
-        }
-
-        private void trainer_Poke2_Moves_btn_Click(object sender, EventArgs e)
-        {
-            OpenMoveEditor(1);
-        }
-
-        private void trainer_Poke3_Moves_btn_Click(object sender, EventArgs e)
-        {
-            OpenMoveEditor(2);
-        }
-
-        private void trainer_Poke4_Moves_btn_Click(object sender, EventArgs e)
-        {
-            OpenMoveEditor(3);
-        }
-
-        private void trainer_Poke5_Moves_btn_Click(object sender, EventArgs e)
-        {
-            OpenMoveEditor(4);
-        }
-
-        private void trainer_Poke6_Moves_btn_Click(object sender, EventArgs e)
-        {
-            OpenMoveEditor(5);
-        }
-
-        private void trainerClass_PrizeMoney_num_ValueChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                if (!unsavedChanges)
-                {
-                    undoTrainerClass_btn.Enabled = true;
-                }
-                SetUnsavedChanges(undoTrainerClass_btn.Enabled);
-            }
-        }
-
-        private void trainerClass_PrizeMoney_num_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (!loadingData)
-            {
-                if (!unsavedChanges)
-                {
-                    undoTrainerClass_btn.Enabled = true;
-                }
-                SetUnsavedChanges(undoTrainerClass_btn.Enabled);
-            }
-        }
-
-        private void trainerClass_EyeContact_Day_comboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                if (!unsavedChanges)
-                {
-                    undoTrainerClass_btn.Enabled = true;
-                }
-                SetUnsavedChanges(undoTrainerClass_btn.Enabled);
-            }
-        }
-
-        private void trainerClass_EyeContact_Night_comboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                if (!unsavedChanges)
-                {
-                    undoTrainerClass_btn.Enabled = true;
-                }
-                SetUnsavedChanges(undoTrainerClass_btn.Enabled);
-            }
-        }
-
-        private void trainerClass_Gender_comboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                if (!unsavedChanges)
-                {
-                    undoTrainerClass_btn.Enabled = true;
-                }
-                SetUnsavedChanges(undoTrainerClass_btn.Enabled);
-            }
+            return (true, -1);
         }
     }
 }
