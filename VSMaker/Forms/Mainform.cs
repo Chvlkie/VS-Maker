@@ -5,6 +5,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using NarcAPI;
 using System.Data;
 using System.Diagnostics;
+using System.Drawing.Text;
 using VSMaker.CommonFunctions;
 using VSMaker.Data;
 using VSMaker.Fonts;
@@ -43,7 +44,7 @@ namespace VSMaker
         private List<ComboBox> pokeItemComboBoxes;
         private List<NumericUpDown> pokeLevels;
         private List<Pokemon> pokemons = new();
-        private SpeciesFile[] pokemonSpecies;
+        public SpeciesFile[] pokemonSpecies;
         private (int abi1, int abi2)[] pokemonSpeciesAbilities;
         private List<string> pokeNames = new();
         private List<PrizeMoney> prizeMoneyList = new();
@@ -55,6 +56,7 @@ namespace VSMaker
         private List<TrainerClass> trainerClasses = new();
         private TrainerFile trainerFile;
         private List<ComboBox> trainerItemComboBoxes;
+        private List<PictureBox> partyPokemonIcons;
         private List<TrainerMessage> trainerMessages = new();
         private PaletteBase trainerPal;
         private List<Trainer> trainers = new();
@@ -116,6 +118,16 @@ namespace VSMaker
                 trainer_Item2_comboBox,
                 trainer_Item3_comboBox,
                 trainer_Item4_comboBox,
+            };
+
+            partyPokemonIcons = new List<PictureBox>
+            {
+                pokeIcon1,
+                pokeIcon2,
+                pokeIcon3,
+                pokeIcon4,
+                pokeIcon5,
+                pokeIcon6,
             };
         }
 
@@ -1297,6 +1309,8 @@ namespace VSMaker
                 item.Items.Add("-----");
                 pokemons.Where(x => !ExcludePokeNames.ExcludeNames.Contains(x.PokemonName.ToLower())).ToList().ForEach(x => item.Items.Add(x.PokemonName));
             }
+
+            SetMonIconsPalTableAddress();
         }
 
         private (int abi1, int abi2)[] GetPokemonAbilities(int numberOfPokemon)
@@ -2426,10 +2440,13 @@ namespace VSMaker
 
         private void trainer_Poke1_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            ShowPartyPokemonPic(0);
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
                 undoTrainer_btn.Enabled = unsavedChanges;
+                trainerFile.party[0].pokeID = (ushort)pokeNames.FindIndex(x => x == trainer_Poke1_comboBox.SelectedItem.ToString());
+                trainerFile.party[0].formID = 0;
             }
         }
 
@@ -2454,10 +2471,13 @@ namespace VSMaker
 
         private void trainer_Poke2_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            ShowPartyPokemonPic(1);
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
                 undoTrainer_btn.Enabled = unsavedChanges;
+                trainerFile.party[1].pokeID = (ushort)pokeNames.FindIndex(x => x == trainer_Poke2_comboBox.SelectedItem.ToString());
+                trainerFile.party[1].formID = 0;
             }
         }
 
@@ -2473,10 +2493,13 @@ namespace VSMaker
 
         private void trainer_Poke3_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            ShowPartyPokemonPic(2);
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
                 undoTrainer_btn.Enabled = unsavedChanges;
+                trainerFile.party[2].pokeID = (ushort)pokeNames.FindIndex(x => x == trainer_Poke3_comboBox.SelectedItem.ToString());
+                trainerFile.party[2].formID = 0;
             }
         }
 
@@ -2492,10 +2515,13 @@ namespace VSMaker
 
         private void trainer_Poke4_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            ShowPartyPokemonPic(3);
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
                 undoTrainer_btn.Enabled = unsavedChanges;
+                trainerFile.party[3].pokeID = (ushort)pokeNames.FindIndex(x => x == trainer_Poke4_comboBox.SelectedItem.ToString());
+                trainerFile.party[3].formID = 0;
             }
         }
 
@@ -2511,10 +2537,13 @@ namespace VSMaker
 
         private void trainer_Poke5_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            ShowPartyPokemonPic(4);
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
                 undoTrainer_btn.Enabled = unsavedChanges;
+                trainerFile.party[4].pokeID = (ushort)pokeNames.FindIndex(x => x == trainer_Poke5_comboBox.SelectedItem.ToString());
+                trainerFile.party[4].formID = 0;
             }
         }
 
@@ -2530,16 +2559,36 @@ namespace VSMaker
 
         private void trainer_Poke6_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            ShowPartyPokemonPic(5);
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
                 undoTrainer_btn.Enabled = unsavedChanges;
+                trainerFile.party[5].pokeID = (ushort)pokeNames.FindIndex(x => x == trainer_Poke6_comboBox.SelectedItem.ToString());
+                trainerFile.party[5].formID = 0;
             }
         }
 
         private void trainer_Poke6_Moves_btn_Click(object sender, EventArgs e)
         {
             OpenMoveEditor(5);
+        }
+
+        private void ShowPartyPokemonPic(byte partyPos)
+        {
+            ComboBox cb = pokeComboBoxes[partyPos];
+            PictureBox pb = partyPokemonIcons[partyPos];
+            
+            int pokeId = pokeNames.FindIndex(x => x == cb.SelectedItem.ToString());
+            if (gameFamily != gFamEnum.DP)
+            {
+               int formId = (int)trainerFile.party[partyPos].formID;
+                if (formId > 0)
+                {
+                    pokeId = formId+=495;
+                }
+            }
+            partyPokemonIcons[partyPos].Image = GetPokePic(pokeId, pb.Width, pb.Height);
         }
 
         private void TrainerChangesCommit()

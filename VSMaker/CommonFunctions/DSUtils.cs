@@ -712,6 +712,11 @@ namespace VSMaker.CommonFunctions
 
         public static Image GetPokePic(int species, int w, int h)
         {
+            if (species == 0)
+            {
+                return Properties.Resources.pokeIcon;
+            }
+
             PaletteBase paletteBase;
             bool fiveDigits = false; // some extreme future proofing
             string filename = "0000";
@@ -732,11 +737,11 @@ namespace VSMaker.CommonFunctions
             string iconTablePath;
 
             int iconPalTableOffsetFromFileStart;
-            string ov129path = DSUtils.GetOverlayPath(129);
+            string ov129path = GetOverlayPath(129);
             if (File.Exists(ov129path))
             {
                 // if overlay 129 exists, read it from there
-                iconPalTableOffsetFromFileStart = (int)(RomInfo.monIconPalTableAddress - DSUtils.GetOverlayRAMAddress(129));
+                iconPalTableOffsetFromFileStart = (int)(monIconPalTableAddress - GetOverlayRAMAddress(129));
                 iconTablePath = ov129path;
             }
             else if ((int)(RomInfo.monIconPalTableAddress - RomInfo.synthOverlayLoadAddress) >= 0)
@@ -787,7 +792,7 @@ namespace VSMaker.CommonFunctions
             }
             catch (FormatException)
             {
-                return Properties.Resources.IconPokeball;
+                return Properties.Resources.pokeIcon;
             }
         }
     }

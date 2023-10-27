@@ -73,16 +73,6 @@ namespace VSMaker.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap IconPokeball {
-            get {
-                object obj = ResourceManager.GetObject("IconPokeball", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap importIcon {
             get {
                 object obj = ResourceManager.GetObject("importIcon", resourceCulture);
@@ -206,6 +196,16 @@ namespace VSMaker.Properties {
         internal static System.Drawing.Bitmap pokeballs6 {
             get {
                 object obj = ResourceManager.GetObject("pokeballs6", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap pokeIcon {
+            get {
+                object obj = ResourceManager.GetObject("pokeIcon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

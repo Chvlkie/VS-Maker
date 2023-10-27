@@ -10,6 +10,7 @@ namespace VSMaker.Data
     {
         public static class Descriptions
         {
+            public const string Default = "Default";
             public const string Male = "Male ♂";
             public const string Female = "Female ♀";
             public const string None = "None";
