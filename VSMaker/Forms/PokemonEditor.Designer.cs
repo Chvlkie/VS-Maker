@@ -112,6 +112,7 @@
             // 
             // pokeStat_BallSeal_comboBox
             // 
+            pokeStat_BallSeal_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             pokeStat_BallSeal_comboBox.FormattingEnabled = true;
             pokeStat_BallSeal_comboBox.Location = new Point(219, 141);
             pokeStat_BallSeal_comboBox.Name = "pokeStat_BallSeal_comboBox";
@@ -133,11 +134,13 @@
             // 
             pokeStat_Form_comboBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
             pokeStat_Form_comboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
+            pokeStat_Form_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             pokeStat_Form_comboBox.FormattingEnabled = true;
             pokeStat_Form_comboBox.Location = new Point(363, 25);
             pokeStat_Form_comboBox.Name = "pokeStat_Form_comboBox";
             pokeStat_Form_comboBox.Size = new Size(117, 23);
             pokeStat_Form_comboBox.TabIndex = 44;
+            pokeStat_Form_comboBox.SelectedIndexChanged += pokeStat_Form_comboBox_SelectedIndexChanged;
             // 
             // label7
             // 
@@ -155,6 +158,7 @@
             // 
             pokeStat_Ability_comboBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
             pokeStat_Ability_comboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
+            pokeStat_Ability_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             pokeStat_Ability_comboBox.Enabled = false;
             pokeStat_Ability_comboBox.FormattingEnabled = true;
             pokeStat_Ability_comboBox.Location = new Point(363, 78);
@@ -200,6 +204,7 @@
             // 
             pokeStat_Nature_comboBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
             pokeStat_Nature_comboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
+            pokeStat_Nature_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             pokeStat_Nature_comboBox.FormattingEnabled = true;
             pokeStat_Nature_comboBox.Location = new Point(219, 78);
             pokeStat_Nature_comboBox.Name = "pokeStat_Nature_comboBox";
@@ -210,6 +215,7 @@
             // 
             pokeStat_Gender_comboBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
             pokeStat_Gender_comboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
+            pokeStat_Gender_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             pokeStat_Gender_comboBox.FormattingEnabled = true;
             pokeStat_Gender_comboBox.Location = new Point(219, 25);
             pokeStat_Gender_comboBox.Name = "pokeStat_Gender_comboBox";

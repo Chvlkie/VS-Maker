@@ -63,8 +63,8 @@ namespace VSMaker
         private SpriteBase trainerSprite;
         private bool trainerSpriteMessage;
         private ImageBase trainerTile;
-        private bool unsavedChanges;
-
+        public bool unsavedChanges;
+        public bool hgEngine = false;
         #endregion Editor Data
 
         #region Forms
@@ -608,7 +608,6 @@ namespace VSMaker
             SetupTrainerClassEditorInputs(selectedTrainerClass);
             saveTrainerClassAll_btn.Enabled = true;
             SetUnsavedChanges(false);
-            undoTrainerClass_btn.Enabled = false;
             loadingData = false;
             statusLabelMessage();
             Update();
@@ -1030,7 +1029,6 @@ namespace VSMaker
                 MessageBox.Show("Trainer has no Pokemon set.\nYou must select at least one.", "No Pokemon", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 trainerEditor_tab.SelectedTab = trainerEditor_Pokemon;
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = true;
             }
 
             trainer_NumPoke_num.Value = selectedTrainer.Pokemon.Count;
@@ -1044,7 +1042,6 @@ namespace VSMaker
             SetupTrainerEditorInputs(selectedTrainer);
             EnableTrainerButtons();
             SetUnsavedChanges(false);
-            undoTrainer_btn.Enabled = false;
             loadingData = false;
             statusLabelMessage();
             Update();
@@ -1093,7 +1090,6 @@ namespace VSMaker
                 trainer_frames_num.Maximum = selectedTrainer.TrainerSpriteFrames;
                 trainer_frames_num.Enabled = selectedTrainer.TrainerSpriteFrames > 0;
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
             }
         }
 
@@ -1310,6 +1306,7 @@ namespace VSMaker
                 pokemons.Where(x => !ExcludePokeNames.ExcludeNames.Contains(x.PokemonName.ToLower())).ToList().ForEach(x => item.Items.Add(x.PokemonName));
             }
 
+            hgEngine = pokemons.Count(x => !ExcludePokeNames.ExcludeNames.Contains(x.PokemonName.ToLower())) > 496 && gameFamily == gFamEnum.HGSS;
             SetMonIconsPalTableAddress();
         }
 
@@ -2060,9 +2057,11 @@ namespace VSMaker
             }
         }
 
-        private void SetUnsavedChanges(bool unsaved)
+        public void SetUnsavedChanges(bool unsaved)
         {
             unsavedChanges = unsaved;
+            undoTrainerClass_btn.Enabled = unsaved;
+            undoTrainer_btn.Enabled = unsaved;
         }
 
         private void SetupPokemonTab()
@@ -2134,7 +2133,6 @@ namespace VSMaker
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
             }
         }
 
@@ -2143,7 +2141,6 @@ namespace VSMaker
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
             }
         }
 
@@ -2152,7 +2149,6 @@ namespace VSMaker
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
             }
         }
 
@@ -2161,7 +2157,6 @@ namespace VSMaker
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
             }
         }
 
@@ -2170,7 +2165,6 @@ namespace VSMaker
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
             }
         }
 
@@ -2179,7 +2173,6 @@ namespace VSMaker
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
             }
         }
 
@@ -2188,7 +2181,6 @@ namespace VSMaker
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
             }
         }
 
@@ -2197,7 +2189,6 @@ namespace VSMaker
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
             }
         }
 
@@ -2206,7 +2197,6 @@ namespace VSMaker
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
             }
         }
 
@@ -2215,7 +2205,6 @@ namespace VSMaker
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
             }
         }
 
@@ -2238,9 +2227,8 @@ namespace VSMaker
 
                 if (!unsavedChanges)
                 {
-                    undoTrainer_btn.Enabled = selectedTrainer.IsDouble != trainer_Double_checkBox.Checked;
+                    SetUnsavedChanges(true);
                 }
-                SetUnsavedChanges(undoTrainer_btn.Enabled);
                 EnablePokemon();
             }
         }
@@ -2272,7 +2260,6 @@ namespace VSMaker
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
             }
         }
 
@@ -2281,7 +2268,6 @@ namespace VSMaker
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
             }
         }
 
@@ -2290,7 +2276,6 @@ namespace VSMaker
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
             }
         }
 
@@ -2299,7 +2284,6 @@ namespace VSMaker
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
             }
         }
 
@@ -2389,9 +2373,8 @@ namespace VSMaker
             {
                 if (!unsavedChanges)
                 {
-                    undoTrainer_btn.Enabled = selectedTrainer.TrainerName != trainer_Name.Text;
+                    SetUnsavedChanges(true);
                 }
-                SetUnsavedChanges(undoTrainer_btn.Enabled);
             }
         }
 
@@ -2401,9 +2384,8 @@ namespace VSMaker
             {
                 if (!unsavedChanges)
                 {
-                    undoTrainer_btn.Enabled = selectedTrainer.Pokemon.Count != trainer_NumPoke_num.Value;
+                    SetUnsavedChanges(true);
                 }
-                SetUnsavedChanges(undoTrainer_btn.Enabled);
                 EnablePokemon();
             }
         }
@@ -2419,7 +2401,6 @@ namespace VSMaker
             {
                 EnablePokemon();
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
             }
         }
 
@@ -2429,7 +2410,6 @@ namespace VSMaker
             {
                 EnablePokemon();
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
             }
         }
 
@@ -2440,14 +2420,13 @@ namespace VSMaker
 
         private void trainer_Poke1_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ShowPartyPokemonPic(0);
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
                 trainerFile.party[0].pokeID = (ushort)pokeNames.FindIndex(x => x == trainer_Poke1_comboBox.SelectedItem.ToString());
                 trainerFile.party[0].formID = 0;
             }
+            ShowPartyPokemonPic(0);
         }
 
         private void trainer_Poke1_Level_ValueChanged(object sender, EventArgs e)
@@ -2455,7 +2434,6 @@ namespace VSMaker
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
             }
         }
 
@@ -2471,14 +2449,13 @@ namespace VSMaker
 
         private void trainer_Poke2_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ShowPartyPokemonPic(1);
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
                 trainerFile.party[1].pokeID = (ushort)pokeNames.FindIndex(x => x == trainer_Poke2_comboBox.SelectedItem.ToString());
                 trainerFile.party[1].formID = 0;
             }
+            ShowPartyPokemonPic(1);
         }
 
         private void trainer_Poke2_Moves_btn_Click(object sender, EventArgs e)
@@ -2493,14 +2470,13 @@ namespace VSMaker
 
         private void trainer_Poke3_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ShowPartyPokemonPic(2);
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
                 trainerFile.party[2].pokeID = (ushort)pokeNames.FindIndex(x => x == trainer_Poke3_comboBox.SelectedItem.ToString());
                 trainerFile.party[2].formID = 0;
             }
+            ShowPartyPokemonPic(2);
         }
 
         private void trainer_Poke3_Moves_btn_Click(object sender, EventArgs e)
@@ -2515,14 +2491,13 @@ namespace VSMaker
 
         private void trainer_Poke4_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ShowPartyPokemonPic(3);
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
                 trainerFile.party[3].pokeID = (ushort)pokeNames.FindIndex(x => x == trainer_Poke4_comboBox.SelectedItem.ToString());
                 trainerFile.party[3].formID = 0;
             }
+            ShowPartyPokemonPic(3);
         }
 
         private void trainer_Poke4_Moves_btn_Click(object sender, EventArgs e)
@@ -2537,14 +2512,13 @@ namespace VSMaker
 
         private void trainer_Poke5_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ShowPartyPokemonPic(4);
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
                 trainerFile.party[4].pokeID = (ushort)pokeNames.FindIndex(x => x == trainer_Poke5_comboBox.SelectedItem.ToString());
                 trainerFile.party[4].formID = 0;
             }
+            ShowPartyPokemonPic(4);
         }
 
         private void trainer_Poke5_Moves_btn_Click(object sender, EventArgs e)
@@ -2559,14 +2533,13 @@ namespace VSMaker
 
         private void trainer_Poke6_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            ShowPartyPokemonPic(5);
             if (!loadingData)
             {
                 SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
                 trainerFile.party[5].pokeID = (ushort)pokeNames.FindIndex(x => x == trainer_Poke6_comboBox.SelectedItem.ToString());
                 trainerFile.party[5].formID = 0;
             }
+            ShowPartyPokemonPic(5);
         }
 
         private void trainer_Poke6_Moves_btn_Click(object sender, EventArgs e)
@@ -2574,18 +2547,19 @@ namespace VSMaker
             OpenMoveEditor(5);
         }
 
-        private void ShowPartyPokemonPic(byte partyPos)
+        public void ShowPartyPokemonPic(byte partyPos)
         {
             ComboBox cb = pokeComboBoxes[partyPos];
             PictureBox pb = partyPokemonIcons[partyPos];
-            
+
             int pokeId = pokeNames.FindIndex(x => x == cb.SelectedItem.ToString());
             if (gameFamily != gFamEnum.DP)
             {
-               int formId = (int)trainerFile.party[partyPos].formID;
+                int formId = (int)trainerFile.party[partyPos].formID;
+
                 if (formId > 0)
                 {
-                    pokeId = formId+=495;
+                    pokeId = PokemonForms.GetPokemonForms(pokeId, hgEngine).Find(x => x.FormId == formId).SpeciesId;
                 }
             }
             partyPokemonIcons[partyPos].Image = GetPokePic(pokeId, pb.Width, pb.Height);
@@ -2605,9 +2579,8 @@ namespace VSMaker
             {
                 if (!unsavedChanges)
                 {
-                    undoTrainerClass_btn.Enabled = true;
+                    SetUnsavedChanges(true);
                 }
-                SetUnsavedChanges(undoTrainerClass_btn.Enabled);
             }
         }
 
@@ -2617,9 +2590,8 @@ namespace VSMaker
             {
                 if (!unsavedChanges)
                 {
-                    undoTrainerClass_btn.Enabled = true;
+                    SetUnsavedChanges(true);
                 }
-                SetUnsavedChanges(undoTrainerClass_btn.Enabled);
             }
         }
 
@@ -2634,9 +2606,8 @@ namespace VSMaker
             {
                 if (!unsavedChanges)
                 {
-                    undoTrainerClass_btn.Enabled = true;
+                    SetUnsavedChanges(true);
                 }
-                SetUnsavedChanges(undoTrainerClass_btn.Enabled);
             }
         }
 
@@ -2646,9 +2617,8 @@ namespace VSMaker
             {
                 if (!unsavedChanges)
                 {
-                    undoTrainerClass_btn.Enabled = true;
+                    SetUnsavedChanges(true);
                 }
-                SetUnsavedChanges(undoTrainerClass_btn.Enabled);
             }
         }
 
@@ -2658,9 +2628,8 @@ namespace VSMaker
             {
                 if (!unsavedChanges)
                 {
-                    undoTrainerClass_btn.Enabled = true;
+                    SetUnsavedChanges(true);
                 }
-                SetUnsavedChanges(undoTrainerClass_btn.Enabled);
             }
         }
 
@@ -2670,9 +2639,8 @@ namespace VSMaker
             {
                 if (!unsavedChanges)
                 {
-                    undoTrainerClass_btn.Enabled = selectedTrainerClass.TrainerClassName != trainerClassName.Text;
+                    SetUnsavedChanges(true);
                 }
-                SetUnsavedChanges(undoTrainerClass_btn.Enabled);
             }
         }
 

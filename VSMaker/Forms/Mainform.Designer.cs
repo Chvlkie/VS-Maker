@@ -452,6 +452,7 @@ namespace VSMaker
             // 
             // trainerClass_EyeContact_Night_comboBox
             // 
+            trainerClass_EyeContact_Night_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             trainerClass_EyeContact_Night_comboBox.Enabled = false;
             trainerClass_EyeContact_Night_comboBox.FormattingEnabled = true;
             trainerClass_EyeContact_Night_comboBox.Location = new Point(176, 72);
@@ -463,6 +464,7 @@ namespace VSMaker
             // 
             // trainerClass_EyeContact_Day_comboBox
             // 
+            trainerClass_EyeContact_Day_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             trainerClass_EyeContact_Day_comboBox.Enabled = false;
             trainerClass_EyeContact_Day_comboBox.FormattingEnabled = true;
             trainerClass_EyeContact_Day_comboBox.Location = new Point(176, 41);
@@ -523,6 +525,7 @@ namespace VSMaker
             // 
             // trainerClass_Gender_comboBox
             // 
+            trainerClass_Gender_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             trainerClass_Gender_comboBox.Enabled = false;
             trainerClass_Gender_comboBox.FormattingEnabled = true;
             trainerClass_Gender_comboBox.Location = new Point(384, 72);
@@ -625,6 +628,7 @@ namespace VSMaker
             // 
             // trainerClass_Theme_comboBox
             // 
+            trainerClass_Theme_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             trainerClass_Theme_comboBox.Enabled = false;
             trainerClass_Theme_comboBox.FormattingEnabled = true;
             trainerClass_Theme_comboBox.Location = new Point(131, 257);
@@ -866,6 +870,7 @@ namespace VSMaker
             // 
             // trainer_MessageTrigger_list
             // 
+            trainer_MessageTrigger_list.DropDownStyle = ComboBoxStyle.DropDownList;
             trainer_MessageTrigger_list.FormattingEnabled = true;
             trainer_MessageTrigger_list.Location = new Point(130, 5);
             trainer_MessageTrigger_list.Name = "trainer_MessageTrigger_list";
@@ -932,7 +937,7 @@ namespace VSMaker
             // 
             trainer_EditMessage_btn.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             trainer_EditMessage_btn.Enabled = false;
-            trainer_EditMessage_btn.Location = new Point(392, 7);
+            trainer_EditMessage_btn.Location = new Point(392, 5);
             trainer_EditMessage_btn.Name = "trainer_EditMessage_btn";
             trainer_EditMessage_btn.Size = new Size(69, 23);
             trainer_EditMessage_btn.TabIndex = 46;
@@ -1062,7 +1067,7 @@ namespace VSMaker
             // pokeIcon6
             // 
             pokeIcon6.Image = Properties.Resources.pokeIcon;
-            pokeIcon6.Location = new Point(3, 163);
+            pokeIcon6.Location = new Point(3, 161);
             pokeIcon6.Name = "pokeIcon6";
             pokeIcon6.Size = new Size(32, 32);
             pokeIcon6.SizeMode = PictureBoxSizeMode.CenterImage;
@@ -1072,7 +1077,7 @@ namespace VSMaker
             // pokeIcon5
             // 
             pokeIcon5.Image = Properties.Resources.pokeIcon;
-            pokeIcon5.Location = new Point(3, 131);
+            pokeIcon5.Location = new Point(3, 129);
             pokeIcon5.Name = "pokeIcon5";
             pokeIcon5.Size = new Size(32, 32);
             pokeIcon5.SizeMode = PictureBoxSizeMode.CenterImage;
@@ -1082,7 +1087,7 @@ namespace VSMaker
             // pokeIcon4
             // 
             pokeIcon4.Image = Properties.Resources.pokeIcon;
-            pokeIcon4.Location = new Point(3, 99);
+            pokeIcon4.Location = new Point(3, 97);
             pokeIcon4.Name = "pokeIcon4";
             pokeIcon4.Size = new Size(32, 32);
             pokeIcon4.SizeMode = PictureBoxSizeMode.CenterImage;
@@ -1092,7 +1097,7 @@ namespace VSMaker
             // pokeIcon3
             // 
             pokeIcon3.Image = Properties.Resources.pokeIcon;
-            pokeIcon3.Location = new Point(3, 67);
+            pokeIcon3.Location = new Point(3, 65);
             pokeIcon3.Name = "pokeIcon3";
             pokeIcon3.Size = new Size(32, 32);
             pokeIcon3.SizeMode = PictureBoxSizeMode.CenterImage;
@@ -1102,7 +1107,7 @@ namespace VSMaker
             // pokeIcon2
             // 
             pokeIcon2.Image = Properties.Resources.pokeIcon;
-            pokeIcon2.Location = new Point(3, 35);
+            pokeIcon2.Location = new Point(3, 33);
             pokeIcon2.Name = "pokeIcon2";
             pokeIcon2.Size = new Size(32, 32);
             pokeIcon2.SizeMode = PictureBoxSizeMode.CenterImage;
@@ -1112,7 +1117,7 @@ namespace VSMaker
             // pokeIcon1
             // 
             pokeIcon1.Image = Properties.Resources.pokeIcon;
-            pokeIcon1.Location = new Point(3, 3);
+            pokeIcon1.Location = new Point(3, 1);
             pokeIcon1.Name = "pokeIcon1";
             pokeIcon1.Size = new Size(32, 32);
             pokeIcon1.SizeMode = PictureBoxSizeMode.CenterImage;
@@ -1731,7 +1736,7 @@ namespace VSMaker
             trainerEditor_trnProperties.Location = new Point(4, 24);
             trainerEditor_trnProperties.Name = "trainerEditor_trnProperties";
             trainerEditor_trnProperties.Padding = new Padding(3);
-            trainerEditor_trnProperties.Size = new Size(470, 248);
+            trainerEditor_trnProperties.Size = new Size(470, 259);
             trainerEditor_trnProperties.TabIndex = 2;
             trainerEditor_trnProperties.Text = "Trainer Properties";
             trainerEditor_trnProperties.UseVisualStyleBackColor = true;
@@ -1742,7 +1747,7 @@ namespace VSMaker
             panel12.Dock = DockStyle.Fill;
             panel12.Location = new Point(3, 3);
             panel12.Name = "panel12";
-            panel12.Size = new Size(464, 242);
+            panel12.Size = new Size(464, 253);
             panel12.TabIndex = 0;
             // 
             // panel18
@@ -1771,7 +1776,7 @@ namespace VSMaker
             panel18.Dock = DockStyle.Fill;
             panel18.Location = new Point(0, 0);
             panel18.Name = "panel18";
-            panel18.Size = new Size(464, 242);
+            panel18.Size = new Size(464, 253);
             panel18.TabIndex = 0;
             // 
             // label24
