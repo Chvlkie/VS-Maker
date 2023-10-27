@@ -173,6 +173,7 @@
             trainerText_Undo.Name = "trainerText_Undo";
             trainerText_Undo.Size = new Size(56, 22);
             trainerText_Undo.Text = "Undo";
+            trainerText_Undo.Click += trainerText_Undo_Click;
             // 
             // trainerText_redo
             // 
@@ -181,6 +182,7 @@
             trainerText_redo.Name = "trainerText_redo";
             trainerText_redo.Size = new Size(54, 22);
             trainerText_redo.Text = "Redo";
+            trainerText_redo.Click += trainerText_redo_Click;
             // 
             // trainerText_save
             // 
@@ -201,6 +203,7 @@
             MaximizeBox = false;
             Name = "TextEditor";
             Text = "TextEditor";
+            FormClosing += TextEditor_FormClosing;
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
             panel21.ResumeLayout(false);

@@ -12,6 +12,7 @@ namespace VSMaker.Forms
         private readonly int trainerMessageId;
         private readonly Mainform mainform;
         private readonly string seperator = @"\r";
+        private bool unsavedChanges = false;
 
         public TextEditor(Mainform mainform, int trainerMessageId, string message, VsMakerFont vsMakerFont)
         {
@@ -21,6 +22,8 @@ namespace VSMaker.Forms
             this.vsMakerFont = vsMakerFont;
             InitializeComponent();
             UpdateMessage(message);
+            trainerText_Undo.Enabled = false;
+            trainerText_redo.Enabled = false;
         }
 
         public void UpdateMessage(string text)
@@ -32,6 +35,9 @@ namespace VSMaker.Forms
         private void textEditor_Message_TextChanged(object sender, EventArgs e)
         {
             UpdateTextPreview(textEditor_Message.Text);
+            trainerText_Undo.Enabled = textEditor_Message.CanUndo;
+            trainerText_redo.Enabled = textEditor_Message.CanRedo;
+            unsavedChanges = textEditor_Message.CanUndo;
         }
 
         private static string? ReadLine(string text, int lineNumber)
@@ -123,12 +129,52 @@ namespace VSMaker.Forms
             {
                 e.Handled = true;
             }
+            if (e.KeyCode == Keys.Z && e.Control && textEditor_Message.CanUndo)
+            {
+                textEditor_Message.Undo();
+                trainerText_Undo.Enabled = textEditor_Message.CanUndo;
+            }
+            if (e.KeyCode == Keys.Y && e.Control && textEditor_Message.CanRedo)
+            {
+                textEditor_Message.Redo();
+                trainerText_redo.Enabled = textEditor_Message.CanRedo;
+            }
         }
 
         private void trainerText_save_Click(object sender, EventArgs e)
         {
             RomFileSystem.UpdateTrainerTextMessages(textEditor_Message.Text, trainerMessageId);
             mainform.RefreshTrainerMessages();
+        }
+
+        private void trainerText_Undo_Click(object sender, EventArgs e)
+        {
+            if (textEditor_Message.CanUndo)
+            {
+                textEditor_Message.Undo();
+                trainerText_Undo.Enabled = textEditor_Message.CanUndo;
+            }
+        }
+
+        private void trainerText_redo_Click(object sender, EventArgs e)
+        {
+            if (textEditor_Message.CanRedo)
+            {
+                textEditor_Message.Redo();
+                trainerText_redo.Enabled = textEditor_Message.CanRedo;
+            }
+        }
+
+        private void TextEditor_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (unsavedChanges)
+            {
+                var choice = MessageBox.Show("You have unsaved changes.\nDo you wish to discard these changes?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (choice != DialogResult.Yes)
+                {
+                    e.Cancel = true;
+                }
+            }
         }
     }
 }

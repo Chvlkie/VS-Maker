@@ -1685,17 +1685,22 @@ namespace VSMaker
 
         private async void StartGetTrainerTextData(bool repoint = false)
         {
+            loadingData = true;
             trainerText_toolstrip.Enabled = false;
             trainerTextTable_dataGrid.AllowUserToAddRows = true;
+            trainerTextTable_dataGrid.Enabled = false;
             await Task.Run(() => GetTrainerTextTableData().Wait());
             trainerText_toolstrip.Enabled = true;
             trainerTextTable_dataGrid.AllowUserToAddRows = false;
+            trainerTextTable_dataGrid.Enabled = true;
             if (repoint)
             {
                 RepointTrainerOffsetTable(trainerTextTable_dataGrid);
                 statusLabelMessage();
                 Update();
             }
+            loadingData = false;
+
         }
 
         private void ThreadSafeDataTable(DataGridViewRow row)
@@ -1978,11 +1983,13 @@ namespace VSMaker
         {
             if (e.ColumnIndex == 3)
             {
-                textTable_help_lbl.Text = "Double click to open text editor.";
+                statusLabelMessage("Double click to open text editor.");
+                Update();
             }
             else
             {
-                textTable_help_lbl.Text = "";
+                statusLabelMessage();
+                Update();
             }
         }
 
