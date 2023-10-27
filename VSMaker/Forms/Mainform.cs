@@ -1295,9 +1295,7 @@ namespace VSMaker
             {
                 item.Items.Clear();
                 item.Items.Add("-----");
-                pokemons.Where(x => x.PokemonName != "-----"
-                && !x.PokemonName.Equals("egg", StringComparison.InvariantCultureIgnoreCase)
-                && !x.PokemonName.Equals("bad egg", StringComparison.InvariantCultureIgnoreCase)).ToList().ForEach(x => item.Items.Add(x.PokemonName));
+                pokemons.Where(x => !ExcludePokeNames.ExcludeNames.Contains(x.PokemonName.ToLower())).ToList().ForEach(x => item.Items.Add(x.PokemonName));
             }
         }
 
@@ -2913,7 +2911,9 @@ namespace VSMaker
         {
             for (int i = 0; i < trainer_NumPoke_num.Value; i++)
             {
-                if (pokeComboBoxes[i].SelectedIndex == 0 || pokeComboBoxes[i].SelectedItem.ToString() == "-----" || pokeComboBoxes[i].SelectedItem.ToString().Equals("egg", StringComparison.InvariantCultureIgnoreCase) || pokeComboBoxes[i].SelectedItem.ToString().Equals("bad egg", StringComparison.InvariantCultureIgnoreCase))
+                string pokeName = pokeComboBoxes[i].SelectedItem.ToString().ToLower();
+                bool validName = !ExcludePokeNames.ExcludeNames.Contains(pokeName);
+                if (pokeComboBoxes[i].SelectedIndex == 0 || !validName)
                 {
                     MessageBox.Show("You must select a valid Pokemon!", "Unable to Save Pokemon", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;

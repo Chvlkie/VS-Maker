@@ -26,4 +26,22 @@ namespace VSMaker.Data
         public int? SelectedAbility { get; set; }
         public int HeldItemId { get; set; }
     }
+
+    /// <summary>
+    /// A list of Pokemon names to exlude from DropDown Boxes - such as "Bad Egg" etc.
+    /// </summary>
+    public static class ExcludePokeNames
+    {
+        private static List<string> excludeNames;
+        public static List<string> ExcludeNames
+        {
+            get => excludeNames ?? new List<string> 
+            {
+                "-----",
+                "bad egg",
+                "egg"
+            };
+            set => excludeNames = value;
+        }
+    }
 }

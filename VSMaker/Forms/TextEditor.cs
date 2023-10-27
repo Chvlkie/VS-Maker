@@ -37,7 +37,7 @@ namespace VSMaker.Forms
             UpdateTextPreview(textEditor_Message.Text);
             trainerText_Undo.Enabled = textEditor_Message.CanUndo;
             trainerText_redo.Enabled = textEditor_Message.CanRedo;
-            unsavedChanges = textEditor_Message.CanUndo;
+            unsavedChanges = textEditor_Message.CanUndo || textEditor_Message.CanRedo;
         }
 
         private static string? ReadLine(string text, int lineNumber)
