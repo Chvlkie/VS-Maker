@@ -62,6 +62,7 @@ namespace VSMaker
         private bool trainerSpriteMessage;
         private ImageBase trainerTile;
         private bool unsavedChanges;
+
         #endregion Editor Data
 
         #region Forms
@@ -69,6 +70,7 @@ namespace VSMaker
         private ChooseMoves moveEditor;
         private PokemonEditor pokemonEditor;
         private TextEditor textEditor;
+
         #endregion Forms
 
         public Mainform(VsMakerFont vsMakerFont)
@@ -430,6 +432,7 @@ namespace VSMaker
             }
             return true;
         }
+
         #endregion ROM
 
         #region Main Editor
@@ -510,6 +513,7 @@ namespace VSMaker
             OpenRom();
             loadingData = false;
         }
+
         private void statusLabelError(string errorMsg, bool severe = true)
         {
             SafeWriteLabel(statusLabel, errorMsg, new Font(statusLabel.Font, FontStyle.Bold), severe ? Color.Red : Color.DarkOrange);
@@ -563,6 +567,39 @@ namespace VSMaker
             trainer_Name.Enabled = false;
             trainer_Class_comboBox.Enabled = false;
             trainer_MessageTrigger_list.Enabled = false;
+        }
+
+        /// <summary>
+        /// Get Trainer Class Info for given trainerClassId.
+        /// </summary>
+        /// <param name="trainerClassId"></param>
+        private void GetTrainerClassInfo(int trainerClassId)
+        {
+            loadingData = true;
+            statusLabelMessage("Loading Trainer Class Info...");
+            Update();
+            selectedTrainerClass = trainerClasses.Single(x => x.TrainerClassId == trainerClassId);
+
+            trainerClassName.Text = selectedTrainerClass.TrainerClassName;
+            trainerClass_Uses_list.Items.Clear();
+
+            if (selectedTrainerClass.InUse)
+            {
+                foreach (var item in selectedTrainerClass.UsedByTrainers)
+                {
+                    trainerClass_Uses_list.Items.Add($"[{item.DisplayTrainerId}] - {item.TrainerName}");
+                }
+            }
+            selectedTrainerClass.TrainerSpriteFrames = LoadTrainerClassPic(trainerClassId);
+            UpdateTrainerClassPic(trainerClassPicBox);
+
+            SetupTrainerClassEditorInputs(selectedTrainerClass);
+            saveTrainerClassAll_btn.Enabled = true;
+            SetUnsavedChanges(false);
+            undoTrainerClass_btn.Enabled = false;
+            loadingData = false;
+            statusLabelMessage();
+            Update();
         }
 
         private void GoToTrainer()
@@ -768,356 +805,95 @@ namespace VSMaker
             }
             return true;
         }
+
         #endregion Trainer Class Editor
 
         #region Trainer Editor
-
-        private void SaveTrainerName()
-        {
-            RomFileSystem.UpdateCurrentTrainerName(trainer_Name.Text, selectedTrainer.TrainerClassId);
-        }
-
-        private void SetupTrainerEditor()
-        {
-            selectedTrainerIndex = -1;
-            DisableTrainerEditorInputs();
-            trainers_Player_list.Items.Clear();
-            trainers_list.Items.Clear();
-            statusLabelMessage("Setting up Trainer Editor...");
-            Update();
-
-            foreach (var item in trainers)
-            {
-                if (item.IsPlayerTrainer)
-                {
-                    trainers_Player_list.Items.Add($"[{item.DisplayTrainerId}] - {item.TrainerName}");
-                }
-                else
-                {
-                    trainers_list.Items.Add($"[{item.DisplayTrainerId}] - {item.TrainerName}");
-                }
-            }
-            statusLabelMessage();
-            Update();
-            if (selectedTrainer != default)
-            {
-                trainers_list.SelectedIndex = selectedTrainer.TrainerId - 1;
-            }
-        }
-
-        private void trainer_Class_comboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (!loadingData)
-            {
-                int trainerId = trainer_Class_comboBox.SelectedIndex;
-                selectedTrainer.TrainerSpriteFrames = LoadTrainerClassPic(trainerId);
-                UpdateTrainerClassPic(trainerPicBox);
-                trainer_frames_num.Maximum = selectedTrainer.TrainerSpriteFrames;
-                trainer_frames_num.Enabled = selectedTrainer.TrainerSpriteFrames > 0;
-                SetUnsavedChanges(true);
-                undoTrainer_btn.Enabled = unsavedChanges;
-            }
-        }
-
-        private bool ValidateTrainerName()
-        {
-            if (trainer_Name.Text.Length > TrainerFile.maxNameLen)
-            {
-                MessageBox.Show($"Trainer name cannot exceed {TrainerFile.maxNameLen} characters.", "Trainer Name Length", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-            else
-            {
-                return true;
-            }
-        }
-        #endregion Trainer Editor
-
-        #region Unpack NARCs
-
-        private void UnpackEssentialNarcs()
-        {
-            /* Extract essential NARCs sub-archives*/
-            statusLabelMessage("Unpacking essential NARCs...");
-            Update();
-            DSUtils.TryUnpackNarcs(new List<DirNames> {
-                DirNames.trainerProperties,
-                DirNames.trainerParty,
-                DirNames.trainerGraphics,
-                DirNames.textArchives,
-                DirNames.monIcons,
-                DirNames.personalPokeData,
-                DirNames.trainerTextTable,
-                DirNames.trainerTextOffset,
-            });
-            GetTrainerClassEncounterMusic();
-            try
-            {
-                ReadTrainerTable();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-
-            try
-            {
-                ReadPrizeMoneyTable();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        #endregion Unpack NARCs
-
-        #region Get
-
-        private static MessageTrigger GetMessageTriggerDetails(MessageTriggerEnum messageTrigger)
-        {
-            return new MessageTrigger
-            {
-                MessageTriggerId = (int)messageTrigger,
-                MessageTriggerName = messageTrigger.GetEnumDescription(),
-            };
-        }
 
         private void EnableTrainerButtons()
         {
             saveTrainerAll_btn.Enabled = true;
         }
 
-        private void GetAbilities()
+        private void EnablePokemon()
         {
-            statusLabelMessage("Getting Pokemon Abilities...");
-            Update(); abilityNames = GetAbilityNames();
-        }
+            switch (trainer_NumPoke_num.Value)
+            {
+                case 1:
+                    EnableButtons(true);
+                    trainer_Poke_Num_pic.Image = Properties.Resources.pokeballs1;
+                    break;
 
-        private void GetData()
-        {
-            loadingData = true;
-            if (eyeContactMusics.Count == 0)
-            {
-                GetEyeContactMusicLists();
-            }
-            if (trainers.Count == 0)
-            {
-                GetTrainers();
-            }
-            if (trainerClasses.Count == 0)
-            {
-                GetTrainerClasses();
-            }
-            if (messageTriggers.Count == 0)
-            {
-                GetMessageTriggers();
-            }
-            if (trainerMessages.Count == 0)
-            {
-                GetTrainerMessages();
-            }
-            if (itemNames.Count == 0)
-            {
-                GetItems();
-            }
-            if (moveNames.Length == 0)
-            {
-                GetMoves();
-            }
-            if (abilityNames.Length == 0)
-            {
-                GetAbilities();
-            }
-            if (pokemons.Count == 0)
-            {
-                GetPokemon();
-            }
-            if (prizeMoneyList.Count == 0)
-            {
-                GetPrizeMoneyData();
-            }
-            if (gameFamily != gFamEnum.DP && classGenderList.Count == 0)
-            {
-                GetTrainerClassGenders();
-            }
-            loadingData = false;
-        }
+                case 2:
+                    EnableButtons(true, true);
+                    trainer_Poke_Num_pic.Image = Properties.Resources.pokeballs2;
+                    break;
 
-        private void GetItems()
-        {
-            statusLabelMessage("Getting Item Names...");
-            Update();
-            itemNames = GetItemNames().ToList();
+                case 3:
+                    EnableButtons(true, true, true);
+                    trainer_Poke_Num_pic.Image = Properties.Resources.pokeballs3;
+                    break;
 
-            foreach (var item in pokeItemComboBoxes)
-            {
-                item.Items.Clear();
-                itemNames.ForEach(x => item.Items.Add(x));
-            }
-        }
-        private void GetMessageTriggers()
-        {
-            statusLabelMessage("Getting Messages Triggers...");
-            Update();
+                case 4:
+                    EnableButtons(true, true, true, true);
+                    trainer_Poke_Num_pic.Image = Properties.Resources.pokeballs4;
+                    break;
 
-            messageTriggers = new List<MessageTrigger>{
-                GetMessageTriggerDetails(MessageTriggerEnum.preBattleOw),
-                GetMessageTriggerDetails(MessageTriggerEnum.playerWins),
-                GetMessageTriggerDetails(MessageTriggerEnum.postBattleOw),
-                GetMessageTriggerDetails(MessageTriggerEnum.playerLost),
-                GetMessageTriggerDetails(MessageTriggerEnum.trainerLastPoke),
-                GetMessageTriggerDetails(MessageTriggerEnum.trainerLastPokeCritical),
+                case 5:
+                    EnableButtons(true, true, true, true, true);
+                    trainer_Poke_Num_pic.Image = Properties.Resources.pokeballs5;
+                    break;
 
-                GetMessageTriggerDetails(MessageTriggerEnum.doublePreBattleOwTrainer1),
-                GetMessageTriggerDetails(MessageTriggerEnum.doublePlayerWinTrainer1),
-                GetMessageTriggerDetails(MessageTriggerEnum.doublePostBattleOwTrainer1),
-                GetMessageTriggerDetails(MessageTriggerEnum.doubleOnlyOnePokeTrainer1),
+                case 6:
+                    EnableButtons(true, true, true, true, true, true);
+                    trainer_Poke_Num_pic.Image = Properties.Resources.pokeballs6;
+                    break;
 
-                GetMessageTriggerDetails(MessageTriggerEnum.doublePreBattleOwTrainer2),
-                GetMessageTriggerDetails(MessageTriggerEnum.doublePlayerWinTrainer2),
-                GetMessageTriggerDetails(MessageTriggerEnum.doublePostBattleOwTrainer2),
-                GetMessageTriggerDetails(MessageTriggerEnum.doubleOnlyOnePokeTrainer2),
-                GetMessageTriggerDetails(MessageTriggerEnum.rematch),
-                GetMessageTriggerDetails(MessageTriggerEnum.doubleRematchTrainer1),
-                GetMessageTriggerDetails(MessageTriggerEnum.doubleRematchTrainer2),
-                GetMessageTriggerDetails(MessageTriggerEnum.notUsed0B),
-                GetMessageTriggerDetails(MessageTriggerEnum.notUsed0C),
-                GetMessageTriggerDetails(MessageTriggerEnum.notUsed0D),
-                GetMessageTriggerDetails(MessageTriggerEnum.notUsed0E),
-            };
-        }
-
-        private void GetMoves()
-        {
-            statusLabelMessage("Getting Moves...");
-            Update();
-            moveNames = GetAttackNames();
-        }
-
-        private void GetPokemon()
-        {
-            statusLabelMessage("Getting Pokemon...");
-            Update();
-            pokemons = new List<Pokemon>();
-
-            int numberOfPokemon = Directory.GetFiles(gameDirs[DirNames.personalPokeData].unpackedDir, "*").Length;
-            pokemonSpecies = new SpeciesFile[numberOfPokemon];
-
-            for (int i = 0; i < numberOfPokemon; i++)
-            {
-                pokemonSpecies[i] = new SpeciesFile(new FileStream($"{gameDirs[DirNames.personalPokeData].unpackedDir}\\{i:D4}", FileMode.Open));
-            }
-            if (gameFamily == gFamEnum.DP)
-            {
-                pokeNames = GetPokemonNames(0).ToList();
-            }
-            else
-            {
-                pokeNames = GetPokemonNames(0).ToList();
-            }
-            pokemonSpeciesAbilities = GetPokemonAbilities(numberOfPokemon);
-
-            for (int i = 0; i < pokeNames.Count; i++)
-            {
-                var pokemon = new Pokemon
-                {
-                    PokemonId = i,
-                    PokemonName = pokeNames[i],
-                };
-                pokemons.Add(pokemon);
+                default:
+                    EnableButtons();
+                    trainer_Poke_Num_pic.Image = Properties.Resources.pokeballs0;
+                    break;
             }
 
-            foreach (var item in pokeComboBoxes)
+            void EnableButtons(bool poke1 = false, bool poke2 = false, bool poke3 = false, bool poke4 = false, bool poke5 = false, bool poke6 = false)
             {
-                item.Items.Clear();
-                item.Items.Add("-----");
-                pokemons.Where(x => x.PokemonName != "-----"
-                && !x.PokemonName.Equals("egg", StringComparison.InvariantCultureIgnoreCase)
-                && !x.PokemonName.Equals("bad egg", StringComparison.InvariantCultureIgnoreCase)).ToList().ForEach(x => item.Items.Add(x.PokemonName));
+                bool itemEnabled = trainer_Poke_HeldItem_checkBox.Checked;
+                bool movesEnabled = trainer_Poke_Moves_checkBox.Checked;
+                trainer_Poke1_comboBox.Enabled = poke1;
+                trainer_Poke2_comboBox.Enabled = poke2;
+                trainer_Poke3_comboBox.Enabled = poke3;
+                trainer_Poke4_comboBox.Enabled = poke4;
+                trainer_Poke5_comboBox.Enabled = poke5;
+                trainer_Poke6_comboBox.Enabled = poke6;
+
+                trainer_Poke1_Level.Enabled = poke1;
+                trainer_Poke2_Level.Enabled = poke2;
+                trainer_Poke3_Level.Enabled = poke3;
+                trainer_Poke4_Level.Enabled = poke4;
+                trainer_Poke5_Level.Enabled = poke5;
+                trainer_Poke6_Level.Enabled = poke6;
+
+                trainer_Poke1_Item.Enabled = poke1 && itemEnabled;
+                trainer_Poke2_Item.Enabled = poke2 && itemEnabled;
+                trainer_Poke3_Item.Enabled = poke3 && itemEnabled;
+                trainer_Poke4_Item.Enabled = poke4 && itemEnabled;
+                trainer_Poke5_Item.Enabled = poke5 && itemEnabled;
+                trainer_Poke6_Item.Enabled = poke6 && itemEnabled;
+
+                trainer_Poke1_Moves_btn.Enabled = poke1 && movesEnabled;
+                trainer_Poke2_Moves_btn.Enabled = poke2 && movesEnabled;
+                trainer_Poke3_Moves_btn.Enabled = poke3 && movesEnabled;
+                trainer_Poke4_Moves_btn.Enabled = poke4 && movesEnabled;
+                trainer_Poke5_Moves_btn.Enabled = poke5 && movesEnabled;
+                trainer_Poke6_Moves_btn.Enabled = poke6 && movesEnabled;
+
+                trainer_Poke1_Stats_btn.Enabled = poke1;
+                trainer_Poke2_Stats_btn.Enabled = poke2;
+                trainer_Poke3_Stats_btn.Enabled = poke3;
+                trainer_Poke4_Stats_btn.Enabled = poke4;
+                trainer_Poke5_Stats_btn.Enabled = poke5;
+                trainer_Poke6_Stats_btn.Enabled = poke6;
             }
-        }
-
-        private (int abi1, int abi2)[] GetPokemonAbilities(int numberOfPokemon)
-        {
-            statusLabelMessage("Getting Trainer's Pokemon Abilities...");
-            Update();
-            var pokemonSpeciesAbilities = new (int abi1, int abi2)[numberOfPokemon];
-
-            for (int i = 0; i < numberOfPokemon; i++)
-            {
-                pokemonSpeciesAbilities[i] = (pokemonSpecies[i].Ability1, pokemonSpecies[i].Ability2);
-            }
-
-            return pokemonSpeciesAbilities;
-        }
-
-        /// <summary>
-        /// Get a list of TrainerClasses
-        /// </summary>
-        private void GetTrainerClasses()
-        {
-            // Clear list data
-            trainerClasses = new List<TrainerClass>();
-
-            statusLabelMessage("Getting Trainer Classes...");
-            Update();
-            string[] classNames = GetTrainerClassNames();
-
-            if (classNames.Length > byte.MaxValue + 1)
-            {
-                MessageBox.Show($"There can't be more than 256 trainer classes! [Found {classNames.Length}].\nAborting.",
-                    "Too many trainer classes", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            for (int i = 0; i < classNames.Length; i++)
-            {
-                string suffix = "\\" + i.ToString("D4");
-                var classProperties = new TrainerProperties((ushort)i, new FileStream($"{gameDirs[DirNames.trainerProperties].unpackedDir}{suffix}", FileMode.Open));
-
-                var item = new TrainerClass
-                {
-                    TrainerClassId = i,
-                    TrainerClassName = classNames[i],
-                    UsedByTrainers = new List<Trainer>(),
-                    TrainerSpriteFrames = 0,
-                };
-                item.UsedByTrainers.AddRange(trainers.Where(x => x.TrainerClassId == item.TrainerClassId && !x.IsPlayerTrainer));
-                trainerClasses.Add(item);
-            }
-        }
-
-        /// <summary>
-        /// Get Trainer Class Info for given trainerClassId.
-        /// </summary>
-        /// <param name="trainerClassId"></param>
-        private void GetTrainerClassInfo(int trainerClassId)
-        {
-            loadingData = true;
-            statusLabelMessage("Loading Trainer Class Info...");
-            Update();
-            selectedTrainerClass = trainerClasses.Single(x => x.TrainerClassId == trainerClassId);
-
-            trainerClassName.Text = selectedTrainerClass.TrainerClassName;
-            trainerClass_Uses_list.Items.Clear();
-
-            if (selectedTrainerClass.InUse)
-            {
-                foreach (var item in selectedTrainerClass.UsedByTrainers)
-                {
-                    trainerClass_Uses_list.Items.Add($"[{item.DisplayTrainerId}] - {item.TrainerName}");
-                }
-            }
-            selectedTrainerClass.TrainerSpriteFrames = LoadTrainerClassPic(trainerClassId);
-            UpdateTrainerClassPic(trainerClassPicBox);
-
-            SetupTrainerClassEditorInputs(selectedTrainerClass);
-            saveTrainerClassAll_btn.Enabled = true;
-            SetUnsavedChanges(false);
-            undoTrainerClass_btn.Enabled = false;
-            loadingData = false;
-            statusLabelMessage();
-            Update();
         }
 
         /// <summary>
@@ -1261,6 +1037,319 @@ namespace VSMaker
             statusLabelMessage();
             Update();
         }
+
+        private void SaveTrainerName()
+        {
+            RomFileSystem.UpdateCurrentTrainerName(trainer_Name.Text, selectedTrainer.TrainerClassId);
+        }
+
+        private void SetupTrainerEditor()
+        {
+            selectedTrainerIndex = -1;
+            DisableTrainerEditorInputs();
+            trainers_Player_list.Items.Clear();
+            trainers_list.Items.Clear();
+            statusLabelMessage("Setting up Trainer Editor...");
+            Update();
+
+            foreach (var item in trainers)
+            {
+                if (item.IsPlayerTrainer)
+                {
+                    trainers_Player_list.Items.Add($"[{item.DisplayTrainerId}] - {item.TrainerName}");
+                }
+                else
+                {
+                    trainers_list.Items.Add($"[{item.DisplayTrainerId}] - {item.TrainerName}");
+                }
+            }
+            statusLabelMessage();
+            Update();
+            if (selectedTrainer != default)
+            {
+                trainers_list.SelectedIndex = selectedTrainer.TrainerId - 1;
+            }
+        }
+
+        private void trainer_Class_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                int trainerId = trainer_Class_comboBox.SelectedIndex;
+                selectedTrainer.TrainerSpriteFrames = LoadTrainerClassPic(trainerId);
+                UpdateTrainerClassPic(trainerPicBox);
+                trainer_frames_num.Maximum = selectedTrainer.TrainerSpriteFrames;
+                trainer_frames_num.Enabled = selectedTrainer.TrainerSpriteFrames > 0;
+                SetUnsavedChanges(true);
+                undoTrainer_btn.Enabled = unsavedChanges;
+            }
+        }
+
+        private bool ValidateTrainerName()
+        {
+            if (trainer_Name.Text.Length > TrainerFile.maxNameLen)
+            {
+                MessageBox.Show($"Trainer name cannot exceed {TrainerFile.maxNameLen} characters.", "Trainer Name Length", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        #endregion Trainer Editor
+
+        #region Unpack NARCs
+
+        private void UnpackEssentialNarcs()
+        {
+            /* Extract essential NARCs sub-archives*/
+            statusLabelMessage("Unpacking essential NARCs...");
+            Update();
+            DSUtils.TryUnpackNarcs(new List<DirNames> {
+                DirNames.trainerProperties,
+                DirNames.trainerParty,
+                DirNames.trainerGraphics,
+                DirNames.textArchives,
+                DirNames.monIcons,
+                DirNames.personalPokeData,
+                DirNames.trainerTextTable,
+                DirNames.trainerTextOffset,
+            });
+            GetTrainerClassEncounterMusic();
+            try
+            {
+                ReadTrainerTable();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+            try
+            {
+                ReadPrizeMoneyTable();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        #endregion Unpack NARCs
+
+        #region Get
+
+        private static MessageTrigger GetMessageTriggerDetails(MessageTriggerEnum messageTrigger)
+        {
+            return new MessageTrigger
+            {
+                MessageTriggerId = (int)messageTrigger,
+                MessageTriggerName = messageTrigger.GetEnumDescription(),
+            };
+        }
+
+        private void GetAbilities()
+        {
+            statusLabelMessage("Getting Pokemon Abilities...");
+            Update(); abilityNames = GetAbilityNames();
+        }
+
+        private void GetData()
+        {
+            loadingData = true;
+            if (eyeContactMusics.Count == 0)
+            {
+                GetEyeContactMusicLists();
+            }
+            if (trainers.Count == 0)
+            {
+                GetTrainers();
+            }
+            if (trainerClasses.Count == 0)
+            {
+                GetTrainerClasses();
+            }
+            if (messageTriggers.Count == 0)
+            {
+                GetMessageTriggers();
+            }
+            if (trainerMessages.Count == 0)
+            {
+                GetTrainerMessages();
+            }
+            if (itemNames.Count == 0)
+            {
+                GetItems();
+            }
+            if (moveNames.Length == 0)
+            {
+                GetMoves();
+            }
+            if (abilityNames.Length == 0)
+            {
+                GetAbilities();
+            }
+            if (pokemons.Count == 0)
+            {
+                GetPokemon();
+            }
+            if (prizeMoneyList.Count == 0)
+            {
+                GetPrizeMoneyData();
+            }
+            if (gameFamily != gFamEnum.DP && classGenderList.Count == 0)
+            {
+                GetTrainerClassGenders();
+            }
+            loadingData = false;
+        }
+
+        private void GetItems()
+        {
+            statusLabelMessage("Getting Item Names...");
+            Update();
+            itemNames = GetItemNames().ToList();
+
+            foreach (var item in pokeItemComboBoxes)
+            {
+                item.Items.Clear();
+                itemNames.ForEach(x => item.Items.Add(x));
+            }
+        }
+
+        private void GetMessageTriggers()
+        {
+            statusLabelMessage("Getting Messages Triggers...");
+            Update();
+
+            messageTriggers = new List<MessageTrigger>{
+                GetMessageTriggerDetails(MessageTriggerEnum.preBattleOw),
+                GetMessageTriggerDetails(MessageTriggerEnum.playerWins),
+                GetMessageTriggerDetails(MessageTriggerEnum.postBattleOw),
+                GetMessageTriggerDetails(MessageTriggerEnum.playerLost),
+                GetMessageTriggerDetails(MessageTriggerEnum.trainerLastPoke),
+                GetMessageTriggerDetails(MessageTriggerEnum.trainerLastPokeCritical),
+
+                GetMessageTriggerDetails(MessageTriggerEnum.doublePreBattleOwTrainer1),
+                GetMessageTriggerDetails(MessageTriggerEnum.doublePlayerWinTrainer1),
+                GetMessageTriggerDetails(MessageTriggerEnum.doublePostBattleOwTrainer1),
+                GetMessageTriggerDetails(MessageTriggerEnum.doubleOnlyOnePokeTrainer1),
+
+                GetMessageTriggerDetails(MessageTriggerEnum.doublePreBattleOwTrainer2),
+                GetMessageTriggerDetails(MessageTriggerEnum.doublePlayerWinTrainer2),
+                GetMessageTriggerDetails(MessageTriggerEnum.doublePostBattleOwTrainer2),
+                GetMessageTriggerDetails(MessageTriggerEnum.doubleOnlyOnePokeTrainer2),
+                GetMessageTriggerDetails(MessageTriggerEnum.rematch),
+                GetMessageTriggerDetails(MessageTriggerEnum.doubleRematchTrainer1),
+                GetMessageTriggerDetails(MessageTriggerEnum.doubleRematchTrainer2),
+                GetMessageTriggerDetails(MessageTriggerEnum.notUsed0B),
+                GetMessageTriggerDetails(MessageTriggerEnum.notUsed0C),
+                GetMessageTriggerDetails(MessageTriggerEnum.notUsed0D),
+                GetMessageTriggerDetails(MessageTriggerEnum.notUsed0E),
+            };
+        }
+
+        private void GetMoves()
+        {
+            statusLabelMessage("Getting Moves...");
+            Update();
+            moveNames = GetAttackNames();
+        }
+
+        private void GetPokemon()
+        {
+            statusLabelMessage("Getting Pokemon...");
+            Update();
+            pokemons = new List<Pokemon>();
+
+            int numberOfPokemon = Directory.GetFiles(gameDirs[DirNames.personalPokeData].unpackedDir, "*").Length;
+            pokemonSpecies = new SpeciesFile[numberOfPokemon];
+
+            for (int i = 0; i < numberOfPokemon; i++)
+            {
+                pokemonSpecies[i] = new SpeciesFile(new FileStream($"{gameDirs[DirNames.personalPokeData].unpackedDir}\\{i:D4}", FileMode.Open));
+            }
+            if (gameFamily == gFamEnum.DP)
+            {
+                pokeNames = GetPokemonNames(0).ToList();
+            }
+            else
+            {
+                pokeNames = GetPokemonNames(0).ToList();
+            }
+            pokemonSpeciesAbilities = GetPokemonAbilities(numberOfPokemon);
+
+            for (int i = 0; i < pokeNames.Count; i++)
+            {
+                var pokemon = new Pokemon
+                {
+                    PokemonId = i,
+                    PokemonName = pokeNames[i],
+                };
+                pokemons.Add(pokemon);
+            }
+
+            foreach (var item in pokeComboBoxes)
+            {
+                item.Items.Clear();
+                item.Items.Add("-----");
+                pokemons.Where(x => x.PokemonName != "-----"
+                && !x.PokemonName.Equals("egg", StringComparison.InvariantCultureIgnoreCase)
+                && !x.PokemonName.Equals("bad egg", StringComparison.InvariantCultureIgnoreCase)).ToList().ForEach(x => item.Items.Add(x.PokemonName));
+            }
+        }
+
+        private (int abi1, int abi2)[] GetPokemonAbilities(int numberOfPokemon)
+        {
+            statusLabelMessage("Getting Trainer's Pokemon Abilities...");
+            Update();
+            var pokemonSpeciesAbilities = new (int abi1, int abi2)[numberOfPokemon];
+
+            for (int i = 0; i < numberOfPokemon; i++)
+            {
+                pokemonSpeciesAbilities[i] = (pokemonSpecies[i].Ability1, pokemonSpecies[i].Ability2);
+            }
+
+            return pokemonSpeciesAbilities;
+        }
+
+        /// <summary>
+        /// Get a list of TrainerClasses
+        /// </summary>
+        private void GetTrainerClasses()
+        {
+            // Clear list data
+            trainerClasses = new List<TrainerClass>();
+
+            statusLabelMessage("Getting Trainer Classes...");
+            Update();
+            string[] classNames = GetTrainerClassNames();
+
+            if (classNames.Length > byte.MaxValue + 1)
+            {
+                MessageBox.Show($"There can't be more than 256 trainer classes! [Found {classNames.Length}].\nAborting.",
+                    "Too many trainer classes", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            for (int i = 0; i < classNames.Length; i++)
+            {
+                string suffix = "\\" + i.ToString("D4");
+                var classProperties = new TrainerProperties((ushort)i, new FileStream($"{gameDirs[DirNames.trainerProperties].unpackedDir}{suffix}", FileMode.Open));
+
+                var item = new TrainerClass
+                {
+                    TrainerClassId = i,
+                    TrainerClassName = classNames[i],
+                    UsedByTrainers = new List<Trainer>(),
+                    TrainerSpriteFrames = 0,
+                };
+                item.UsedByTrainers.AddRange(trainers.Where(x => x.TrainerClassId == item.TrainerClassId && !x.IsPlayerTrainer));
+                trainerClasses.Add(item);
+            }
+        }
+
         private void GetTrainerMessages()
         {
             trainerMessages = new List<TrainerMessage>();
@@ -1381,6 +1470,8 @@ namespace VSMaker
 
         #endregion TrainerSprite
 
+        #region TrainerTextTable
+
         public XLWorkbook OpenSpreadsheet()
         {
             OpenFileDialog file = new();
@@ -1410,6 +1501,8 @@ namespace VSMaker
             }
         }
 
+        #endregion TrainerTextTable
+
         private static string ReadLine(string text, int lineNumber)
         {
             var reader = new StringReader(text);
@@ -1426,87 +1519,6 @@ namespace VSMaker
 
             return (currentLineNumber == lineNumber) ? line :
                                                        string.Empty;
-        }
-
-        private void EnablePokemon()
-        {
-            switch (trainer_NumPoke_num.Value)
-            {
-                case 1:
-                    EnableButtons(true);
-                    trainer_Poke_Num_pic.Image = Properties.Resources.pokeballs1;
-                    break;
-
-                case 2:
-                    EnableButtons(true, true);
-                    trainer_Poke_Num_pic.Image = Properties.Resources.pokeballs2;
-                    break;
-
-                case 3:
-                    EnableButtons(true, true, true);
-                    trainer_Poke_Num_pic.Image = Properties.Resources.pokeballs3;
-                    break;
-
-                case 4:
-                    EnableButtons(true, true, true, true);
-                    trainer_Poke_Num_pic.Image = Properties.Resources.pokeballs4;
-                    break;
-
-                case 5:
-                    EnableButtons(true, true, true, true, true);
-                    trainer_Poke_Num_pic.Image = Properties.Resources.pokeballs5;
-                    break;
-
-                case 6:
-                    EnableButtons(true, true, true, true, true, true);
-                    trainer_Poke_Num_pic.Image = Properties.Resources.pokeballs6;
-                    break;
-
-                default:
-                    EnableButtons();
-                    trainer_Poke_Num_pic.Image = Properties.Resources.pokeballs0;
-                    break;
-            }
-
-            void EnableButtons(bool poke1 = false, bool poke2 = false, bool poke3 = false, bool poke4 = false, bool poke5 = false, bool poke6 = false)
-            {
-                bool itemEnabled = trainer_Poke_HeldItem_checkBox.Checked;
-                bool movesEnabled = trainer_Poke_Moves_checkBox.Checked;
-                trainer_Poke1_comboBox.Enabled = poke1;
-                trainer_Poke2_comboBox.Enabled = poke2;
-                trainer_Poke3_comboBox.Enabled = poke3;
-                trainer_Poke4_comboBox.Enabled = poke4;
-                trainer_Poke5_comboBox.Enabled = poke5;
-                trainer_Poke6_comboBox.Enabled = poke6;
-
-                trainer_Poke1_Level.Enabled = poke1;
-                trainer_Poke2_Level.Enabled = poke2;
-                trainer_Poke3_Level.Enabled = poke3;
-                trainer_Poke4_Level.Enabled = poke4;
-                trainer_Poke5_Level.Enabled = poke5;
-                trainer_Poke6_Level.Enabled = poke6;
-
-                trainer_Poke1_Item.Enabled = poke1 && itemEnabled;
-                trainer_Poke2_Item.Enabled = poke2 && itemEnabled;
-                trainer_Poke3_Item.Enabled = poke3 && itemEnabled;
-                trainer_Poke4_Item.Enabled = poke4 && itemEnabled;
-                trainer_Poke5_Item.Enabled = poke5 && itemEnabled;
-                trainer_Poke6_Item.Enabled = poke6 && itemEnabled;
-
-                trainer_Poke1_Moves_btn.Enabled = poke1 && movesEnabled;
-                trainer_Poke2_Moves_btn.Enabled = poke2 && movesEnabled;
-                trainer_Poke3_Moves_btn.Enabled = poke3 && movesEnabled;
-                trainer_Poke4_Moves_btn.Enabled = poke4 && movesEnabled;
-                trainer_Poke5_Moves_btn.Enabled = poke5 && movesEnabled;
-                trainer_Poke6_Moves_btn.Enabled = poke6 && movesEnabled;
-
-                trainer_Poke1_Stats_btn.Enabled = poke1;
-                trainer_Poke2_Stats_btn.Enabled = poke2;
-                trainer_Poke3_Stats_btn.Enabled = poke3;
-                trainer_Poke4_Stats_btn.Enabled = poke4;
-                trainer_Poke5_Stats_btn.Enabled = poke5;
-                trainer_Poke6_Stats_btn.Enabled = poke6;
-            }
         }
 
         /// <summary>
@@ -1756,6 +1768,7 @@ namespace VSMaker
             textEditor = new TextEditor(this, trainerMessageId, messageText, vsMakerFont);
             textEditor.ShowDialog();
         }
+
         /// <summary>
         /// Repoint Trainer Text Offset table.
         /// </summary>
@@ -2895,6 +2908,7 @@ namespace VSMaker
             SetUnsavedChanges(false);
             GetTrainerClassInfo(selectedTrainerClass.TrainerClassId);
         }
+
         private bool ValidateTrainerPokemon()
         {
             for (int i = 0; i < trainer_NumPoke_num.Value; i++)
