@@ -266,6 +266,25 @@ namespace VSMaker.Forms
 
         private void pokeStat_Ability_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (!loadingData)
+            {
+                if (!mainform.unsavedChanges)
+                {
+                    mainform.SetUnsavedChanges(true);
+                }
+
+                if (pokeStat_Ability_comboBox.SelectedIndex == TRAINER_PARTY_POKEMON_ABILITY_SLOT2_INDEX)
+                {
+                    trainerFile.party[partyIndex].genderAndAbilityFlags |= PartyPokemon.GenderAndAbilityFlags.ABILITY_SLOT2;
+                }
+                //ability slot 1 flag must be set if the pokemon's gender is forced to male or female, otherwise the pokemon will have ability2 even if the ability2 flag is not set
+                //the ability 1 flag should not be set if neither of the gender flags are set, otherwise this will cause a problem with using alternate forms
+                else if (trainerFile.party[partyIndex].genderAndAbilityFlags.HasFlag(PartyPokemon.GenderAndAbilityFlags.FORCE_MALE)
+                        || trainerFile.party[partyIndex].genderAndAbilityFlags.HasFlag(PartyPokemon.GenderAndAbilityFlags.FORCE_FEMALE))
+                {
+                    trainerFile.party[partyIndex].genderAndAbilityFlags |= PartyPokemon.GenderAndAbilityFlags.ABILITY_SLOT1;
+                }
+            }
         }
     }
 }
