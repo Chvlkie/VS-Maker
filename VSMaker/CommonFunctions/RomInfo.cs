@@ -55,6 +55,7 @@ namespace VSMaker.CommonFunctions
         public static string TrainerTablePath { get; private set; }
 
         public static uint monIconPalTableAddress { get; private set; }
+        public static uint monSpritePalTableAddress { get; private set; }
 
         public static int nullEncounterID { get; private set; }
         public static int abilityNamesTextNumber { get; private set; }
@@ -148,6 +149,7 @@ namespace VSMaker.CommonFunctions
             trainerGraphics,
 
             monIcons,
+            monSprites,
 
             interiorBuildingModels,
             learnsets,
@@ -878,6 +880,93 @@ namespace VSMaker.CommonFunctions
             }
         }
 
+        public static void SetMonIconsSpriteTableAddress()
+        {
+            switch (RomInfo.gameFamily)
+            {
+                case gFamEnum.DP:
+                    switch (gameLanguage)
+                    {
+                        case gLangEnum.English:
+                            monIconPalTableAddress = BitConverter.ToUInt32(DSUtils.ARM9.ReadBytes(0x6B838, 4), 0);
+                            break;
+
+                        case gLangEnum.Italian:
+                            monIconPalTableAddress = BitConverter.ToUInt32(DSUtils.ARM9.ReadBytes(0x6B874, 4), 0);
+                            break;
+
+                        case gLangEnum.German:
+                        case gLangEnum.French:
+                        case gLangEnum.Spanish:
+                            monIconPalTableAddress = BitConverter.ToUInt32(DSUtils.ARM9.ReadBytes(0x6B894, 4), 0);
+                            break;
+
+                        case gLangEnum.Japanese:
+                            monIconPalTableAddress = BitConverter.ToUInt32(DSUtils.ARM9.ReadBytes(0x6FDEC, 4), 0);
+                            break;
+                    }
+                    break;
+
+                case gFamEnum.Plat:
+                    switch (gameLanguage)
+                    {
+                        case gLangEnum.English:
+                            monIconPalTableAddress = BitConverter.ToUInt32(DSUtils.ARM9.ReadBytes(0x79F80, 4), 0);
+                            break;
+
+                        case gLangEnum.Italian:
+                        case gLangEnum.German:
+                        case gLangEnum.French:
+                        case gLangEnum.Spanish:
+                            monIconPalTableAddress = BitConverter.ToUInt32(DSUtils.ARM9.ReadBytes(0x7A020, 4), 0);
+                            break;
+
+                        case gLangEnum.Japanese:
+                            monIconPalTableAddress = BitConverter.ToUInt32(DSUtils.ARM9.ReadBytes(0x79858, 4), 0);
+                            break;
+                    }
+                    break;
+
+                case gFamEnum.HGSS:
+                default:
+                    switch (gameLanguage)
+                    {
+                        case gLangEnum.English:
+                        case gLangEnum.Italian:
+                            monIconPalTableAddress = BitConverter.ToUInt32(DSUtils.ARM9.ReadBytes(0x74408, 4), 0);
+                            break;
+
+                        case gLangEnum.German:
+                            if (gameVersion == gVerEnum.HeartGold)
+                            {
+                                monIconPalTableAddress = BitConverter.ToUInt32(DSUtils.ARM9.ReadBytes(0x74408, 4), 0);
+                            }
+                            else
+                            {
+                                monIconPalTableAddress = BitConverter.ToUInt32(DSUtils.ARM9.ReadBytes(0x74400, 4), 0);
+                            }
+                            break;
+
+                        case gLangEnum.French:
+                        case gLangEnum.Spanish:
+                            if (gameVersion == gVerEnum.HeartGold)
+                            {
+                                monIconPalTableAddress = BitConverter.ToUInt32(DSUtils.ARM9.ReadBytes(0x74400, 4), 0);
+                            }
+                            else
+                            {
+                                monIconPalTableAddress = BitConverter.ToUInt32(DSUtils.ARM9.ReadBytes(0x74408, 4), 0);
+                            }
+                            break;
+
+                        case gLangEnum.Japanese:
+                            monIconPalTableAddress = BitConverter.ToUInt32(DSUtils.ARM9.ReadBytes(0x73EA0, 4), 0);
+                            break;
+                    }
+                    break;
+            }
+        }
+
         private void SetItemScriptFileNumber()
         {
             switch (gameFamily)
@@ -1320,6 +1409,7 @@ namespace VSMaker.CommonFunctions
                         [DirNames.trainerTextOffset] = @"data\a\1\3\1",
 
                         [DirNames.monIcons] = @"data\a\0\2\0",
+                        [DirNames.monSprites] = @"data\a\0\0\4",
 
                         [DirNames.interiorBuildingModels] = @"data\a\1\4\8",
                         [DirNames.learnsets] = @"data\a\0\3\3",
@@ -1335,67 +1425,6 @@ namespace VSMaker.CommonFunctions
             {
                 gameDirs.Add(kvp.Key, (workDir + kvp.Value, workDir + @"unpacked" + '\\' + kvp.Key.ToString()));
             }
-        }
-
-        public void ResetMapCellsColorDictionary()
-        {
-            switch (gameFamily)
-            {
-                case gFamEnum.DP:
-                case gFamEnum.Plat:
-                    MapCellsColorDictionary = PokeDatabase.System.MatrixCellColors.DPPtmatrixColorsDict;
-                    break;
-
-                case gFamEnum.HGSS:
-                    MapCellsColorDictionary = PokeDatabase.System.MatrixCellColors.HGSSmatrixColorsDict;
-                    break;
-            }
-        }
-
-        public static void ReadOWTable()
-        {
-            OverworldTable = new SortedDictionary<uint, (uint spriteID, ushort properties)>();
-            switch (gameFamily)
-            {
-                case gFamEnum.DP:
-                case gFamEnum.Plat:
-                    using (BinaryReader idReader = new BinaryReader(new FileStream(OWtablePath, FileMode.Open)))
-                    {
-                        idReader.BaseStream.Position = OWTableOffset;
-
-                        uint entryID = idReader.ReadUInt32();
-                        idReader.BaseStream.Position -= 4;
-                        while ((entryID = idReader.ReadUInt32()) != 0xFFFF)
-                        {
-                            uint spriteID = idReader.ReadUInt32();
-                            (uint spriteID, ushort properties) tup = (spriteID, 0x0000);
-                            OverworldTable.Add(entryID, tup);
-                        }
-                    }
-                    break;
-
-                case gFamEnum.HGSS:
-                    using (BinaryReader idReader = new BinaryReader(new FileStream(OWtablePath, FileMode.Open)))
-                    {
-                        idReader.BaseStream.Position = OWTableOffset;
-
-                        ushort entryID = idReader.ReadUInt16();
-                        idReader.BaseStream.Position -= 2;
-                        while ((entryID = idReader.ReadUInt16()) != 0xFFFF)
-                        {
-                            uint spriteID = idReader.ReadUInt16();
-                            ushort properties = idReader.ReadUInt16();
-                            (uint spriteID, ushort properties) tup = (spriteID, properties);
-                            OverworldTable.Add(entryID, tup);
-                        }
-                    }
-                    break;
-            }
-            foreach (uint k in ow3DSpriteDict.Keys)
-            {
-                OverworldTable.Add(k, (0x3D3D, 0x3D3D)); //ADD 3D overworld data (spriteID and properties are dummy values)
-            }
-            overworldTableKeys = OverworldTable.Keys.ToArray();
         }
 
         public static void ReadTrainerTable()
@@ -1421,8 +1450,8 @@ namespace VSMaker.CommonFunctions
         public static void ReadPrizeMoneyTable()
         {
             PreparePrizeMoneyData();
-            PrizeMoneyData = new(); 
-            
+            PrizeMoneyData = new();
+
             // Decompress Overlay if game is HGSS
             if (DSUtils.OverlayIsCompressed(prizeMoneyTableOverlayNumber) && gameFamily == gFamEnum.HGSS)
             {
@@ -1432,7 +1461,7 @@ namespace VSMaker.CommonFunctions
             idReader.BaseStream.Position = prizeMoneyTableOffset;
 
             long streamSize = (idReader.BaseStream.Position + prizeMoneyTableSize);
-            
+
             uint count = 0; // trainerId counter for DP and platinum table
             while (idReader.BaseStream.Position <= streamSize)
             {
@@ -1444,11 +1473,11 @@ namespace VSMaker.CommonFunctions
                     PrizeMoneyData.Add((offset, trainerClassId, prizeMoney));
                 }
                 else
-                {    
+                {
                     uint prizeMoney = idReader.ReadByte();
                     PrizeMoneyData.Add((offset, count, prizeMoney));
                     count++;
-                }            
+                }
             }
             var test = PrizeMoneyData;
         }

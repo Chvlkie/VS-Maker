@@ -253,6 +253,16 @@ namespace VSMaker.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap pokeSprite {
+            get {
+                object obj = ResourceManager.GetObject("pokeSprite", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap redoIconSm {
             get {
                 object obj = ResourceManager.GetObject("redoIconSm", resourceCulture);

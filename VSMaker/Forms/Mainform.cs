@@ -31,7 +31,7 @@ namespace VSMaker
 
         #region Editor Data
 
-        private string[] abilityNames = Array.Empty<string>();
+        public string[] abilityNames = Array.Empty<string>();
         private List<ClassGender> classGenderList = new();
         private int currentTrainerMessageIndex;
         private List<string> displayTrainerMessage = new();
@@ -45,7 +45,7 @@ namespace VSMaker
         private List<NumericUpDown> pokeLevels;
         private List<Pokemon> pokemons = new();
         public SpeciesFile[] pokemonSpecies;
-        private (int abi1, int abi2)[] pokemonSpeciesAbilities;
+        public (int abi1, int abi2)[] pokemonSpeciesAbilities;
         private List<string> pokeNames = new();
         private List<PrizeMoney> prizeMoneyList = new();
         private Trainer selectedTrainer;
@@ -577,7 +577,7 @@ namespace VSMaker
 
             //Disable Fields
             trainer_Name.Enabled = false;
-            trainer_Class_comboBox.Enabled = false;
+            trainer_TrainerClass_listBox.Enabled = false;
             trainer_MessageTrigger_list.Enabled = false;
         }
 
@@ -697,7 +697,7 @@ namespace VSMaker
         private void SetupTrainerEditorInputs(Trainer trainer)
         {
             trainer_Name.Enabled = !string.IsNullOrEmpty(trainer.TrainerName);
-            trainer_Class_comboBox.Enabled = trainer.TrainerClassId >= 0;
+            trainer_TrainerClass_listBox.Enabled = trainer.TrainerClassId > -1;
             trainer_frames_num.Enabled = trainer.TrainerSpriteFrames > 0;
             trainer_frames_num.Maximum = trainer.TrainerSpriteFrames;
             trainer_ai_Basic_checkbox.Enabled = true;
@@ -918,7 +918,7 @@ namespace VSMaker
             loadingData = true;
 
             trainer_Message.Text = string.Empty;
-            trainer_Class_comboBox.Items.Clear();
+            trainer_TrainerClass_listBox.Items.Clear();
             trainer_MessageTrigger_list.Items.Clear();
 
             selectedTrainer = trainers.Single(x => x.TrainerId == trainerId);
@@ -947,15 +947,15 @@ namespace VSMaker
 
             foreach (var item in trainerClasses)
             {
-                trainer_Class_comboBox.Items.Add($"[{item.DisplayTrainerClassId}] - {item.TrainerClassName}");
+                trainer_TrainerClass_listBox.Items.Add($"[{item.DisplayTrainerClassId}] - {item.TrainerClassName}");
             }
 
-            if (trainer_Class_comboBox.Items.Count > 0)
+            if (trainer_TrainerClass_listBox.Items.Count > 0)
             {
                 int index = selectedTrainer.TrainerClassId;
-                trainer_Class_comboBox.Enabled = true;
+                trainer_TrainerClass_listBox.Enabled = true;
                 trainer_GoToClass_btn.Enabled = true;
-                trainer_Class_comboBox.SelectedIndex = index > -1 ? index : 0;
+                trainer_TrainerClass_listBox.SelectedIndex = index > -1 ? index : 0;
             }
 
             //Setup Trainer Messages
@@ -1080,11 +1080,11 @@ namespace VSMaker
             }
         }
 
-        private void trainer_Class_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        private void trainer_TrainerClass_listBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (!loadingData)
             {
-                int trainerId = trainer_Class_comboBox.SelectedIndex;
+                int trainerId = trainer_TrainerClass_listBox.SelectedIndex;
                 selectedTrainer.TrainerSpriteFrames = LoadTrainerClassPic(trainerId);
                 UpdateTrainerClassPic(trainerPicBox);
                 trainer_frames_num.Maximum = selectedTrainer.TrainerSpriteFrames;
@@ -1121,6 +1121,7 @@ namespace VSMaker
                 DirNames.trainerGraphics,
                 DirNames.textArchives,
                 DirNames.monIcons,
+                DirNames.monSprites,
                 DirNames.personalPokeData,
                 DirNames.trainerTextTable,
                 DirNames.trainerTextOffset,
@@ -1314,7 +1315,7 @@ namespace VSMaker
         {
             statusLabelMessage("Getting Trainer's Pokemon Abilities...");
             Update();
-            var pokemonSpeciesAbilities = new (int abi1, int abi2)[numberOfPokemon];
+            pokemonSpeciesAbilities = new (int abi1, int abi2)[numberOfPokemon];
 
             for (int i = 0; i < numberOfPokemon; i++)
             {
@@ -1932,7 +1933,7 @@ namespace VSMaker
 
         private void SaveTrainerClass()
         {
-            trainerFile.trp.trainerClass = (byte)trainer_Class_comboBox.SelectedIndex;
+            trainerFile.trp.trainerClass = (byte)trainer_TrainerClass_listBox.SelectedIndex;
         }
 
         private void saveTrainerClassAll_btn_Click(object sender, EventArgs e)
@@ -2248,8 +2249,8 @@ namespace VSMaker
 
         private void trainer_GoToClass_btn_Click(object sender, EventArgs e)
         {
-            int index = trainer_Class_comboBox.SelectedIndex;
-            var text = trainer_Class_comboBox.Items[index].ToString();
+            int index = trainer_TrainerClass_listBox.SelectedIndex;
+            var text = trainer_TrainerClass_listBox.Items[index].ToString();
             int id = int.Parse(text.Remove(0, 1).Remove(3));
             selectedTrainerClass = trainerClasses.SingleOrDefault(x => x.TrainerClassId == id);
             mainContent.SelectedTab = mainContent_trainerClass;
@@ -2555,7 +2556,7 @@ namespace VSMaker
             int pokeId = pokeNames.FindIndex(x => x == cb.SelectedItem.ToString());
             if (gameFamily != gFamEnum.DP)
             {
-                int formId = (int)trainerFile.party[partyPos].formID;
+                int formId = trainerFile.party[partyPos].formID;
 
                 if (formId > 0)
                 {

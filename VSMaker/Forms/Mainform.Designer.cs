@@ -182,13 +182,12 @@ namespace VSMaker
             trainer_Name = new TextBox();
             trainer_Name_Label = new Label();
             panel6 = new Panel();
+            trainer_TrainerClass_listBox = new ListBox();
             trainer_GoToClass_btn = new Button();
             label5 = new Label();
-            trainer_Class_comboBox = new ComboBox();
             trainer_frames_num = new NumericUpDown();
             label3 = new Label();
             trainerPicBox = new PictureBox();
-            label4 = new Label();
             panel5 = new Panel();
             trainer_Player_help_btn = new Button();
             label2 = new Label();
@@ -432,9 +431,9 @@ namespace VSMaker
             panel4.Controls.Add(trainerClass_PrizeMoney_num);
             panel4.Controls.Add(trainerClass_EyeContactMusic_Main_label);
             panel4.Controls.Add(trainerClass_PrizeMoney_label);
-            panel4.Location = new Point(209, 73);
+            panel4.Location = new Point(339, 75);
             panel4.Name = "panel4";
-            panel4.Size = new Size(473, 109);
+            panel4.Size = new Size(549, 109);
             panel4.TabIndex = 7;
             // 
             // eyeContact_help_btn
@@ -580,7 +579,7 @@ namespace VSMaker
             panel3.Controls.Add(trainerClass_introGfx_label);
             panel3.Location = new Point(415, 188);
             panel3.Name = "panel3";
-            panel3.Size = new Size(472, 303);
+            panel3.Size = new Size(472, 298);
             panel3.TabIndex = 6;
             // 
             // trainerClass_Theme_label
@@ -656,15 +655,15 @@ namespace VSMaker
             trainerClass_Used_panel.Controls.Add(trainerClassUse_label);
             trainerClass_Used_panel.Location = new Point(209, 188);
             trainerClass_Used_panel.Name = "trainerClass_Used_panel";
-            trainerClass_Used_panel.Size = new Size(200, 295);
+            trainerClass_Used_panel.Size = new Size(200, 298);
             trainerClass_Used_panel.TabIndex = 4;
             // 
             // trainerClass_GoToTrainer_btn
             // 
             trainerClass_GoToTrainer_btn.Enabled = false;
-            trainerClass_GoToTrainer_btn.Location = new Point(142, 8);
+            trainerClass_GoToTrainer_btn.Location = new Point(130, 8);
             trainerClass_GoToTrainer_btn.Name = "trainerClass_GoToTrainer_btn";
-            trainerClass_GoToTrainer_btn.Size = new Size(53, 23);
+            trainerClass_GoToTrainer_btn.Size = new Size(65, 23);
             trainerClass_GoToTrainer_btn.TabIndex = 35;
             trainerClass_GoToTrainer_btn.Text = "Go To";
             trainerClass_GoToTrainer_btn.UseVisualStyleBackColor = true;
@@ -701,16 +700,17 @@ namespace VSMaker
             trainerClass_Info_panel.Controls.Add(saveTrainerClassAll_btn);
             trainerClass_Info_panel.Controls.Add(trainerClassName);
             trainerClass_Info_panel.Controls.Add(trainerClassName_Label);
-            trainerClass_Info_panel.Location = new Point(209, 3);
+            trainerClass_Info_panel.Location = new Point(339, 3);
             trainerClass_Info_panel.Name = "trainerClass_Info_panel";
-            trainerClass_Info_panel.Size = new Size(473, 69);
+            trainerClass_Info_panel.Size = new Size(548, 69);
             trainerClass_Info_panel.TabIndex = 2;
             // 
             // undoTrainerClass_btn
             // 
+            undoTrainerClass_btn.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             undoTrainerClass_btn.Enabled = false;
             undoTrainerClass_btn.Image = Properties.Resources.undoIconSm;
-            undoTrainerClass_btn.Location = new Point(337, 28);
+            undoTrainerClass_btn.Location = new Point(413, 31);
             undoTrainerClass_btn.Name = "undoTrainerClass_btn";
             undoTrainerClass_btn.Size = new Size(131, 23);
             undoTrainerClass_btn.TabIndex = 14;
@@ -721,9 +721,10 @@ namespace VSMaker
             // 
             // saveTrainerClassAll_btn
             // 
+            saveTrainerClassAll_btn.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             saveTrainerClassAll_btn.Enabled = false;
             saveTrainerClassAll_btn.Image = Properties.Resources.saveIconSm;
-            saveTrainerClassAll_btn.Location = new Point(337, 3);
+            saveTrainerClassAll_btn.Location = new Point(413, 3);
             saveTrainerClassAll_btn.Name = "saveTrainerClassAll_btn";
             saveTrainerClassAll_btn.Size = new Size(131, 23);
             saveTrainerClassAll_btn.TabIndex = 13;
@@ -737,7 +738,7 @@ namespace VSMaker
             trainerClassName.AllowDrop = true;
             trainerClassName.Location = new Point(5, 28);
             trainerClassName.Name = "trainerClassName";
-            trainerClassName.Size = new Size(133, 23);
+            trainerClassName.Size = new Size(150, 23);
             trainerClassName.TabIndex = 11;
             trainerClassName.TextChanged += trainerClassName_TextChanged;
             // 
@@ -755,22 +756,21 @@ namespace VSMaker
             // 
             // trainerClass_Spite_Panel
             // 
-            trainerClass_Spite_Panel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             trainerClass_Spite_Panel.Controls.Add(trainerClass_frames_num);
             trainerClass_Spite_Panel.Controls.Add(trainerClass_frames_label);
             trainerClass_Spite_Panel.Controls.Add(trainerClassPicBox);
             trainerClass_Spite_Panel.Controls.Add(trainerClassPic_label);
-            trainerClass_Spite_Panel.Location = new Point(688, 3);
+            trainerClass_Spite_Panel.Location = new Point(208, 3);
             trainerClass_Spite_Panel.Name = "trainerClass_Spite_Panel";
-            trainerClass_Spite_Panel.Size = new Size(200, 179);
+            trainerClass_Spite_Panel.Size = new Size(125, 179);
             trainerClass_Spite_Panel.TabIndex = 1;
             // 
             // trainerClass_frames_num
             // 
             trainerClass_frames_num.Enabled = false;
-            trainerClass_frames_num.Location = new Point(140, 142);
+            trainerClass_frames_num.Location = new Point(64, 145);
             trainerClass_frames_num.Name = "trainerClass_frames_num";
-            trainerClass_frames_num.Size = new Size(53, 23);
+            trainerClass_frames_num.Size = new Size(49, 23);
             trainerClass_frames_num.TabIndex = 38;
             trainerClass_frames_num.ValueChanged += trainerClass_frames_num_ValueChanged;
             // 
@@ -779,7 +779,7 @@ namespace VSMaker
             trainerClass_frames_label.AutoSize = true;
             trainerClass_frames_label.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             trainerClass_frames_label.ImageAlign = ContentAlignment.MiddleLeft;
-            trainerClass_frames_label.Location = new Point(84, 145);
+            trainerClass_frames_label.Location = new Point(8, 147);
             trainerClass_frames_label.Name = "trainerClass_frames_label";
             trainerClass_frames_label.Size = new Size(50, 15);
             trainerClass_frames_label.TabIndex = 28;
@@ -790,9 +790,11 @@ namespace VSMaker
             // 
             trainerClassPicBox.BackColor = Color.White;
             trainerClassPicBox.BorderStyle = BorderStyle.Fixed3D;
-            trainerClassPicBox.Location = new Point(5, 28);
+            trainerClassPicBox.Image = Properties.Resources.pokeSprite;
+            trainerClassPicBox.Location = new Point(8, 29);
             trainerClassPicBox.Name = "trainerClassPicBox";
-            trainerClassPicBox.Size = new Size(188, 107);
+            trainerClassPicBox.Size = new Size(102, 102);
+            trainerClassPicBox.SizeMode = PictureBoxSizeMode.CenterImage;
             trainerClassPicBox.TabIndex = 26;
             trainerClassPicBox.TabStop = false;
             // 
@@ -803,9 +805,9 @@ namespace VSMaker
             trainerClassPic_label.ImageAlign = ContentAlignment.MiddleLeft;
             trainerClassPic_label.Location = new Point(5, 6);
             trainerClassPic_label.Name = "trainerClassPic_label";
-            trainerClassPic_label.Size = new Size(115, 15);
+            trainerClassPic_label.Size = new Size(44, 15);
             trainerClassPic_label.TabIndex = 27;
-            trainerClassPic_label.Text = "Trainer Class Sprite:";
+            trainerClassPic_label.Text = "Sprite:";
             trainerClassPic_label.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // trainerClass_List_panel
@@ -858,23 +860,24 @@ namespace VSMaker
             // 
             // panel9
             // 
+            panel9.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             panel9.Controls.Add(trainer_MessageTrigger_list);
             panel9.Controls.Add(panel21);
             panel9.Controls.Add(trainer_EditMessage_btn);
             panel9.Controls.Add(label6);
-            panel9.Dock = DockStyle.Bottom;
-            panel9.Location = new Point(203, 365);
+            panel9.Location = new Point(415, 365);
             panel9.Name = "panel9";
-            panel9.Size = new Size(685, 121);
+            panel9.Size = new Size(473, 121);
             panel9.TabIndex = 5;
             // 
             // trainer_MessageTrigger_list
             // 
+            trainer_MessageTrigger_list.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             trainer_MessageTrigger_list.DropDownStyle = ComboBoxStyle.DropDownList;
             trainer_MessageTrigger_list.FormattingEnabled = true;
-            trainer_MessageTrigger_list.Location = new Point(130, 5);
+            trainer_MessageTrigger_list.Location = new Point(118, 9);
             trainer_MessageTrigger_list.Name = "trainer_MessageTrigger_list";
-            trainer_MessageTrigger_list.Size = new Size(239, 23);
+            trainer_MessageTrigger_list.Size = new Size(242, 23);
             trainer_MessageTrigger_list.TabIndex = 50;
             trainer_MessageTrigger_list.SelectedIndexChanged += trainer_MessageTrigger_list_SelectedIndexChanged;
             // 
@@ -886,7 +889,7 @@ namespace VSMaker
             panel21.Controls.Add(trainer_Message);
             panel21.Controls.Add(trainer_Message_Back_btn);
             panel21.Controls.Add(trainer_Message_Next_btn);
-            panel21.Location = new Point(13, 35);
+            panel21.Location = new Point(3, 38);
             panel21.Name = "panel21";
             panel21.Size = new Size(448, 84);
             panel21.TabIndex = 49;
@@ -937,9 +940,9 @@ namespace VSMaker
             // 
             trainer_EditMessage_btn.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             trainer_EditMessage_btn.Enabled = false;
-            trainer_EditMessage_btn.Location = new Point(392, 5);
+            trainer_EditMessage_btn.Location = new Point(365, 9);
             trainer_EditMessage_btn.Name = "trainer_EditMessage_btn";
-            trainer_EditMessage_btn.Size = new Size(69, 23);
+            trainer_EditMessage_btn.Size = new Size(86, 23);
             trainer_EditMessage_btn.TabIndex = 46;
             trainer_EditMessage_btn.Text = "Edit Text";
             trainer_EditMessage_btn.TextImageRelation = TextImageRelation.ImageBeforeText;
@@ -948,10 +951,11 @@ namespace VSMaker
             // 
             // label6
             // 
+            label6.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             label6.AutoSize = true;
             label6.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label6.ImageAlign = ContentAlignment.MiddleLeft;
-            label6.Location = new Point(13, 9);
+            label6.Location = new Point(3, 12);
             label6.Name = "label6";
             label6.Size = new Size(101, 15);
             label6.TabIndex = 11;
@@ -962,7 +966,7 @@ namespace VSMaker
             // 
             panel8.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
             panel8.Controls.Add(trainerEditor_tab);
-            panel8.Location = new Point(209, 77);
+            panel8.Location = new Point(411, 77);
             panel8.Name = "panel8";
             panel8.Size = new Size(478, 287);
             panel8.TabIndex = 4;
@@ -1712,7 +1716,7 @@ namespace VSMaker
             label7.AutoSize = true;
             label7.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label7.ImageAlign = ContentAlignment.MiddleLeft;
-            label7.Location = new Point(15, 9);
+            label7.Location = new Point(3, 8);
             label7.Name = "label7";
             label7.Size = new Size(63, 15);
             label7.TabIndex = 8;
@@ -1723,7 +1727,7 @@ namespace VSMaker
             // 
             trainer_NumPoke_num.Enabled = false;
             trainer_NumPoke_num.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            trainer_NumPoke_num.Location = new Point(87, 5);
+            trainer_NumPoke_num.Location = new Point(87, 6);
             trainer_NumPoke_num.Maximum = new decimal(new int[] { 6, 0, 0, 0 });
             trainer_NumPoke_num.Name = "trainer_NumPoke_num";
             trainer_NumPoke_num.Size = new Size(39, 23);
@@ -1892,7 +1896,7 @@ namespace VSMaker
             label19.AutoSize = true;
             label19.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label19.ImageAlign = ContentAlignment.MiddleLeft;
-            label19.Location = new Point(252, 9);
+            label19.Location = new Point(252, 8);
             label19.Name = "label19";
             label19.Size = new Size(89, 15);
             label19.TabIndex = 63;
@@ -2057,7 +2061,7 @@ namespace VSMaker
             label14.AutoSize = true;
             label14.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label14.ImageAlign = ContentAlignment.MiddleLeft;
-            label14.Location = new Point(15, 9);
+            label14.Location = new Point(3, 8);
             label14.Name = "label14";
             label14.Size = new Size(61, 15);
             label14.TabIndex = 49;
@@ -2070,7 +2074,7 @@ namespace VSMaker
             panel7.Controls.Add(saveTrainerAll_btn);
             panel7.Controls.Add(trainer_Name);
             panel7.Controls.Add(trainer_Name_Label);
-            panel7.Location = new Point(209, 3);
+            panel7.Location = new Point(411, 4);
             panel7.Name = "panel7";
             panel7.Size = new Size(478, 68);
             panel7.TabIndex = 3;
@@ -2080,7 +2084,7 @@ namespace VSMaker
             undoTrainer_btn.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             undoTrainer_btn.Enabled = false;
             undoTrainer_btn.Image = Properties.Resources.undoIconSm;
-            undoTrainer_btn.Location = new Point(337, 27);
+            undoTrainer_btn.Location = new Point(341, 30);
             undoTrainer_btn.Name = "undoTrainer_btn";
             undoTrainer_btn.Size = new Size(131, 23);
             undoTrainer_btn.TabIndex = 16;
@@ -2093,7 +2097,7 @@ namespace VSMaker
             // 
             saveTrainerAll_btn.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             saveTrainerAll_btn.Image = Properties.Resources.saveIconSm;
-            saveTrainerAll_btn.Location = new Point(337, 3);
+            saveTrainerAll_btn.Location = new Point(341, 3);
             saveTrainerAll_btn.Name = "saveTrainerAll_btn";
             saveTrainerAll_btn.Size = new Size(131, 23);
             saveTrainerAll_btn.TabIndex = 15;
@@ -2105,9 +2109,9 @@ namespace VSMaker
             // trainer_Name
             // 
             trainer_Name.AllowDrop = true;
-            trainer_Name.Location = new Point(5, 28);
+            trainer_Name.Location = new Point(7, 27);
             trainer_Name.Name = "trainer_Name";
-            trainer_Name.Size = new Size(133, 23);
+            trainer_Name.Size = new Size(150, 23);
             trainer_Name.TabIndex = 11;
             trainer_Name.TextChanged += trainer_Name_TextChanged;
             // 
@@ -2125,25 +2129,35 @@ namespace VSMaker
             // 
             // panel6
             // 
-            panel6.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            panel6.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            panel6.Controls.Add(trainer_TrainerClass_listBox);
             panel6.Controls.Add(trainer_GoToClass_btn);
             panel6.Controls.Add(label5);
-            panel6.Controls.Add(trainer_Class_comboBox);
             panel6.Controls.Add(trainer_frames_num);
             panel6.Controls.Add(label3);
             panel6.Controls.Add(trainerPicBox);
-            panel6.Controls.Add(label4);
-            panel6.Location = new Point(688, 3);
+            panel6.Location = new Point(208, 3);
             panel6.Name = "panel6";
-            panel6.Size = new Size(200, 258);
+            panel6.Size = new Size(203, 483);
             panel6.TabIndex = 2;
+            // 
+            // trainer_TrainerClass_listBox
+            // 
+            trainer_TrainerClass_listBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+            trainer_TrainerClass_listBox.FormattingEnabled = true;
+            trainer_TrainerClass_listBox.ItemHeight = 15;
+            trainer_TrainerClass_listBox.Location = new Point(7, 179);
+            trainer_TrainerClass_listBox.Name = "trainer_TrainerClass_listBox";
+            trainer_TrainerClass_listBox.Size = new Size(190, 289);
+            trainer_TrainerClass_listBox.TabIndex = 43;
+            trainer_TrainerClass_listBox.SelectedIndexChanged += trainer_TrainerClass_listBox_SelectedIndexChanged;
             // 
             // trainer_GoToClass_btn
             // 
             trainer_GoToClass_btn.Enabled = false;
-            trainer_GoToClass_btn.Location = new Point(140, 193);
+            trainer_GoToClass_btn.Location = new Point(133, 145);
             trainer_GoToClass_btn.Name = "trainer_GoToClass_btn";
-            trainer_GoToClass_btn.Size = new Size(53, 23);
+            trainer_GoToClass_btn.Size = new Size(65, 23);
             trainer_GoToClass_btn.TabIndex = 42;
             trainer_GoToClass_btn.Text = "Go To";
             trainer_GoToClass_btn.UseVisualStyleBackColor = true;
@@ -2154,30 +2168,19 @@ namespace VSMaker
             label5.AutoSize = true;
             label5.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label5.ImageAlign = ContentAlignment.MiddleLeft;
-            label5.Location = new Point(5, 175);
+            label5.Location = new Point(5, 6);
             label5.Name = "label5";
             label5.Size = new Size(78, 15);
             label5.TabIndex = 40;
             label5.Text = "Trainer Class:";
             label5.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // trainer_Class_comboBox
-            // 
-            trainer_Class_comboBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-            trainer_Class_comboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
-            trainer_Class_comboBox.FormattingEnabled = true;
-            trainer_Class_comboBox.Location = new Point(5, 193);
-            trainer_Class_comboBox.Name = "trainer_Class_comboBox";
-            trainer_Class_comboBox.Size = new Size(129, 23);
-            trainer_Class_comboBox.TabIndex = 39;
-            trainer_Class_comboBox.SelectedIndexChanged += trainer_Class_comboBox_SelectedIndexChanged;
-            // 
             // trainer_frames_num
             // 
             trainer_frames_num.Enabled = false;
-            trainer_frames_num.Location = new Point(140, 142);
+            trainer_frames_num.Location = new Point(64, 145);
             trainer_frames_num.Name = "trainer_frames_num";
-            trainer_frames_num.Size = new Size(53, 23);
+            trainer_frames_num.Size = new Size(49, 23);
             trainer_frames_num.TabIndex = 38;
             trainer_frames_num.ValueChanged += trainer_frames_num_ValueChanged;
             // 
@@ -2186,7 +2189,7 @@ namespace VSMaker
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label3.ImageAlign = ContentAlignment.MiddleLeft;
-            label3.Location = new Point(84, 145);
+            label3.Location = new Point(8, 147);
             label3.Name = "label3";
             label3.Size = new Size(50, 15);
             label3.TabIndex = 28;
@@ -2197,23 +2200,13 @@ namespace VSMaker
             // 
             trainerPicBox.BackColor = Color.White;
             trainerPicBox.BorderStyle = BorderStyle.Fixed3D;
-            trainerPicBox.Location = new Point(5, 28);
+            trainerPicBox.Image = Properties.Resources.pokeSprite;
+            trainerPicBox.Location = new Point(8, 29);
             trainerPicBox.Name = "trainerPicBox";
-            trainerPicBox.Size = new Size(188, 107);
+            trainerPicBox.Size = new Size(102, 102);
+            trainerPicBox.SizeMode = PictureBoxSizeMode.CenterImage;
             trainerPicBox.TabIndex = 26;
             trainerPicBox.TabStop = false;
-            // 
-            // label4
-            // 
-            label4.AutoSize = true;
-            label4.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label4.ImageAlign = ContentAlignment.MiddleLeft;
-            label4.Location = new Point(5, 6);
-            label4.Name = "label4";
-            label4.Size = new Size(115, 15);
-            label4.TabIndex = 27;
-            label4.Text = "Trainer Class Sprite:";
-            label4.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // panel5
             // 
@@ -2883,11 +2876,9 @@ namespace VSMaker
         private Panel panel6;
         private Button trainer_GoToClass_btn;
         private Label label5;
-        private ComboBox trainer_Class_comboBox;
         private NumericUpDown trainer_frames_num;
         private Label label3;
         private PictureBox trainerPicBox;
-        private Label label4;
         private TextBox trainer_Name;
         private Label trainer_Name_Label;
         private Panel panel8;
@@ -3027,5 +3018,6 @@ namespace VSMaker
         private PictureBox pokeIcon3;
         private PictureBox pokeIcon2;
         private PictureBox pokeIcon1;
+        private ListBox trainer_TrainerClass_listBox;
     }
 }

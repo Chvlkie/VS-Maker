@@ -439,7 +439,6 @@
             this.applyDynamicHeadersButton.TabIndex = 35;
             this.applyDynamicHeadersButton.Text = "Apply Patch";
             this.applyDynamicHeadersButton.UseVisualStyleBackColor = true;
-            this.applyDynamicHeadersButton.Click += new System.EventHandler(this.dynamicHeadersButton_Click);
             // 
             // disableDynamicTexturesCB
             // 
@@ -480,7 +479,6 @@
             this.disableTextureAnimationsButton.TabIndex = 36;
             this.disableTextureAnimationsButton.Text = "Apply Patch";
             this.disableTextureAnimationsButton.UseVisualStyleBackColor = true;
-            this.disableTextureAnimationsButton.Click += new System.EventHandler(this.disableDynamicTexturesButton_Click);
             // 
             // ROMToolboxDialog
             // 

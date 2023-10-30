@@ -133,17 +133,14 @@
   <data name="pokeballs2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Graphics\Graphics\pokeballs2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="redoIconSm" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Graphics\Icons\redoIconSm.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="pokeItemIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Graphics\Icons\pokeItemIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="exportIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Graphics\Icons\exportIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="pokemon_ds_font" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Fonts\pokemon-ds-font.ttf;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="pokeItemIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Graphics\Icons\pokeItemIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="pokeballs3" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Graphics\Graphics\pokeballs3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -178,19 +175,25 @@
   <data name="sortIconSm" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Graphics\Icons\sortIconSm.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="pokeballs5" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Graphics\Graphics\pokeballs5.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="openFolderIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Graphics\Icons\openFolderIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="pokeballs4" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Graphics\Graphics\pokeballs4.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="pokeballs5" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Graphics\Graphics\pokeballs5.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="redoIconSm" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Graphics\Icons\redoIconSm.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="pokeballs1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Graphics\Graphics\pokeballs1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="pokeIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Graphics\Icons\pokeIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="pokeSprite" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Graphics\Graphics\pokeSprite.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
