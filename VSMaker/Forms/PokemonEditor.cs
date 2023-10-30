@@ -39,6 +39,7 @@ namespace VSMaker.Forms
             SetupForm();
             SetupPokemonSprite();
             SetupPokemonAbility();
+            SetupBallSeals();
             loadingData = false;
         }
 
@@ -130,6 +131,17 @@ namespace VSMaker.Forms
         //pictureBox.Image = pokemonSprite.Get_Image(pokemonTile, pokemonPalette, frameNumber, pictureBox.Width, pictureBox.Height, false, false, false, true, true, -1, OAMenabled);
         //pictureBox.Update();
         //}
+
+        private void SetupBallSeals()
+        {
+            pokeStat_BallSeal_comboBox.Items.Clear();
+            foreach (var item in BallSeals.Seals)
+            {
+                pokeStat_BallSeal_comboBox.Items.Add(item.Name);
+            }
+
+            pokeStat_BallSeal_comboBox.SelectedIndex = trainerFile.party[partyIndex].ballSeals;
+        }
 
         private void SetupStatEditor()
         {
@@ -284,6 +296,18 @@ namespace VSMaker.Forms
                 {
                     trainerFile.party[partyIndex].genderAndAbilityFlags |= PartyPokemon.GenderAndAbilityFlags.ABILITY_SLOT1;
                 }
+            }
+        }
+
+        private void pokeStat_BallSeal_comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!loadingData)
+            {
+                if (!mainform.unsavedChanges)
+                {
+                    mainform.SetUnsavedChanges(true);
+                }
+                trainerFile.party[partyIndex].ballSeals = (ushort)pokeStat_BallSeal_comboBox.SelectedIndex;
             }
         }
     }

@@ -3,7 +3,6 @@
     public class Trainer
     {
         #region TrainerInfo
-
         public string TrainerName { get; set; }
         public int TrainerId { get; set; }
         public int TrainerClassId { get; set; }

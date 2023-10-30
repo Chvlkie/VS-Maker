@@ -133,6 +133,7 @@
             pokeStat_BallSeal_comboBox.Name = "pokeStat_BallSeal_comboBox";
             pokeStat_BallSeal_comboBox.Size = new Size(117, 23);
             pokeStat_BallSeal_comboBox.TabIndex = 46;
+            pokeStat_BallSeal_comboBox.SelectedIndexChanged += pokeStat_BallSeal_comboBox_SelectedIndexChanged;
             // 
             // pokeStat_Dv_slider
             // 
