@@ -140,7 +140,14 @@ namespace VSMaker.Forms
                 pokeStat_BallSeal_comboBox.Items.Add(item.Name);
             }
 
-            pokeStat_BallSeal_comboBox.SelectedIndex = trainerFile.party[partyIndex].ballSeals;
+            if (trainerFile.party[partyIndex].ballSeals > 27)
+            {
+                pokeStat_BallSeal_comboBox.SelectedIndex = 0;
+            }
+            else
+            {
+                pokeStat_BallSeal_comboBox.SelectedIndex = trainerFile.party[partyIndex].ballSeals;
+            }
         }
 
         private void SetupStatEditor()

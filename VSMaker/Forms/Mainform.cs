@@ -5,7 +5,6 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using NarcAPI;
 using System.Data;
 using System.Diagnostics;
-using System.Drawing.Text;
 using VSMaker.CommonFunctions;
 using VSMaker.Data;
 using VSMaker.Fonts;
@@ -65,13 +64,15 @@ namespace VSMaker
         private ImageBase trainerTile;
         public bool unsavedChanges;
         public bool hgEngine = false;
+
         #endregion Editor Data
 
         #region Forms
 
-        private ChooseMoves moveEditor;
-        private PokemonEditor pokemonEditor;
-        private TextEditor textEditor;
+        //private ChooseMoves moveEditor;
+        //private PokemonEditor pokemonEditor;
+        //private TextEditor textEditor;
+        //private UnpackingDialog unpackLoading;
 
         #endregion Forms
 
@@ -1143,6 +1144,7 @@ namespace VSMaker
             {
                 MessageBox.Show(ex.Message);
             }
+
         }
 
         #endregion Unpack NARCs
@@ -1762,20 +1764,28 @@ namespace VSMaker
 
         private void OpenMoveEditor(int partyIndex)
         {
-            moveEditor = new ChooseMoves(this, partyIndex, trainerFile);
-            moveEditor.ShowDialog();
+
+            using (ChooseMoves moveEditor = new ChooseMoves(this, partyIndex, trainerFile))
+            {
+                moveEditor.ShowDialog();
+            };
         }
 
         private void OpenPokemonEditor(int partyIndex)
         {
-            pokemonEditor = new PokemonEditor(this, partyIndex, trainerFile);
-            pokemonEditor.ShowDialog();
+            using (PokemonEditor pokemonEditor = new PokemonEditor(this, partyIndex, trainerFile))
+            {
+                pokemonEditor.ShowDialog();
+
+            }
         }
 
         private void OpenTextEditor(int trainerMessageId, string messageText)
         {
-            textEditor = new TextEditor(this, trainerMessageId, messageText, vsMakerFont);
-            textEditor.ShowDialog();
+            using (TextEditor textEditor = new TextEditor(this, trainerMessageId, messageText, vsMakerFont))
+            {
+                textEditor.ShowDialog();
+            }
         }
 
         /// <summary>
@@ -1872,7 +1882,7 @@ namespace VSMaker
             }
 
             statusLabelMessage("Repacking ROM...");
-
+            Update();
             if (DSUtils.CheckOverlayHasCompressionFlag(1))
             {
                 if (ROMToolboxDialog.overlay1MustBeRestoredFromBackup)
@@ -1886,12 +1896,6 @@ namespace VSMaker
                         DSUtils.CompressOverlay(1);
                     }
                 }
-            }
-
-            // Compress Overlay for HGSS
-            if (DSUtils.CheckOverlayHasCompressionFlag(prizeMoneyTableOverlayNumber) && !DSUtils.OverlayIsCompressed(prizeMoneyTableOverlayNumber) && gameFamily == gFamEnum.HGSS)
-            {
-                DSUtils.CompressOverlay(prizeMoneyTableOverlayNumber);
             }
 
             if (DSUtils.CheckOverlayHasCompressionFlag(RomInfo.initialMoneyOverlayNumber) && !DSUtils.OverlayIsCompressed(RomInfo.initialMoneyOverlayNumber))
@@ -1989,8 +1993,8 @@ namespace VSMaker
 
         private void SaveTrainerClassPrizeMoney()
         {
-            int trainerClassId = selectedTrainerClass.TrainerClassId;
-            int prizeMoneyValue = (int)trainerClass_PrizeMoney_num.Value;
+            ushort trainerClassId = (ushort)selectedTrainerClass.TrainerClassId;
+            ushort prizeMoneyValue = (ushort)trainerClass_PrizeMoney_num.Value;
             var prizeMoney = prizeMoneyList.Find(x => x.TrainerClassId == trainerClassId);
             long offset = prizeMoney.Offset;
             var overlayPath = DSUtils.GetOverlayPath(prizeMoneyTableOverlayNumber);
@@ -2001,19 +2005,18 @@ namespace VSMaker
                 if (OverlayIsCompressed(prizeMoneyTableOverlayNumber))
                 {
                     DecompressOverlay(prizeMoneyTableOverlayNumber);
-
-                    using (EasyWriter wr = new EasyWriter(overlayPath, offset))
-                    {
-                        wr.Write((ushort)trainerClassId);
-                        wr.Write((ushort)prizeMoneyValue);
-                    };
                 }
+                using (EasyWriter wr = new EasyWriter(overlayPath, offset))
+                {
+                    wr.Write(trainerClassId);
+                    wr.Write(prizeMoneyValue);
+                };
             }
             else
             {
                 using (EasyWriter wr = new EasyWriter(overlayPath, offset))
                 {
-                    wr.Write((byte)trainerClass_PrizeMoney_num.Value);
+                    wr.Write((byte)prizeMoneyValue);
                 };
             }
             prizeMoney.PrizeMoneyValue = prizeMoneyValue;
@@ -2935,7 +2938,7 @@ namespace VSMaker
                     MessageBox.Show("You must select a valid Pokemon!", "Unable to Save Pokemon", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
                 }
-                if (trainerFile.party[i].moves[0] == 0 && trainerFile.party[i].moves[1] == 0 && trainerFile.party[i].moves[2] == 0 && trainerFile.party[i].moves[3] == 0)
+                if (trainer_Poke_Moves_checkBox.Checked && trainerFile.party[i].moves[0] == 0 && trainerFile.party[i].moves[1] == 0 && trainerFile.party[i].moves[2] == 0 && trainerFile.party[i].moves[3] == 0)
                 {
                     MessageBox.Show("Choose Pokemon moves is selected.\n\nYou must select at least one move.", "Unable to Save Pokemon", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;

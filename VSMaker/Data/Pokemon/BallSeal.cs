@@ -2,101 +2,52 @@
 {
     public class BallSeal
     {
-        public int BallSealTypeId { get; set; }
+        public ushort BallSealId { get; set; }
         public string Name { get; set; }
     }
-
-    public class BallSealType
-    {
-        public int BallSealTypeId { get; set; }
-        public string Description { get; set; }
-    }
-
-    public static class BallSealTypes
-    {
-        private static List<BallSealType> types;
-
-        public static List<BallSealType> Types
-        {
-            get => types ?? new List<BallSealType>
-            {
-                new BallSealType{BallSealTypeId = 0, Description = "-----"},
-                new BallSealType{BallSealTypeId = 1, Description = "Heart Seal"},
-                new BallSealType{BallSealTypeId = 2, Description = "Star Seal"},
-                new BallSealType{BallSealTypeId = 3, Description = "Line Seal"},
-                new BallSealType{BallSealTypeId = 4, Description = "Smoke Seal"},
-                new BallSealType{BallSealTypeId = 5, Description = "Ele-Seal"},
-                new BallSealType{BallSealTypeId = 6, Description = "Foamy Seal"},
-                new BallSealType{BallSealTypeId = 7, Description = "Fire Seal"},
-                new BallSealType{BallSealTypeId = 8, Description = "Party Seal"},
-                new BallSealType{BallSealTypeId = 9, Description = "Flora Seal"},
-                new BallSealType{BallSealTypeId = 10, Description = "Song Seal"},
-                new BallSealType{BallSealTypeId = 11, Description = "Alphabet Seal"},
-                new BallSealType{BallSealTypeId = 12, Description = "Shock Seal"},
-                new BallSealType{BallSealTypeId = 13, Description = "Mystery Seal"},
-                new BallSealType{BallSealTypeId = 14, Description = "Liquid Seal"},
-                new BallSealType{BallSealTypeId = 15, Description = "Burst Seal"},
-                new BallSealType{BallSealTypeId = 16, Description = "Twinkle Seal"},
-            };
-            set => types = value;
-        }
-    }
-
+  
     public static class BallSeals
     {
         private static List<BallSeal> seals;
         public static List<BallSeal> Seals
         {
-            get
+            get => seals ?? new List<BallSeal>
             {
-                if (seals == default)
-                {
-                    List<BallSeal> ballSeals = new()
-                    {
-                        new BallSeal { BallSealTypeId = 0, Name = BallSealTypes.Types.Find(x => x.BallSealTypeId == 0).Description }
-                    };
-                    ballSeals.AddRange(BallSealRange(1));
-                    ballSeals.AddRange(BallSealRange(2));
-                    ballSeals.AddRange(BallSealRange(3, 'D'));
-                    ballSeals.AddRange(BallSealRange(4, 'D'));
-                    ballSeals.AddRange(BallSealRange(5, 'D'));
-                    ballSeals.AddRange(BallSealRange(6, 'D'));
-                    ballSeals.AddRange(BallSealRange(7, 'D'));
-                    ballSeals.AddRange(BallSealRange(8, 'D'));
-                    ballSeals.AddRange(BallSealRange(9, 'F'));
-                    ballSeals.AddRange(BallSealRange(10, 'G'));
-                    ballSeals.AddRange(BallSealRange(11, 'Z', true));
-                    ballSeals.Add(new BallSeal { BallSealTypeId = 12, Name = BallSealTypes.Types.Find(x => x.BallSealTypeId == 12).Description });
-                    ballSeals.Add(new BallSeal { BallSealTypeId = 13, Name = BallSealTypes.Types.Find(x => x.BallSealTypeId == 13).Description });
-                    ballSeals.Add(new BallSeal { BallSealTypeId = 14, Name = BallSealTypes.Types.Find(x => x.BallSealTypeId == 14).Description });
-                    ballSeals.Add(new BallSeal { BallSealTypeId = 15, Name = BallSealTypes.Types.Find(x => x.BallSealTypeId == 15).Description });
-                    ballSeals.Add(new BallSeal { BallSealTypeId = 16, Name = BallSealTypes.Types.Find(x => x.BallSealTypeId == 16).Description });
-
-                    return ballSeals;
-                }
-                else
-                {
-                    return seals;
-                }
-
-            }
-
+                CreateBallSeal(0, "-----"),
+                CreateBallSeal(1, "Red Petals"),
+                CreateBallSeal(2, "Music Notes"),
+                CreateBallSeal(3, "Confetti"),
+                CreateBallSeal(4, "Lightning Bolts"),
+                CreateBallSeal(5, "Black Smoke Clouds"),
+                CreateBallSeal(6, "Hearts & Stars"),
+                CreateBallSeal(7, "Red Hearts"),
+                CreateBallSeal(8, "Blue Bubbles"),
+                CreateBallSeal(9, "Pink Bubbles"),
+                CreateBallSeal(10, "Yellow Stars"),
+                CreateBallSeal(11, "Cyan & Yellow Stars"),
+                CreateBallSeal(12, "Black & White Smoke"),
+                CreateBallSeal(13, "Orange Flame Clouds"),
+                CreateBallSeal(14, "Blue Flame Clouds"),
+                CreateBallSeal(15, "Pink & Blue Bubbles"),
+                CreateBallSeal(16, "Black & White Smoke, Bubbles, Flame & Confetti"),
+                CreateBallSeal(17, "Orange & Blue Flames, Blue & Yellow Stars"),
+                CreateBallSeal(18, "Music Notes & Lightning"),
+                CreateBallSeal(19, "Lots of Red Petals"),
+                CreateBallSeal(20, "Small Red Pettles & Confetti"),
+                CreateBallSeal(21, "Red Petal Spiral"),
+                CreateBallSeal(22, "3 Confetti Pieces"),
+                CreateBallSeal(23, "Blue Stars"),
+                CreateBallSeal(24, "Blue & Yellow Stars"),
+                CreateBallSeal(25, "Black Smoke From Ground"),
+                CreateBallSeal(26, "Dark Purple Petal Spirals"),
+                CreateBallSeal(27, "Lots of Red Petals 2"),
+            };
             set => seals = value;
         }
 
-        private static List<BallSeal> BallSealRange(int ballSealTypeId, char maxChar = 'F', bool isAlphabetSeal = false)
+        private static BallSeal CreateBallSeal(ushort ballSealId, string name)
         {
-            var returnList = new List<BallSeal>();
-            for (char c = 'A'; c <= maxChar; c++)
-            {
-                string name = !isAlphabetSeal ? $"{BallSealTypes.Types.Find(x => x.BallSealTypeId == ballSealTypeId).Description} {c}"
-                    : $"{c} Seal";
-
-                var item = new BallSeal { BallSealTypeId = ballSealTypeId, Name = name };
-                returnList.Add(item);
-            }
-            return returnList;
-
+           return new BallSeal { BallSealId = ballSealId, Name = name };
         }
     }
 }

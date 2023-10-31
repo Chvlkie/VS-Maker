@@ -36,12 +36,10 @@
             pokeStat_BallSeal_comboBox = new ComboBox();
             pokeStat_Dv_slider = new TrackBar();
             pokeStat_Form_comboBox = new ComboBox();
-            label7 = new Label();
             pokeStat_Ability_comboBox = new ComboBox();
             label6 = new Label();
             label5 = new Label();
             pokeStat_Dv_num = new NumericUpDown();
-            pokeStat_Nature_comboBox = new ComboBox();
             pokeStat_Gender_comboBox = new ComboBox();
             label3 = new Label();
             label2 = new Label();
@@ -59,7 +57,7 @@
             // 
             toolStrip1.Location = new Point(0, 0);
             toolStrip1.Name = "toolStrip1";
-            toolStrip1.Size = new Size(412, 25);
+            toolStrip1.Size = new Size(428, 25);
             toolStrip1.TabIndex = 0;
             toolStrip1.Text = "toolStrip1";
             // 
@@ -71,12 +69,10 @@
             panel1.Controls.Add(pokeStat_BallSeal_comboBox);
             panel1.Controls.Add(pokeStat_Dv_slider);
             panel1.Controls.Add(pokeStat_Form_comboBox);
-            panel1.Controls.Add(label7);
             panel1.Controls.Add(pokeStat_Ability_comboBox);
             panel1.Controls.Add(label6);
             panel1.Controls.Add(label5);
             panel1.Controls.Add(pokeStat_Dv_num);
-            panel1.Controls.Add(pokeStat_Nature_comboBox);
             panel1.Controls.Add(pokeStat_Gender_comboBox);
             panel1.Controls.Add(label3);
             panel1.Controls.Add(label2);
@@ -86,7 +82,7 @@
             panel1.Dock = DockStyle.Fill;
             panel1.Location = new Point(0, 25);
             panel1.Name = "panel1";
-            panel1.Size = new Size(412, 240);
+            panel1.Size = new Size(428, 240);
             panel1.TabIndex = 1;
             // 
             // pokeSprite_back
@@ -107,7 +103,7 @@
             label11.BackColor = Color.Transparent;
             label11.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label11.ForeColor = Color.Red;
-            label11.Location = new Point(364, 216);
+            label11.Location = new Point(382, 216);
             label11.Name = "label11";
             label11.Size = new Size(34, 15);
             label11.TabIndex = 48;
@@ -119,7 +115,7 @@
             label10.BackColor = Color.Transparent;
             label10.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label10.ForeColor = Color.LimeGreen;
-            label10.Location = new Point(142, 216);
+            label10.Location = new Point(132, 216);
             label10.Name = "label10";
             label10.Size = new Size(30, 15);
             label10.TabIndex = 47;
@@ -129,19 +125,19 @@
             // 
             pokeStat_BallSeal_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             pokeStat_BallSeal_comboBox.FormattingEnabled = true;
-            pokeStat_BallSeal_comboBox.Location = new Point(281, 131);
+            pokeStat_BallSeal_comboBox.Location = new Point(132, 78);
             pokeStat_BallSeal_comboBox.Name = "pokeStat_BallSeal_comboBox";
-            pokeStat_BallSeal_comboBox.Size = new Size(117, 23);
+            pokeStat_BallSeal_comboBox.Size = new Size(284, 23);
             pokeStat_BallSeal_comboBox.TabIndex = 46;
             pokeStat_BallSeal_comboBox.SelectedIndexChanged += pokeStat_BallSeal_comboBox_SelectedIndexChanged;
             // 
             // pokeStat_Dv_slider
             // 
-            pokeStat_Dv_slider.Location = new Point(135, 171);
+            pokeStat_Dv_slider.Location = new Point(130, 161);
             pokeStat_Dv_slider.Margin = new Padding(15);
             pokeStat_Dv_slider.Maximum = 255;
             pokeStat_Dv_slider.Name = "pokeStat_Dv_slider";
-            pokeStat_Dv_slider.Size = new Size(263, 45);
+            pokeStat_Dv_slider.Size = new Size(286, 45);
             pokeStat_Dv_slider.TabIndex = 45;
             pokeStat_Dv_slider.Value = 1;
             pokeStat_Dv_slider.Scroll += pokeStat_Dv_slider_Scroll;
@@ -152,23 +148,11 @@
             pokeStat_Form_comboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
             pokeStat_Form_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             pokeStat_Form_comboBox.FormattingEnabled = true;
-            pokeStat_Form_comboBox.Location = new Point(140, 78);
+            pokeStat_Form_comboBox.Location = new Point(132, 25);
             pokeStat_Form_comboBox.Name = "pokeStat_Form_comboBox";
-            pokeStat_Form_comboBox.Size = new Size(117, 23);
+            pokeStat_Form_comboBox.Size = new Size(87, 23);
             pokeStat_Form_comboBox.TabIndex = 44;
             pokeStat_Form_comboBox.SelectedIndexChanged += pokeStat_Form_comboBox_SelectedIndexChanged;
-            // 
-            // label7
-            // 
-            label7.AutoSize = true;
-            label7.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            label7.ImageAlign = ContentAlignment.MiddleLeft;
-            label7.Location = new Point(281, 7);
-            label7.Name = "label7";
-            label7.Size = new Size(46, 15);
-            label7.TabIndex = 39;
-            label7.Text = "Nature";
-            label7.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // pokeStat_Ability_comboBox
             // 
@@ -177,9 +161,9 @@
             pokeStat_Ability_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             pokeStat_Ability_comboBox.Enabled = false;
             pokeStat_Ability_comboBox.FormattingEnabled = true;
-            pokeStat_Ability_comboBox.Location = new Point(281, 78);
+            pokeStat_Ability_comboBox.Location = new Point(329, 25);
             pokeStat_Ability_comboBox.Name = "pokeStat_Ability_comboBox";
-            pokeStat_Ability_comboBox.Size = new Size(117, 23);
+            pokeStat_Ability_comboBox.Size = new Size(87, 23);
             pokeStat_Ability_comboBox.TabIndex = 38;
             pokeStat_Ability_comboBox.SelectedIndexChanged += pokeStat_Ability_comboBox_SelectedIndexChanged;
             // 
@@ -188,7 +172,7 @@
             label6.AutoSize = true;
             label6.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label6.ImageAlign = ContentAlignment.MiddleLeft;
-            label6.Location = new Point(281, 60);
+            label6.Location = new Point(329, 7);
             label6.Name = "label6";
             label6.Size = new Size(42, 15);
             label6.TabIndex = 37;
@@ -200,7 +184,7 @@
             label5.AutoSize = true;
             label5.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label5.ImageAlign = ContentAlignment.MiddleLeft;
-            label5.Location = new Point(281, 113);
+            label5.Location = new Point(132, 60);
             label5.Name = "label5";
             label5.Size = new Size(53, 15);
             label5.TabIndex = 35;
@@ -209,7 +193,7 @@
             // 
             // pokeStat_Dv_num
             // 
-            pokeStat_Dv_num.Location = new Point(142, 131);
+            pokeStat_Dv_num.Location = new Point(231, 129);
             pokeStat_Dv_num.Maximum = new decimal(new int[] { 255, 0, 0, 0 });
             pokeStat_Dv_num.Name = "pokeStat_Dv_num";
             pokeStat_Dv_num.Size = new Size(50, 23);
@@ -217,26 +201,15 @@
             pokeStat_Dv_num.Value = new decimal(new int[] { 1, 0, 0, 0 });
             pokeStat_Dv_num.ValueChanged += pokeStat_Dv_num_ValueChanged;
             // 
-            // pokeStat_Nature_comboBox
-            // 
-            pokeStat_Nature_comboBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-            pokeStat_Nature_comboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
-            pokeStat_Nature_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
-            pokeStat_Nature_comboBox.FormattingEnabled = true;
-            pokeStat_Nature_comboBox.Location = new Point(281, 25);
-            pokeStat_Nature_comboBox.Name = "pokeStat_Nature_comboBox";
-            pokeStat_Nature_comboBox.Size = new Size(117, 23);
-            pokeStat_Nature_comboBox.TabIndex = 33;
-            // 
             // pokeStat_Gender_comboBox
             // 
             pokeStat_Gender_comboBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
             pokeStat_Gender_comboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
             pokeStat_Gender_comboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             pokeStat_Gender_comboBox.FormattingEnabled = true;
-            pokeStat_Gender_comboBox.Location = new Point(140, 25);
+            pokeStat_Gender_comboBox.Location = new Point(231, 25);
             pokeStat_Gender_comboBox.Name = "pokeStat_Gender_comboBox";
-            pokeStat_Gender_comboBox.Size = new Size(117, 23);
+            pokeStat_Gender_comboBox.Size = new Size(87, 23);
             pokeStat_Gender_comboBox.TabIndex = 32;
             pokeStat_Gender_comboBox.SelectedIndexChanged += pokeStat_Gender_comboBox_SelectedIndexChanged;
             // 
@@ -245,7 +218,7 @@
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label3.ImageAlign = ContentAlignment.MiddleLeft;
-            label3.Location = new Point(140, 7);
+            label3.Location = new Point(231, 7);
             label3.Name = "label3";
             label3.Size = new Size(49, 15);
             label3.TabIndex = 31;
@@ -257,7 +230,7 @@
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label2.ImageAlign = ContentAlignment.MiddleLeft;
-            label2.Location = new Point(140, 60);
+            label2.Location = new Point(132, 7);
             label2.Name = "label2";
             label2.Size = new Size(36, 15);
             label2.TabIndex = 30;
@@ -269,7 +242,7 @@
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label1.ImageAlign = ContentAlignment.MiddleLeft;
-            label1.Location = new Point(140, 113);
+            label1.Location = new Point(132, 131);
             label1.Name = "label1";
             label1.Size = new Size(87, 15);
             label1.TabIndex = 29;
@@ -304,7 +277,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(412, 265);
+            ClientSize = new Size(428, 265);
             Controls.Add(panel1);
             Controls.Add(toolStrip1);
             Name = "PokemonEditor";
@@ -327,13 +300,11 @@
         private Label label4;
         private Label label5;
         private NumericUpDown pokeStat_Dv_num;
-        private ComboBox pokeStat_Nature_comboBox;
         private ComboBox pokeStat_Gender_comboBox;
         private Label label3;
         private Label label2;
         private Label label1;
         private ComboBox pokeStat_Form_comboBox;
-        private Label label7;
         private ComboBox pokeStat_Ability_comboBox;
         private Label label6;
         private TrackBar pokeStat_Dv_slider;
