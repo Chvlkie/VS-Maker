@@ -39,7 +39,7 @@ namespace VSMaker
         private List<string> itemNames = new();
         private bool loadingData = false;
         private List<MessageTrigger> messageTriggers = new();
-        private string[] moveNames = Array.Empty<string>();
+        public List<string> moveNames = new();
         private List<ComboBox> pokeComboBoxes;
         private List<ComboBox> pokeItemComboBoxes;
         private List<NumericUpDown> pokeLevels;
@@ -1121,7 +1121,6 @@ namespace VSMaker
                 DirNames.trainerGraphics,
                 DirNames.textArchives,
                 DirNames.monIcons,
-                DirNames.monSprites,
                 DirNames.personalPokeData,
                 DirNames.trainerTextTable,
                 DirNames.trainerTextOffset,
@@ -1192,7 +1191,7 @@ namespace VSMaker
             {
                 GetItems();
             }
-            if (moveNames.Length == 0)
+            if (moveNames.Count == 0)
             {
                 GetMoves();
             }
@@ -1264,7 +1263,7 @@ namespace VSMaker
         {
             statusLabelMessage("Getting Moves...");
             Update();
-            moveNames = GetAttackNames();
+            moveNames = GetAttackNames().ToList();
         }
 
         private void GetPokemon()
@@ -1890,7 +1889,7 @@ namespace VSMaker
             }
 
             // Compress Overlay for HGSS
-            if (!DSUtils.OverlayIsCompressed(prizeMoneyTableOverlayNumber) && gameFamily == gFamEnum.HGSS)
+            if (DSUtils.CheckOverlayHasCompressionFlag(prizeMoneyTableOverlayNumber) && !DSUtils.OverlayIsCompressed(prizeMoneyTableOverlayNumber) && gameFamily == gFamEnum.HGSS)
             {
                 DSUtils.CompressOverlay(prizeMoneyTableOverlayNumber);
             }
@@ -2934,6 +2933,11 @@ namespace VSMaker
                 if (pokeComboBoxes[i].SelectedIndex == 0 || !validName)
                 {
                     MessageBox.Show("You must select a valid Pokemon!", "Unable to Save Pokemon", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+                if (trainerFile.party[i].moves[0] == 0 && trainerFile.party[i].moves[1] == 0 && trainerFile.party[i].moves[2] == 0 && trainerFile.party[i].moves[3] == 0)
+                {
+                    MessageBox.Show("Choose Pokemon moves is selected.\n\nYou must select at least one move.", "Unable to Save Pokemon", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
                 }
             }

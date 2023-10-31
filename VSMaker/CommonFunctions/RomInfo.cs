@@ -1409,7 +1409,6 @@ namespace VSMaker.CommonFunctions
                         [DirNames.trainerTextOffset] = @"data\a\1\3\1",
 
                         [DirNames.monIcons] = @"data\a\0\2\0",
-                        [DirNames.monSprites] = @"data\a\0\0\4",
 
                         [DirNames.interiorBuildingModels] = @"data\a\1\4\8",
                         [DirNames.learnsets] = @"data\a\0\3\3",
