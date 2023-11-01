@@ -840,6 +840,7 @@
             Controls.Add(tableLayoutPanel1);
             Controls.Add(panel1);
             Name = "ChooseMoves";
+            StartPosition = FormStartPosition.CenterParent;
             Text = "Pokemon Moves";
             panel1.ResumeLayout(false);
             panel1.PerformLayout();

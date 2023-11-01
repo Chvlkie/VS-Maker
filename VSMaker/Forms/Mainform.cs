@@ -64,6 +64,8 @@ namespace VSMaker
         private ImageBase trainerTile;
         public bool unsavedChanges;
         public bool hgEngine = false;
+        public string romFileName;
+        public string saveFileName;
 
         #endregion Editor Data
 
@@ -214,7 +216,7 @@ namespace VSMaker
             SetEncounterMusicTableOffsetToRAMAddress();
             trainerClassEncounterMusicDict = new Dictionary<byte, (uint entryOffset, ushort musicD, ushort? musicN)>();
 
-            uint encounterMusicTableTableStartAddress = BitConverter.ToUInt32(ARM9.ReadBytes(encounterMusicTableOffsetToRAMAddress, 4), 0) - DSUtils.ARM9.address;
+            uint encounterMusicTableTableStartAddress = BitConverter.ToUInt32(ARM9.ReadBytes(encounterMusicTableOffsetToRAMAddress, 4), 0) - ARM9.address;
             uint tableSizeOffset = gameFamily == gFamEnum.HGSS ? (uint)12 : (uint)10;
             byte tableEntriesCount = ARM9.ReadByte(encounterMusicTableOffsetToRAMAddress - tableSizeOffset);
 
@@ -257,7 +259,14 @@ namespace VSMaker
             trainerClass_Gender_comboBox.Items.Add(Gender.Descriptions.None);
         }
 
-        private void OpenRom()
+        private void OpenLoadingDialog(LoadingDataEnum loadType)
+        {
+            loadingDialog = new LoadingDialog(this, loadType);
+            loadingDialog.StartPosition = FormStartPosition.CenterParent;
+            loadingDialog.ShowDialog();
+        }
+
+        private async void OpenRom()
         {
             OpenFileDialog openRom = new()
             {
@@ -269,9 +278,10 @@ namespace VSMaker
             }
 
             loadingData = true;
-            RomFileSystem.SetupROMLanguage(openRom.FileName);
+            romFileName = openRom.FileName;
+            RomFileSystem.SetupROMLanguage(romFileName);
             /* Set ROM gameVersion and language */
-            romInfo = new RomInfo(RomFileSystem.gameCode, openRom.FileName, useSuffix: true);
+            romInfo = new RomInfo(RomFileSystem.gameCode, romFileName, useSuffix: true);
 
             if (string.IsNullOrWhiteSpace(romID) || string.IsNullOrWhiteSpace(fileName))
             {
@@ -285,7 +295,7 @@ namespace VSMaker
             {
                 case -1:
                     statusLabelMessage("Loading aborted");
-                    Update();
+
                     return;
 
                 case 0:
@@ -307,38 +317,62 @@ namespace VSMaker
                                 "\nMake sure no other process is using the extracted ROM folder while VS-Maker is running.", "Concurrent Access", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             return;
                         }
-                        Update();
                     }
 
                     try
                     {
-                        if (!UnpackRom(openRom.FileName))
-                        {
-                            statusLabelError("ERROR");
-                            languageLabel.Text = "";
-                            versionLabel.Text = "Error";
-                            return;
-                        }
-                        DSUtils.ARM9.EditSize(-12);
+                        OpenLoadingDialog(LoadingDataEnum.UnpackRom);
                     }
                     catch (IOException)
                     {
                         MessageBox.Show("Can't access temp directory: \n" + workDir + "\nThis might be a temporary issue.\nMake sure no other process is using it and try again.", "Open Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         statusLabelError("ERROR: Concurrent access to " + workDir);
-                        Update();
+
                         return;
                     }
                     break;
             }
             statusLabelMessage("Attempting to unpack NARCs from folder...");
-            Update();
+
+            OpenLoadingDialog(LoadingDataEnum.LoadRomData);
+            OpenLoadingDialog(LoadingDataEnum.UnpackNarcs);
+            OpenLoadingDialog(LoadingDataEnum.SetupEditor);
+            openRom_toolstrip.Enabled = false;
+            openFolder_toolstrip.Enabled = false;
+            openRom_btn.Enabled = false;
+            openFolder_btn.Enabled = false;
+            save_toolstrip.Enabled = true;
+            save_btn.Enabled = true;
+            mainContent.Enabled = true;
+            mainContent.Visible = true;
+            Text += $"  -  {fileName}";
+        }
+
+        public void BeginLoadRomData()
+        {
+            CheckROMLanguage();
             ReadROMInitData();
+        }
 
-            // Unpack Narcs
+        public void BeginUnpackRomData()
+        {
+            if (!UnpackRom(romFileName))
+            {
+                statusLabelError("ERROR");
+                languageLabel.Text = "";
+                versionLabel.Text = "Error";
+            }
+            ARM9.EditSize(-12);
+        }
+
+        public void BeginUnpackNarcs()
+        {
             UnpackEssentialNarcs();
-            GetData();
+        }
 
-            // Setup data for initial trainer class tab.
+        public void BeginSetupEditor()
+        {
+            GetData();
             SetupTrainerClassEditor();
         }
 
@@ -371,43 +405,19 @@ namespace VSMaker
             {
                 return;
             }
-           
-            CheckROMLanguage();
-            ReadROMInitData();
 
-            loadingDialog = new("Unpacking Essential NARCs");
-
-            async Task<bool> unpackNarcs()
-            {
-                try
-                {
-                    await Task.Yield();
-                    return await UnpackNarcs();
-                }
-                finally
-                {
-                    loadingDialog.Close();
-                }
-            }
-            var task = unpackNarcs();
-            loadingDialog.ShowDialog();
-            object data = await task;
-
-            //loadingDialog = new("Getting Editor Data");
-            //loadingDialog.Show();
-            GetData();
-            SetupTrainerClassEditor();
-            //loadingDialog.Close();
-        }
-
-        private async Task<bool> UnpackNarcs()
-        {
-            UnpackEssentialNarcs();
-            if (!loadingDialog.IsDisposed)
-            {
-                loadingDialog.Close();
-            }
-            return Task.CompletedTask.IsCompleted;
+            OpenLoadingDialog(LoadingDataEnum.LoadRomData);
+            OpenLoadingDialog(LoadingDataEnum.UnpackNarcs);
+            OpenLoadingDialog(LoadingDataEnum.SetupEditor);
+            openRom_toolstrip.Enabled = false;
+            openFolder_toolstrip.Enabled = false;
+            openRom_btn.Enabled = false;
+            openFolder_btn.Enabled = false;
+            save_toolstrip.Enabled = true;
+            save_btn.Enabled = true;
+            mainContent.Enabled = true;
+            mainContent.Visible = true;
+            Text += $"  -  {fileName}";
         }
 
         private void ReadROMInitData()
@@ -426,23 +436,12 @@ namespace VSMaker
                 }
             }
             //mainTabControl.Show();
-            openRom_toolstrip.Enabled = false;
-            openFolder_toolstrip.Enabled = false;
-            openRom_btn.Enabled = false;
-            openFolder_btn.Enabled = false;
-            save_toolstrip.Enabled = true;
-            save_btn.Enabled = true;
-            mainContent.Enabled = true;
-            mainContent.Visible = true;
-
             statusLabelMessage();
-            Text += $"  -  {fileName}";
         }
 
         private bool UnpackRom(string ndsFileName)
         {
             statusLabelMessage($"Unpacking ROM contents to {workDir} ...");
-            Update();
 
             Directory.CreateDirectory(workDir);
             Process unpack = new();
@@ -514,7 +513,7 @@ namespace VSMaker
             }
         }
 
-        private void openFolder_btn_Click(object sender, EventArgs e)
+        private async void openFolder_btn_Click(object sender, EventArgs e)
         {
             try
             {
@@ -527,7 +526,7 @@ namespace VSMaker
             }
         }
 
-        private void openFolder_toolstrip_Click(object sender, EventArgs e)
+        private async void openFolder_toolstrip_Click(object sender, EventArgs e)
         {
             try
             {
@@ -542,19 +541,19 @@ namespace VSMaker
             }
         }
 
-        private void openRom_btn_Click(object sender, EventArgs e)
+        private async void openRom_btn_Click(object sender, EventArgs e)
         {
             OpenRom();
             loadingData = false;
         }
 
-        private void openRom_toolstrip_Click(object sender, EventArgs e)
+        private async void openRom_toolstrip_Click(object sender, EventArgs e)
         {
             OpenRom();
             loadingData = false;
         }
 
-        private void statusLabelError(string errorMsg, bool severe = true)
+        private async void statusLabelError(string errorMsg, bool severe = true)
         {
             SafeWriteLabel(statusLabel, errorMsg, new Font(statusLabel.Font, FontStyle.Bold), severe ? Color.Red : Color.DarkOrange);
 
@@ -564,7 +563,7 @@ namespace VSMaker
             statusLabel.Invalidate();
         }
 
-        private void statusLabelMessage(string msg = "Ready")
+        private async void statusLabelMessage(string msg = "Ready")
         {
             SafeWriteLabel(statusLabel, msg, new Font(statusLabel.Font, FontStyle.Regular), Color.Black);
         }
@@ -617,7 +616,7 @@ namespace VSMaker
         {
             loadingData = true;
             statusLabelMessage("Loading Trainer Class Info...");
-            Update();
+
             selectedTrainerClass = trainerClasses.Single(x => x.TrainerClassId == trainerClassId);
 
             trainerClassName.Text = selectedTrainerClass.TrainerClassName;
@@ -638,7 +637,6 @@ namespace VSMaker
             SetUnsavedChanges(false);
             loadingData = false;
             statusLabelMessage();
-            Update();
         }
 
         private void GoToTrainer()
@@ -661,7 +659,6 @@ namespace VSMaker
             ClearTrainerClassLists();
             DisableTrainerClassEditorInputs();
             statusLabelMessage("Setting up Trainer Class Editor...");
-            Update();
 
             //Setup Trainer Class List
 
@@ -675,7 +672,6 @@ namespace VSMaker
             }
 
             statusLabelMessage();
-            Update();
 
             if (selectedTrainerClass != default)
             {
@@ -942,7 +938,7 @@ namespace VSMaker
         private void GetTrainerInfo(int trainerId)
         {
             statusLabelMessage("Loading Trainer Info...");
-            Update();
+
             loadingData = true;
 
             trainer_Message.Text = string.Empty;
@@ -1072,7 +1068,6 @@ namespace VSMaker
             SetUnsavedChanges(false);
             loadingData = false;
             statusLabelMessage();
-            Update();
         }
 
         private void SaveTrainerName()
@@ -1087,7 +1082,6 @@ namespace VSMaker
             trainers_Player_list.Items.Clear();
             trainers_list.Items.Clear();
             statusLabelMessage("Setting up Trainer Editor...");
-            Update();
 
             foreach (var item in trainers)
             {
@@ -1101,7 +1095,7 @@ namespace VSMaker
                 }
             }
             statusLabelMessage();
-            Update();
+
             if (selectedTrainer != default)
             {
                 trainers_list.SelectedIndex = selectedTrainer.TrainerId - 1;
@@ -1142,8 +1136,7 @@ namespace VSMaker
         {
             /* Extract essential NARCs sub-archives*/
             statusLabelMessage("Unpacking essential NARCs...");
-            Update();
-            DSUtils.TryUnpackNarcs(new List<DirNames> {
+            TryUnpackNarcs(new List<DirNames> {
                 DirNames.trainerProperties,
                 DirNames.trainerParty,
                 DirNames.trainerGraphics,
@@ -1189,7 +1182,7 @@ namespace VSMaker
         private void GetAbilities()
         {
             statusLabelMessage("Getting Pokemon Abilities...");
-            Update(); abilityNames = GetAbilityNames();
+            abilityNames = GetAbilityNames();
         }
 
         private void GetData()
@@ -1245,7 +1238,7 @@ namespace VSMaker
         private void GetItems()
         {
             statusLabelMessage("Getting Item Names...");
-            Update();
+
             itemNames = GetItemNames().ToList();
 
             foreach (var item in pokeItemComboBoxes)
@@ -1258,7 +1251,6 @@ namespace VSMaker
         private void GetMessageTriggers()
         {
             statusLabelMessage("Getting Messages Triggers...");
-            Update();
 
             messageTriggers = new List<MessageTrigger>{
                 GetMessageTriggerDetails(MessageTriggerEnum.preBattleOw),
@@ -1290,14 +1282,14 @@ namespace VSMaker
         private void GetMoves()
         {
             statusLabelMessage("Getting Moves...");
-            Update();
+
             moveNames = GetAttackNames().ToList();
         }
 
         private void GetPokemon()
         {
             statusLabelMessage("Getting Pokemon...");
-            Update();
+
             pokemons = new List<Pokemon>();
 
             int numberOfPokemon = Directory.GetFiles(gameDirs[DirNames.personalPokeData].unpackedDir, "*").Length;
@@ -1341,7 +1333,7 @@ namespace VSMaker
         private (int abi1, int abi2)[] GetPokemonAbilities(int numberOfPokemon)
         {
             statusLabelMessage("Getting Trainer's Pokemon Abilities...");
-            Update();
+
             pokemonSpeciesAbilities = new (int abi1, int abi2)[numberOfPokemon];
 
             for (int i = 0; i < numberOfPokemon; i++)
@@ -1361,7 +1353,7 @@ namespace VSMaker
             trainerClasses = new List<TrainerClass>();
 
             statusLabelMessage("Getting Trainer Classes...");
-            Update();
+
             string[] classNames = GetTrainerClassNames();
 
             if (classNames.Length > byte.MaxValue + 1)
@@ -1391,7 +1383,7 @@ namespace VSMaker
         {
             trainerMessages = new List<TrainerMessage>();
             statusLabelMessage("Getting Trainer's Messages...");
-            Update();
+
             var allTrainerMessages = RomInfo.GetTrainerMessages();
             for (uint i = 0; i < allTrainerMessages.Length; i++)
             {
@@ -1418,7 +1410,7 @@ namespace VSMaker
             trainers = new List<Trainer>();
 
             statusLabelMessage("Getting Trainers...");
-            Update();
+
             string[] trainerNames = GetSimpleTrainerNames();
 
             for (int i = 0; i < trainerNames.Length; i++)
@@ -1730,7 +1722,7 @@ namespace VSMaker
                 try
                 {
                     statusLabelMessage("Importing data from spreadhsheet");
-                    Update();
+
                     trainerMessages = new();
 
                     foreach (var row in worksheet.Rows())
@@ -1765,7 +1757,7 @@ namespace VSMaker
                 }
 
                 statusLabelMessage("Reloading Trainer Text data.");
-                Update();
+
                 trainerTextTable_dataGrid.Rows.Clear();
                 trainerText_toolstrip.Enabled = false;
                 StartGetTrainerTextData(false);
@@ -1820,7 +1812,7 @@ namespace VSMaker
         {
             List<uint> offset = new List<uint>();
             statusLabelMessage("Getting Trainer Text offsets.");
-            Update();
+
             foreach (var trainer in trainers)
             {
                 string trainerListItem = $"[{trainer.DisplayTrainerId}] - {trainer.TrainerName}";
@@ -1847,13 +1839,13 @@ namespace VSMaker
 
             for (int i = 0; i < offset.Count; i++)
             {
-                using (DSUtils.EasyWriter wr = new(filePath, 2 * i))
+                using (EasyWriter wr = new(filePath, 2 * i))
                 {
                     wr.Write(offset[i]);
                 };
             }
             statusLabelMessage("Trainer Text offsets generated successfully...");
-            Update();
+
             MessageBox.Show("Trainer Text offsets repointed!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
@@ -1871,15 +1863,19 @@ namespace VSMaker
         {
             SaveFileDialog saveRom = new()
             {
-                Filter = DSUtils.NDSRomFilter
+                Filter = NDSRomFilter
             };
             if (saveRom.ShowDialog(this) != DialogResult.OK)
             {
                 return;
             }
+            saveFileName = saveRom.FileName;
+            OpenLoadingDialog(LoadingDataEnum.SaveRom);
+        }
 
+        public void BeginSaveRomChanges()
+        {
             statusLabelMessage("Repacking NARCS...");
-            Update();
 
             // Repack NARCs
             foreach (KeyValuePair<DirNames, (string packedDir, string unpackedDir)> kvp in gameDirs)
@@ -1891,7 +1887,7 @@ namespace VSMaker
                 }
             }
 
-            if (DSUtils.ARM9.CheckCompressionMark())
+            if (ARM9.CheckCompressionMark())
             {
                 statusLabelMessage("Awaiting user response...");
                 DialogResult d = MessageBox.Show("The ARM9 file of this ROM is currently uncompressed, but marked as compressed.\n" +
@@ -1901,41 +1897,39 @@ namespace VSMaker
 
                 if (d == DialogResult.Yes)
                 {
-                    DSUtils.ARM9.WriteBytes(new byte[4] { 0, 0, 0, 0 }, (uint)(gameFamily == gFamEnum.DP ? 0xB7C : 0xBB4));
+                    ARM9.WriteBytes(new byte[4] { 0, 0, 0, 0 }, (uint)(gameFamily == gFamEnum.DP ? 0xB7C : 0xBB4));
                 }
             }
 
             statusLabelMessage("Repacking ROM...");
-            Update();
-            if (DSUtils.CheckOverlayHasCompressionFlag(1))
+
+            if (CheckOverlayHasCompressionFlag(1))
             {
                 if (ROMToolboxDialog.overlay1MustBeRestoredFromBackup)
                 {
-                    DSUtils.RestoreOverlayFromCompressedBackup(1, false);
+                    RestoreOverlayFromCompressedBackup(1, false);
                 }
                 else
                 {
-                    if (!DSUtils.OverlayIsCompressed(1))
+                    if (!OverlayIsCompressed(1))
                     {
-                        DSUtils.CompressOverlay(1);
+                        CompressOverlay(1);
                     }
                 }
             }
 
-            if (DSUtils.CheckOverlayHasCompressionFlag(RomInfo.initialMoneyOverlayNumber) && !DSUtils.OverlayIsCompressed(RomInfo.initialMoneyOverlayNumber))
+            if (CheckOverlayHasCompressionFlag(initialMoneyOverlayNumber) && !OverlayIsCompressed(initialMoneyOverlayNumber))
             {
-                DSUtils.CompressOverlay(RomInfo.initialMoneyOverlayNumber);
+                CompressOverlay(initialMoneyOverlayNumber);
             }
 
-            Update();
+            RepackROM(saveFileName);
 
-            DSUtils.RepackROM(saveRom.FileName);
-
-            if (RomInfo.gameFamily != gFamEnum.DP && RomInfo.gameFamily != gFamEnum.Plat)
+            if (gameFamily != gFamEnum.DP && gameFamily != gFamEnum.Plat)
             {
-                if (DSUtils.OverlayIsCompressed(1))
+                if (OverlayIsCompressed(1))
                 {
-                    DSUtils.DecompressOverlay(1);
+                    DecompressOverlay(1);
                 }
             }
 
@@ -2021,7 +2015,7 @@ namespace VSMaker
             ushort prizeMoneyValue = (ushort)trainerClass_PrizeMoney_num.Value;
             var prizeMoney = prizeMoneyList.Find(x => x.TrainerClassId == trainerClassId);
             long offset = prizeMoney.Offset;
-            var overlayPath = DSUtils.GetOverlayPath(prizeMoneyTableOverlayNumber);
+            var overlayPath = GetOverlayPath(prizeMoneyTableOverlayNumber);
 
             if (gameFamily == gFamEnum.HGSS)
             {
@@ -2099,7 +2093,7 @@ namespace VSMaker
         private void SetupTrainerTextTab(bool repoint = false)
         {
             statusLabelMessage("Setting up Trainer Text Table Editor...");
-            Update();
+
             trainerTextTable_dataGrid.SuspendLayout();
             StartGetTrainerTextData(repoint);
             trainerTextTable_dataGrid.ResumeLayout();
@@ -2120,7 +2114,6 @@ namespace VSMaker
             {
                 RepointTrainerOffsetTable(trainerTextTable_dataGrid);
                 statusLabelMessage();
-                Update();
             }
             loadingData = false;
         }
@@ -2784,7 +2777,7 @@ namespace VSMaker
                 for (int i = 0; i < trainerTexts.Count; i++)
                 {
                     trainerTextArchive.Messages.Add(trainerTexts[i].MessageText);
-                    using (DSUtils.EasyWriter wr = new(filePath, 4 * i))
+                    using (EasyWriter wr = new(filePath, 4 * i))
                     {
                         wr.Write((ushort)trainerTexts[i].TrainerId);
                         wr.Write((ushort)trainerTexts[i].MessageTriggerId);
@@ -2839,12 +2832,10 @@ namespace VSMaker
             if (e.ColumnIndex == 3)
             {
                 statusLabelMessage("Double click to open text editor.");
-                Update();
             }
             else
             {
                 statusLabelMessage();
-                Update();
             }
         }
 
@@ -2901,7 +2892,7 @@ namespace VSMaker
             else if (dialogResult == DialogResult.Yes)
             {
                 statusLabelMessage("Saving changes...");
-                Update();
+
                 string filePath = $"{gameDirs[DirNames.trainerTextTable].unpackedDir}\\{0.ToString("D4")}";
                 var trainerTextArchive = new TextArchive(trainerTextMessageNumber);
                 trainerTextArchive.Messages.Clear();
@@ -2921,7 +2912,7 @@ namespace VSMaker
                 }
                 trainerTextArchive.SaveToFileDefaultDir(trainerTextMessageNumber);
                 statusLabelMessage("Trainer Texts saved successfully");
-                Update();
+
                 SetUnsavedChanges(false);
                 ReadTrainerTable();
                 RefreshTrainerMessages();

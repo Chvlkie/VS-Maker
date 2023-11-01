@@ -281,6 +281,7 @@
             Controls.Add(panel1);
             Controls.Add(toolStrip1);
             Name = "PokemonEditor";
+            StartPosition = FormStartPosition.CenterParent;
             Text = "Pokemon Stats";
             TopMost = true;
             panel1.ResumeLayout(false);

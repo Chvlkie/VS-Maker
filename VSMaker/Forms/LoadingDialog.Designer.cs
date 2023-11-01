@@ -79,8 +79,12 @@
             Controls.Add(statusStrip1);
             Controls.Add(pictureBox1);
             Controls.Add(progressBar1);
+            Cursor = Cursors.AppStarting;
+            FormBorderStyle = FormBorderStyle.FixedDialog;
             Name = "LoadingDialog";
+            StartPosition = FormStartPosition.CenterParent;
             Text = "LoadingDialog";
+            FormClosing += LoadingDialog_FormClosing;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();

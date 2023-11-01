@@ -606,6 +606,7 @@ namespace VSMaker.CommonFunctions
                         case gLangEnum.Spanish:
                             classGenderOffsetToRAMAddress = gameVersion == gVerEnum.HeartGold ? (uint)0x0735f8 : 0x073600;
                             break;
+
                         case gLangEnum.English:
                         case gLangEnum.Italian:
                         case gLangEnum.French:
@@ -636,11 +637,11 @@ namespace VSMaker.CommonFunctions
                         case gLangEnum.Japanese:
                             classGenderOffsetToRAMAddress = 0x078c8c;
                             break;
-
                     }
                     break;
             }
         }
+
         public static void SetTrainerTable()
         {
             TrainerTablePath = workDir + "\\unpacked\\trainerTextTable\\0000";
@@ -1300,7 +1301,7 @@ namespace VSMaker.CommonFunctions
             }
         }
 
-        private void SetNarcDirs()
+        private static void SetNarcDirs()
         {
             Dictionary<DirNames, string> packedDirsDict = null;
             switch (gameFamily)
@@ -1312,7 +1313,7 @@ namespace VSMaker.CommonFunctions
 
                     packedDirsDict = new Dictionary<DirNames, string>()
                     {
-                        [DirNames.personalPokeData] = gameVersion == gVerEnum.Pearl ? @"data\poketool\personal_pearl\personal.narc" : @"data\poketool\personal_diamond\personal.narc",
+                        [DirNames.personalPokeData] = gameVersion == gVerEnum.Pearl ? @"data\poketool\personal_pearl\personal.narc" : @"data\poketool\personal\personal.narc",
                         [DirNames.synthOverlay] = @"data\data\weather_sys.narc",
                         [DirNames.textArchives] = @"data\msgdata\msg.narc",
 
@@ -1480,6 +1481,7 @@ namespace VSMaker.CommonFunctions
             }
             var test = PrizeMoneyData;
         }
+
         #endregion System Methods
     }
 }
