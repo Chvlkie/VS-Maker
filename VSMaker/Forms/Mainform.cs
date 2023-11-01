@@ -72,7 +72,7 @@ namespace VSMaker
         //private ChooseMoves moveEditor;
         //private PokemonEditor pokemonEditor;
         //private TextEditor textEditor;
-        //private UnpackingDialog unpackLoading;
+        private LoadingDialog loadingDialog;
 
         #endregion Forms
 
@@ -342,7 +342,7 @@ namespace VSMaker
             SetupTrainerClassEditor();
         }
 
-        private void OpenRomFolder()
+        private async void OpenRomFolder()
         {
             CommonOpenFileDialog romFolder = new()
             {
@@ -355,7 +355,6 @@ namespace VSMaker
                 return;
             }
             loadingData = true;
-
             try
             {
                 RomFileSystem.SetupROMLanguage(Directory.GetFiles(romFolder.FileName).First(x => x.Contains("header.bin")));
@@ -372,15 +371,43 @@ namespace VSMaker
             {
                 return;
             }
-
+           
             CheckROMLanguage();
             ReadROMInitData();
-            // Unpack Narcs
-            UnpackEssentialNarcs();
-            GetData();
 
-            // Setup data for initial trainer class tab.
+            loadingDialog = new("Unpacking Essential NARCs");
+
+            async Task<bool> unpackNarcs()
+            {
+                try
+                {
+                    await Task.Yield();
+                    return await UnpackNarcs();
+                }
+                finally
+                {
+                    loadingDialog.Close();
+                }
+            }
+            var task = unpackNarcs();
+            loadingDialog.ShowDialog();
+            object data = await task;
+
+            //loadingDialog = new("Getting Editor Data");
+            //loadingDialog.Show();
+            GetData();
             SetupTrainerClassEditor();
+            //loadingDialog.Close();
+        }
+
+        private async Task<bool> UnpackNarcs()
+        {
+            UnpackEssentialNarcs();
+            if (!loadingDialog.IsDisposed)
+            {
+                loadingDialog.Close();
+            }
+            return Task.CompletedTask.IsCompleted;
         }
 
         private void ReadROMInitData()
@@ -1144,7 +1171,6 @@ namespace VSMaker
             {
                 MessageBox.Show(ex.Message);
             }
-
         }
 
         #endregion Unpack NARCs
@@ -1764,8 +1790,7 @@ namespace VSMaker
 
         private void OpenMoveEditor(int partyIndex)
         {
-
-            using (ChooseMoves moveEditor = new ChooseMoves(this, partyIndex, trainerFile))
+            using (ChooseMoves moveEditor = new(this, partyIndex, trainerFile))
             {
                 moveEditor.ShowDialog();
             };
@@ -1773,16 +1798,15 @@ namespace VSMaker
 
         private void OpenPokemonEditor(int partyIndex)
         {
-            using (PokemonEditor pokemonEditor = new PokemonEditor(this, partyIndex, trainerFile))
+            using (PokemonEditor pokemonEditor = new(this, partyIndex, trainerFile))
             {
                 pokemonEditor.ShowDialog();
-
             }
         }
 
         private void OpenTextEditor(int trainerMessageId, string messageText)
         {
-            using (TextEditor textEditor = new TextEditor(this, trainerMessageId, messageText, vsMakerFont))
+            using (TextEditor textEditor = new(this, trainerMessageId, messageText, vsMakerFont))
             {
                 textEditor.ShowDialog();
             }

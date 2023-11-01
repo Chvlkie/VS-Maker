@@ -23,6 +23,7 @@
     <None Remove="Resources\Graphics\Icons\exportIcon.png" />
     <None Remove="Resources\Graphics\Icons\importIcon.png" />
     <None Remove="Resources\Graphics\Icons\minusIconSm.png" />
+    <None Remove="Resources\Graphics\Icons\oakIcon.png" />
     <None Remove="Resources\Graphics\Icons\openFolderIcon.png" />
     <None Remove="Resources\Graphics\Icons\openRomIcon.png" />
     <None Remove="Resources\Graphics\Icons\plusIconSm.png" />
@@ -56,6 +57,7 @@
   <ItemGroup>
     <Content Include="Resources\Graphics\app.ico" />
     <Content Include="Resources\Graphics\Graphics\pokeSprite.png" />
+    <Content Include="Resources\Graphics\Icons\oakIcon.png" />
     <Content Include="Resources\Graphics\Icons\pokeIcon.png" />
     <Content Include="Tools\apicula.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -10,11 +10,12 @@ using System.Windows.Forms;
 
 namespace VSMaker.Forms
 {
-    public partial class UnpackingDialog : Form
+    public partial class LoadingDialog : Form
     {
-        public UnpackingDialog()
+        public LoadingDialog(string title)
         {
             InitializeComponent();
+            Text = title;
         }
     }
 }
