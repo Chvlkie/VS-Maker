@@ -239,6 +239,8 @@ namespace VSMaker
             saveFileDialog1 = new SaveFileDialog();
             trainerMessageBindingSource1 = new BindingSource(components);
             trainerMessageBindingSource3 = new BindingSource(components);
+            toolStripSeparator5 = new ToolStripSeparator();
+            openTextEditor_btn = new ToolStripButton();
             main_toolstrip.SuspendLayout();
             statusStrip1.SuspendLayout();
             mainContent.SuspendLayout();
@@ -2378,7 +2380,7 @@ namespace VSMaker
             trainerText_toolstrip.AutoSize = false;
             trainerText_toolstrip.Dock = DockStyle.Fill;
             trainerText_toolstrip.ImageScalingSize = new Size(24, 24);
-            trainerText_toolstrip.Items.AddRange(new ToolStripItem[] { saveTrainerTextTable_btn, trainreText_Import_btn, trainerText_Export_btn, toolStripSeparator3, trainerTextTable_addRow_btn, trainerTextTable_delRow_btn, toolStripSeparator4, trainerText_sort });
+            trainerText_toolstrip.Items.AddRange(new ToolStripItem[] { saveTrainerTextTable_btn, trainreText_Import_btn, trainerText_Export_btn, toolStripSeparator3, trainerTextTable_addRow_btn, trainerTextTable_delRow_btn, toolStripSeparator4, trainerText_sort, toolStripSeparator5, openTextEditor_btn });
             trainerText_toolstrip.Location = new Point(0, 0);
             trainerText_toolstrip.Name = "trainerText_toolstrip";
             trainerText_toolstrip.Padding = new Padding(0, 0, 2, 0);
@@ -2391,7 +2393,8 @@ namespace VSMaker
             // 
             saveTrainerTextTable_btn.Alignment = ToolStripItemAlignment.Right;
             saveTrainerTextTable_btn.AutoSize = false;
-            saveTrainerTextTable_btn.Image = Properties.Resources.saveIcon;
+            saveTrainerTextTable_btn.Image = Properties.Resources.saveIconSm;
+            saveTrainerTextTable_btn.ImageScaling = ToolStripItemImageScaling.None;
             saveTrainerTextTable_btn.ImageTransparentColor = Color.Magenta;
             saveTrainerTextTable_btn.Margin = new Padding(5, 1, 0, 5);
             saveTrainerTextTable_btn.Name = "saveTrainerTextTable_btn";
@@ -2431,6 +2434,7 @@ namespace VSMaker
             // 
             trainerTextTable_addRow_btn.AutoSize = false;
             trainerTextTable_addRow_btn.Image = Properties.Resources.plusIconSm;
+            trainerTextTable_addRow_btn.ImageScaling = ToolStripItemImageScaling.None;
             trainerTextTable_addRow_btn.ImageTransparentColor = Color.Magenta;
             trainerTextTable_addRow_btn.Margin = new Padding(5, 1, 0, 5);
             trainerTextTable_addRow_btn.Name = "trainerTextTable_addRow_btn";
@@ -2442,6 +2446,7 @@ namespace VSMaker
             // 
             trainerTextTable_delRow_btn.AutoSize = false;
             trainerTextTable_delRow_btn.Image = Properties.Resources.minusIconSm;
+            trainerTextTable_delRow_btn.ImageScaling = ToolStripItemImageScaling.None;
             trainerTextTable_delRow_btn.ImageTransparentColor = Color.Magenta;
             trainerTextTable_delRow_btn.Margin = new Padding(5, 1, 0, 5);
             trainerTextTable_delRow_btn.Name = "trainerTextTable_delRow_btn";
@@ -2458,6 +2463,7 @@ namespace VSMaker
             // 
             trainerText_sort.AutoSize = false;
             trainerText_sort.Image = Properties.Resources.sortIconSm;
+            trainerText_sort.ImageScaling = ToolStripItemImageScaling.None;
             trainerText_sort.ImageTransparentColor = Color.Magenta;
             trainerText_sort.Margin = new Padding(5, 1, 0, 5);
             trainerText_sort.Name = "trainerText_sort";
@@ -2703,6 +2709,21 @@ namespace VSMaker
             panel2.Name = "panel2";
             panel2.Size = new Size(899, 517);
             panel2.TabIndex = 5;
+            // 
+            // toolStripSeparator5
+            // 
+            toolStripSeparator5.Name = "toolStripSeparator5";
+            toolStripSeparator5.Size = new Size(6, 24);
+            // 
+            // openTextEditor_btn
+            // 
+            openTextEditor_btn.Image = Properties.Resources.editTextIconSm;
+            openTextEditor_btn.ImageScaling = ToolStripItemImageScaling.None;
+            openTextEditor_btn.ImageTransparentColor = Color.Magenta;
+            openTextEditor_btn.Name = "openTextEditor_btn";
+            openTextEditor_btn.Size = new Size(114, 21);
+            openTextEditor_btn.Text = "Open Text Editor";
+            openTextEditor_btn.Click += openTextEditor_btn_Click;
             // 
             // Mainform
             // 
@@ -3019,5 +3040,7 @@ namespace VSMaker
         private PictureBox pokeIcon2;
         private PictureBox pokeIcon1;
         private ListBox trainer_TrainerClass_listBox;
+        private ToolStripSeparator toolStripSeparator5;
+        private ToolStripButton openTextEditor_btn;
     }
 }

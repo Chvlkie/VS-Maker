@@ -66,6 +66,7 @@ namespace VSMaker
         public bool hgEngine = false;
         public string romFileName;
         public string saveFileName;
+        private int selectedTrainerTableRow = -1;
 
         #endregion Editor Data
 
@@ -1682,6 +1683,7 @@ namespace VSMaker
             if (trainerTextTable_dataGrid.RowCount <= 1)
             {
                 statusLabelMessage("Reading Trainer Text Table");
+                selectedTrainerTableRow = -1;
                 string[] currentTrainers = new string[trainers.Count];
                 string[] currentMessageTriggers = new string[messageTriggers.Count];
 
@@ -2093,10 +2095,14 @@ namespace VSMaker
         private void SetupTrainerTextTab(bool repoint = false)
         {
             statusLabelMessage("Setting up Trainer Text Table Editor...");
-
+            openTextEditor_btn.Enabled = false;
             trainerTextTable_dataGrid.SuspendLayout();
             StartGetTrainerTextData(repoint);
             trainerTextTable_dataGrid.ResumeLayout();
+            if (selectedTrainerTableRow > -1)
+            {
+                openTextEditor_btn.Enabled = true;
+            }
             SetUnsavedChanges(false);
         }
 
@@ -2829,6 +2835,8 @@ namespace VSMaker
 
         private void trainerTextTable_dataGrid_CellClick(object sender, DataGridViewCellEventArgs e)
         {
+            selectedTrainerTableRow = e.RowIndex;
+            openTextEditor_btn.Enabled = true;
             if (e.ColumnIndex == 3)
             {
                 statusLabelMessage("Double click to open text editor.");
@@ -2988,6 +2996,16 @@ namespace VSMaker
             }
 
             return (true, -1);
+        }
+
+        private void openTextEditor_btn_Click(object sender, EventArgs e)
+        {
+            if (selectedTrainerTableRow > -1)
+            {
+                int trainerMessageId = selectedTrainerTableRow;
+                var trainerMessage = trainerMessages.Find(x => x.MessageId == trainerMessageId);
+                OpenTextEditor(trainerMessage.MessageId, trainerMessage.MessageText);
+            }
         }
     }
 }

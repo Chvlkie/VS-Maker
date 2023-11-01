@@ -63,6 +63,16 @@ namespace VSMaker.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap editTextIconSm {
+            get {
+                object obj = ResourceManager.GetObject("editTextIconSm", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap exportIcon {
             get {
                 object obj = ResourceManager.GetObject("exportIcon", resourceCulture);
