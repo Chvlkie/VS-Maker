@@ -204,13 +204,15 @@ namespace VSMaker
             panel22 = new Panel();
             trainerText_toolstrip = new ToolStrip();
             saveTrainerTextTable_btn = new ToolStripButton();
-            trainreText_Import_btn = new ToolStripButton();
+            trainerText_Import_btn = new ToolStripButton();
             trainerText_Export_btn = new ToolStripButton();
             toolStripSeparator3 = new ToolStripSeparator();
             trainerTextTable_addRow_btn = new ToolStripButton();
             trainerTextTable_delRow_btn = new ToolStripButton();
             toolStripSeparator4 = new ToolStripSeparator();
             trainerText_sort = new ToolStripButton();
+            toolStripSeparator5 = new ToolStripSeparator();
+            openTextEditor_btn = new ToolStripButton();
             mainContent_trainerTheme = new TabPage();
             panel14 = new Panel();
             button10 = new Button();
@@ -239,8 +241,6 @@ namespace VSMaker
             saveFileDialog1 = new SaveFileDialog();
             trainerMessageBindingSource1 = new BindingSource(components);
             trainerMessageBindingSource3 = new BindingSource(components);
-            toolStripSeparator5 = new ToolStripSeparator();
-            openTextEditor_btn = new ToolStripButton();
             main_toolstrip.SuspendLayout();
             statusStrip1.SuspendLayout();
             mainContent.SuspendLayout();
@@ -2153,6 +2153,7 @@ namespace VSMaker
             trainer_TrainerClass_listBox.Size = new Size(190, 289);
             trainer_TrainerClass_listBox.TabIndex = 43;
             trainer_TrainerClass_listBox.SelectedIndexChanged += trainer_TrainerClass_listBox_SelectedIndexChanged;
+            trainer_TrainerClass_listBox.DoubleClick += trainer_TrainerClass_listBox_DoubleClick;
             // 
             // trainer_GoToClass_btn
             // 
@@ -2380,7 +2381,7 @@ namespace VSMaker
             trainerText_toolstrip.AutoSize = false;
             trainerText_toolstrip.Dock = DockStyle.Fill;
             trainerText_toolstrip.ImageScalingSize = new Size(24, 24);
-            trainerText_toolstrip.Items.AddRange(new ToolStripItem[] { saveTrainerTextTable_btn, trainreText_Import_btn, trainerText_Export_btn, toolStripSeparator3, trainerTextTable_addRow_btn, trainerTextTable_delRow_btn, toolStripSeparator4, trainerText_sort, toolStripSeparator5, openTextEditor_btn });
+            trainerText_toolstrip.Items.AddRange(new ToolStripItem[] { saveTrainerTextTable_btn, trainerText_Import_btn, trainerText_Export_btn, toolStripSeparator3, trainerTextTable_addRow_btn, trainerTextTable_delRow_btn, toolStripSeparator4, trainerText_sort, toolStripSeparator5, openTextEditor_btn });
             trainerText_toolstrip.Location = new Point(0, 0);
             trainerText_toolstrip.Name = "trainerText_toolstrip";
             trainerText_toolstrip.Padding = new Padding(0, 0, 2, 0);
@@ -2402,17 +2403,17 @@ namespace VSMaker
             saveTrainerTextTable_btn.Text = "Save Changes";
             saveTrainerTextTable_btn.Click += trainerTextTable_SaveChanges_btn;
             // 
-            // trainreText_Import_btn
+            // trainerText_Import_btn
             // 
-            trainreText_Import_btn.AutoSize = false;
-            trainreText_Import_btn.Image = Properties.Resources.importIcon;
-            trainreText_Import_btn.ImageTransparentColor = Color.Magenta;
-            trainreText_Import_btn.Margin = new Padding(5, 1, 0, 5);
-            trainreText_Import_btn.Name = "trainreText_Import_btn";
-            trainreText_Import_btn.Padding = new Padding(0, 0, 2, 0);
-            trainreText_Import_btn.Size = new Size(136, 24);
-            trainreText_Import_btn.Text = "Import Spreadsheet";
-            trainreText_Import_btn.Click += trainreText_Import_btn_Click;
+            trainerText_Import_btn.AutoSize = false;
+            trainerText_Import_btn.Image = Properties.Resources.importIcon;
+            trainerText_Import_btn.ImageTransparentColor = Color.Magenta;
+            trainerText_Import_btn.Margin = new Padding(5, 1, 0, 5);
+            trainerText_Import_btn.Name = "trainerText_Import_btn";
+            trainerText_Import_btn.Padding = new Padding(0, 0, 2, 0);
+            trainerText_Import_btn.Size = new Size(136, 24);
+            trainerText_Import_btn.Text = "Import Spreadsheet";
+            trainerText_Import_btn.Click += trainerText_Import_btn_Click;
             // 
             // trainerText_Export_btn
             // 
@@ -2471,6 +2472,21 @@ namespace VSMaker
             trainerText_sort.Text = "Sort + Repoint";
             trainerText_sort.ToolTipText = "Arrange messages and repoint lookups";
             trainerText_sort.Click += trainerText_sort_Click;
+            // 
+            // toolStripSeparator5
+            // 
+            toolStripSeparator5.Name = "toolStripSeparator5";
+            toolStripSeparator5.Size = new Size(6, 24);
+            // 
+            // openTextEditor_btn
+            // 
+            openTextEditor_btn.Image = Properties.Resources.editTextIconSm;
+            openTextEditor_btn.ImageScaling = ToolStripItemImageScaling.None;
+            openTextEditor_btn.ImageTransparentColor = Color.Magenta;
+            openTextEditor_btn.Name = "openTextEditor_btn";
+            openTextEditor_btn.Size = new Size(114, 21);
+            openTextEditor_btn.Text = "Open Text Editor";
+            openTextEditor_btn.Click += openTextEditor_btn_Click;
             // 
             // mainContent_trainerTheme
             // 
@@ -2710,21 +2726,6 @@ namespace VSMaker
             panel2.Size = new Size(899, 517);
             panel2.TabIndex = 5;
             // 
-            // toolStripSeparator5
-            // 
-            toolStripSeparator5.Name = "toolStripSeparator5";
-            toolStripSeparator5.Size = new Size(6, 24);
-            // 
-            // openTextEditor_btn
-            // 
-            openTextEditor_btn.Image = Properties.Resources.editTextIconSm;
-            openTextEditor_btn.ImageScaling = ToolStripItemImageScaling.None;
-            openTextEditor_btn.ImageTransparentColor = Color.Magenta;
-            openTextEditor_btn.Name = "openTextEditor_btn";
-            openTextEditor_btn.Size = new Size(114, 21);
-            openTextEditor_btn.Text = "Open Text Editor";
-            openTextEditor_btn.Click += openTextEditor_btn_Click;
-            // 
             // Mainform
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -2936,7 +2937,7 @@ namespace VSMaker
         private Panel panel17;
         private ToolStrip trainerText_toolstrip;
         private ToolStripButton saveTrainerTextTable_btn;
-        private ToolStripButton trainreText_Import_btn;
+        private ToolStripButton trainerText_Import_btn;
         private ToolStripButton trainerText_Export_btn;
         private DataGridView trainerTextTable_dataGrid;
         private ToolStripSeparator toolStripSeparator3;

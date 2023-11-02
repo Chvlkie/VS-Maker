@@ -1,12 +1,10 @@
 using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
 using Ekona.Images;
 using Images;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using NarcAPI;
 using System.Data;
 using System.Diagnostics;
-using System.Windows.Controls;
 using VSMaker.CommonFunctions;
 using VSMaker.Data;
 using VSMaker.Fonts;
@@ -15,9 +13,9 @@ using VSMaker.ROMFiles;
 using static VSMaker.CommonFunctions.DSUtils;
 using static VSMaker.CommonFunctions.RomInfo;
 using Application = System.Windows.Forms.Application;
+using Color = System.Drawing.Color;
 using ComboBox = System.Windows.Forms.ComboBox;
 using Font = System.Drawing.Font;
-using Color = System.Drawing.Color;
 
 namespace VSMaker
 {
@@ -34,13 +32,31 @@ namespace VSMaker
 
         #region Editor Data
 
+        private bool loadingData = false;
+        public bool unsavedChanges;
+        public bool hgEngine = false;
+
+        public string romFileName;
+        public string saveFileName;
+        public string excelFileName;
+
+        private Trainer selectedTrainer;
+        private TrainerClass selectedTrainerClass;
+
+        private int selectedTrainerClassIndex = -1;
+        private int selectedTrainerIndex = -1;
+        private int selectedTrainerTableRow = -1;
+
+        public int trainerTableCount;
+        public int trainerTableImportCount = 0;
+        public XLWorkbook? importWorkbook;
+
         public string[] abilityNames = Array.Empty<string>();
         private List<ClassGender> classGenderList = new();
         private int currentTrainerMessageIndex;
         private List<string> displayTrainerMessage = new();
         private List<EyeContactMusic> eyeContactMusics = new();
         private List<string> itemNames = new();
-        private bool loadingData = false;
         private List<MessageTrigger> messageTriggers = new();
         public List<string> moveNames = new();
         private List<ComboBox> pokeComboBoxes;
@@ -51,10 +67,6 @@ namespace VSMaker
         public (int abi1, int abi2)[] pokemonSpeciesAbilities;
         private List<string> pokeNames = new();
         private List<PrizeMoney> prizeMoneyList = new();
-        private Trainer selectedTrainer;
-        private TrainerClass selectedTrainerClass;
-        private int selectedTrainerClassIndex = -1;
-        private int selectedTrainerIndex = -1;
         private Dictionary<byte, (uint entryOffset, ushort musicD, ushort? musicN)> trainerClassEncounterMusicDict;
         private List<TrainerClass> trainerClasses = new();
         private TrainerFile trainerFile;
@@ -66,21 +78,11 @@ namespace VSMaker
         private SpriteBase trainerSprite;
         private bool trainerSpriteMessage;
         private ImageBase trainerTile;
-        public bool unsavedChanges;
-        public bool hgEngine = false;
-        public string romFileName;
-        public string saveFileName;
-        public string excelFileName;
-        public int trainerTableCount;
-        private int selectedTrainerTableRow = -1;
 
         #endregion Editor Data
 
         #region Forms
 
-        //private ChooseMoves moveEditor;
-        //private PokemonEditor pokemonEditor;
-        //private TextEditor textEditor;
         private LoadingDialog loadingDialog;
 
         #endregion Forms
@@ -1519,8 +1521,10 @@ namespace VSMaker
 
         public XLWorkbook OpenSpreadsheet()
         {
-            OpenFileDialog file = new();
-            file.Filter = "Excel Files|*.xls;*.xlsx;*.xlsm";
+            OpenFileDialog file = new OpenFileDialog
+            {
+                Filter = "Excel Files|*.xls;*.xlsx;*.xlsm"
+            };
 
             if (file.ShowDialog(this) != DialogResult.OK)
             {
@@ -1566,7 +1570,7 @@ namespace VSMaker
                                                        string.Empty;
         }
 
-        public void BeginExportExcel(IProgress<int> progress)
+        public void BeginExportExcel(IProgress<int> progress, int max)
         {
             // Setup DataTable for Export
             var dataTable = new DataTable();
@@ -1608,17 +1612,17 @@ namespace VSMaker
             }
             trainerText.Columns().AdjustToContents();
             messageTriggerTypes.Columns().AdjustToContents();
-            progress?.Report(trainerTableCount + (trainerTableCount / 3));
+            progress?.Report(trainerTableCount + 5);
             // Try save Spreadsheet
             try
             {
                 workbook.SaveAs(excelFileName);
-                progress?.Report(trainerTableCount + (trainerTableCount / 2));
+                progress?.Report(max);
                 MessageBox.Show("Speadsheet exported to\n\n" + excelFileName, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                progress?.Report(trainerTableCount + (trainerTableCount / 2));
+                progress?.Report(max);
                 MessageBox.Show("Speadsheet not exported.\n\n" + ex.Message, "Unable to Export", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -1640,8 +1644,8 @@ namespace VSMaker
                 if (sfd.ShowDialog() == DialogResult.OK)
                 {
                     excelFileName = sfd.FileName;
+                    OpenLoadingDialog(LoadingDataEnum.ExportTextTable);
                 }
-                OpenLoadingDialog(LoadingDataEnum.ExportTextTable);
             }
         }
 
@@ -1733,20 +1737,18 @@ namespace VSMaker
             return Task.CompletedTask;
         }
 
-        private void ImportSpreadsheet()
+        public void BeginImportExcel(IProgress<int> progress, int max)
         {
-            var workbook = OpenSpreadsheet();
-            if (workbook != null)
+            if (importWorkbook != null)
             {
-                bool firstRow = false; ;
-                var worksheet = workbook.Worksheet(1);
+                bool firstRow = false;
+                var worksheet = importWorkbook.Worksheet(1);
                 try
                 {
-                    statusLabelMessage("Importing data from spreadhsheet");
-
+                    statusLabelMessage("Importing data from Spreadsheet...");
                     trainerMessages = new();
-
-                    foreach (var row in worksheet.Rows())
+                    int count = 0;
+                    foreach (var row in worksheet.RowsUsed())
                     {
                         if (!firstRow)
                         {
@@ -1769,19 +1771,45 @@ namespace VSMaker
                             item.MessageTriggerText = messageTriggers.Find(x => x.MessageTriggerId == item.MessageTriggerId).MessageTriggerName;
                             trainerMessages.Add(item);
                         }
+                        progress?.Report(count++);
                     }
                 }
                 catch (Exception ex)
                 {
+                    progress?.Report(max);
                     MessageBox.Show("Unable to open spreadsheet.\n\n" + ex.Message, "Unable to Open Spreadsheet", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
                 statusLabelMessage("Reloading Trainer Text data.");
+                progress?.Report(trainerTableImportCount + 5);
+            }
+            else
+            {
+                progress?.Report(max);
+                MessageBox.Show("Unable to open spreadsheet.\nThere are no rows!", "Unable to Open Spreadsheet", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                statusLabelMessage();
+                return;
+            }
+        }
 
+        private void ImportSpreadsheet()
+        {
+            importWorkbook = null;
+            importWorkbook = OpenSpreadsheet();
+            if (importWorkbook != null)
+            {
+                trainerTableImportCount = importWorkbook.Worksheet(1).RowsUsed().Count();
+                OpenLoadingDialog(LoadingDataEnum.ImportTextTable);
                 trainerTextTable_dataGrid.Rows.Clear();
                 trainerText_toolstrip.Enabled = false;
                 StartGetTrainerTextData(false);
+            }
+            else
+            {
+                MessageBox.Show("Unable to open spreadsheet.", "Unable to Open Spreadsheet", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                statusLabelMessage();
+                return;
             }
         }
 
@@ -2775,52 +2803,61 @@ namespace VSMaker
 
             if (dialogResult == DialogResult.OK)
             {
-                var trainerTexts = new List<TrainerMessage>();
-
-                // Sort Trainer Text Table by Trainer.
-                foreach (var trainer in trainers)
-                {
-                    var thisTrainerText = new List<TrainerMessage>();
-                    for (int i = 0; i < trainerTextTable_dataGrid.Rows.Count; i++)
-                    {
-                        var selectedMessageTrigger = trainerTextTable_dataGrid.Rows[i].Cells[2].Value.ToString();
-                        var selectedTrainer = trainerTextTable_dataGrid.Rows[i].Cells[1].Value.ToString();
-                        int trainerId = int.Parse(selectedTrainer.Remove(0, 1).Remove(3));
-
-                        if (trainerId == trainer.TrainerId)
-                        {
-                            var trainerMessage = new TrainerMessage
-                            {
-                                TrainerId = trainerId,
-                                MessageTriggerId = messageTriggers.Single(x => x.MessageTriggerName == selectedMessageTrigger).MessageTriggerId,
-                                MessageText = trainerTextTable_dataGrid.Rows[i].Cells[3].Value.ToString()
-                            };
-
-                            thisTrainerText.Add(trainerMessage);
-                        }
-                    }
-                    thisTrainerText = thisTrainerText.OrderBy(x => x.MessageTriggerId).ToList();
-                    trainerTexts.AddRange(thisTrainerText);
-                }
-                var trainerTextArchive = new TextArchive(trainerTextMessageNumber);
-                trainerTextArchive.Messages.Clear();
-                string filePath = $"{gameDirs[DirNames.trainerTextTable].unpackedDir}\\{0.ToString("D4")}";
-
-                for (int i = 0; i < trainerTexts.Count; i++)
-                {
-                    trainerTextArchive.Messages.Add(trainerTexts[i].MessageText);
-                    using (EasyWriter wr = new(filePath, 4 * i))
-                    {
-                        wr.Write((ushort)trainerTexts[i].TrainerId);
-                        wr.Write((ushort)trainerTexts[i].MessageTriggerId);
-                    };
-                }
-                trainerTextArchive.SaveToFileDefaultDir(trainerTextMessageNumber);
+                trainerTableCount = trainerTextTable_dataGrid.Rows.Count;
+                OpenLoadingDialog(LoadingDataEnum.RepointTextTable);
                 ReadTrainerTable();
                 RefreshTrainerMessages(true);
             }
         }
 
+        public void BeginSortRepointTrainerText(IProgress<int> progress, int max)
+        {
+            var trainerTexts = new List<TrainerMessage>();
+            int count = 0;
+            // Sort Trainer Text Table by Trainer.
+            foreach (var trainer in trainers)
+            {
+                var thisTrainerText = new List<TrainerMessage>();
+                for (int i = 0; i < trainerTableCount; i++)
+                {
+                    var selectedMessageTrigger = trainerTextTable_dataGrid.Rows[i].Cells[2].Value.ToString();
+                    var selectedTrainer = trainerTextTable_dataGrid.Rows[i].Cells[1].Value.ToString();
+                    int trainerId = int.Parse(selectedTrainer.Remove(0, 1).Remove(3));
+
+                    if (trainerId == trainer.TrainerId)
+                    {
+                        var trainerMessage = new TrainerMessage
+                        {
+                            TrainerId = trainerId,
+                            MessageTriggerId = messageTriggers.Single(x => x.MessageTriggerName == selectedMessageTrigger).MessageTriggerId,
+                            MessageText = trainerTextTable_dataGrid.Rows[i].Cells[3].Value.ToString()
+                        };
+
+                        thisTrainerText.Add(trainerMessage);
+                        progress?.Report(count++);
+                    }
+                }
+                thisTrainerText = thisTrainerText.OrderBy(x => x.MessageTriggerId).ToList();
+                trainerTexts.AddRange(thisTrainerText);
+            }
+            var trainerTextArchive = new TextArchive(trainerTextMessageNumber);
+            trainerTextArchive.Messages.Clear();
+            string filePath = $"{gameDirs[DirNames.trainerTextTable].unpackedDir}\\{0.ToString("D4")}";
+            progress?.Report(0);
+
+            for (int i = 0; i < trainerTexts.Count; i++)
+            {
+                trainerTextArchive.Messages.Add(trainerTexts[i].MessageText);
+                using (EasyWriter wr = new(filePath, 4 * i))
+                {
+                    wr.Write((ushort)trainerTexts[i].TrainerId);
+                    wr.Write((ushort)trainerTexts[i].MessageTriggerId);
+                };
+                progress?.Report(i);
+            }
+            progress?.Report(max);
+            trainerTextArchive.SaveToFileDefaultDir(trainerTextMessageNumber);
+        }
         private void trainerTextTable_addRow_btn_Click(object sender, EventArgs e)
         {
             int index = trainerTextTable_dataGrid.Rows.Count - 1;
@@ -2927,6 +2964,9 @@ namespace VSMaker
             {
                 trainerTableCount = trainerTextTable_dataGrid.Rows.Count;
                 OpenLoadingDialog(LoadingDataEnum.SaveTrainerTextTable);
+                SetUnsavedChanges(false);
+                ReadTrainerTable();
+                RefreshTrainerMessages();
             }
         }
 
@@ -2945,23 +2985,20 @@ namespace VSMaker
                 var selectedTrainer = trainerTextTable_dataGrid.Rows[i].Cells[1].Value.ToString();
                 int trainerId = int.Parse(selectedTrainer.Remove(0, 1).Remove(3));
                 int messageTriggerId = messageTriggers.Find(x => x.MessageTriggerName == selectedMessageTrigger).MessageTriggerId;
-                using (EasyWriter wr = new EasyWriter(filePath, 4 * i))
+                using (EasyWriter wr = new(filePath, 4 * i))
                 {
                     wr.Write((ushort)trainerId);
                     wr.Write((ushort)messageTriggerId);
                 };
                 progress?.Report(i);
             }
-            trainerTextArchive.SaveToFileDefaultDir(trainerTextMessageNumber);
-            progress?.Report(trainerTableCount + (trainerTableCount / 2));
-            statusLabelMessage("Trainer Texts saved successfully");
+            progress?.Report(trainerTableCount + 10);
 
-            SetUnsavedChanges(false);
-            ReadTrainerTable();
-            RefreshTrainerMessages();
+            trainerTextArchive.SaveToFileDefaultDir(trainerTextMessageNumber);
+            statusLabelMessage("Trainer Texts saved successfully");
         }
 
-        private void trainreText_Import_btn_Click(object sender, EventArgs e)
+        private void trainerText_Import_btn_Click(object sender, EventArgs e)
         {
             DialogResult dialog = MessageBox.Show("Importing from a spreadsheet will clear the current table\n" +
                 "and you will lose any unsaved changes.\n\nDo you wish to continue?", "Import Spreadsheet", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -3040,6 +3077,15 @@ namespace VSMaker
                 var trainerMessage = trainerMessages.Find(x => x.MessageId == trainerMessageId);
                 OpenTextEditor(trainerMessage.MessageId, trainerMessage.MessageText);
             }
+        }
+
+        private void trainer_TrainerClass_listBox_DoubleClick(object sender, EventArgs e)
+        {
+            int index = trainer_TrainerClass_listBox.SelectedIndex;
+            var text = trainer_TrainerClass_listBox.Items[index].ToString();
+            int id = int.Parse(text.Remove(0, 1).Remove(3));
+            selectedTrainerClass = trainerClasses.SingleOrDefault(x => x.TrainerClassId == id);
+            mainContent.SelectedTab = mainContent_trainerClass;
         }
     }
 }
