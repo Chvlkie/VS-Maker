@@ -363,8 +363,9 @@ namespace VSMaker
             // about_toolstrip
             // 
             about_toolstrip.Name = "about_toolstrip";
-            about_toolstrip.Size = new Size(107, 22);
+            about_toolstrip.Size = new Size(180, 22);
             about_toolstrip.Text = "About";
+            about_toolstrip.Click += about_toolstrip_Click;
             // 
             // statusStrip1
             // 

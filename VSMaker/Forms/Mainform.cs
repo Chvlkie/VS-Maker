@@ -3087,5 +3087,11 @@ namespace VSMaker
             selectedTrainerClass = trainerClasses.SingleOrDefault(x => x.TrainerClassId == id);
             mainContent.SelectedTab = mainContent_trainerClass;
         }
+
+        private void about_toolstrip_Click(object sender, EventArgs e)
+        {
+            AboutBox about = new AboutBox();
+            about.ShowDialog();
+        }
     }
 }
