@@ -231,6 +231,10 @@ namespace VSMaker.Forms
                         break;
                 }
             }
+            else
+            {
+                pokeStat_Gender_comboBox.Enabled = false;
+            }
         }
 
         private void GetPokemonFormNames(int pokemonID)
