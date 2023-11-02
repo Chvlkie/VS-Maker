@@ -1124,7 +1124,10 @@ namespace VSMaker
                 UpdateTrainerClassPic(trainerPicBox);
                 trainer_frames_num.Maximum = selectedTrainer.TrainerSpriteFrames;
                 trainer_frames_num.Enabled = selectedTrainer.TrainerSpriteFrames > 0;
-                SetUnsavedChanges(true);
+                if (!unsavedChanges)
+                {
+                    SetUnsavedChanges(trainerId != selectedTrainer.TrainerClassId);
+                }
             }
         }
 

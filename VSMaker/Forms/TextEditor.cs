@@ -145,6 +145,10 @@ namespace VSMaker.Forms
         {
             RomFileSystem.UpdateTrainerTextMessages(textEditor_Message.Text, trainerMessageId);
             mainform.RefreshTrainerMessages();
+            unsavedChanges = false;
+            textEditor_Message.ClearUndo();
+            trainerText_Undo.Enabled = false;
+            trainerText_redo.Enabled = false;
         }
 
         private void trainerText_Undo_Click(object sender, EventArgs e)
