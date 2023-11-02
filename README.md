@@ -53,12 +53,12 @@ A new function that reads data from a ROMs Trainer Table to edit in-battle messa
 <br/>• Edit text using a Text Editor that previews in-game messages
 <br/>• Sort and repoint the offset for trainer texts
 <br/>• Import and export table to an Excel spreadsheet for mass edits
-<br/>•
+<br/>
 
 ## **TRAINER THEMES EDITOR**
 This is To-Do: but will ultimately allow editing of battle intro effects and battle music.
 # Credits
 Many thanks to the everyone involved with DSPRE. See: https://github.com/AdAstra-LD/DS-Pokemon-Rom-Editor
-<br/>and the Kingdom of DS Community. 
+<br/>and the Kingdom of DS Hacking Community. 
 <br/><br/>Always fantastic work!
 # 
