@@ -1151,7 +1151,7 @@ namespace VSMaker.CommonFunctions
             switch (gameFamily)
             {
                 case gFamEnum.DP:
-                    trainerTextMessageNumber = 555;
+                    trainerTextMessageNumber = 558;
                     if (gameLanguage.Equals(gLangEnum.Japanese))
                     {
                         trainerTextMessageNumber -= 9;

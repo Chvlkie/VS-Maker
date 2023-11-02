@@ -1085,7 +1085,7 @@ namespace VSMaker
 
         private void SaveTrainerName()
         {
-            RomFileSystem.UpdateCurrentTrainerName(trainer_Name.Text, selectedTrainer.TrainerClassId);
+            RomFileSystem.UpdateCurrentTrainerName(trainer_Name.Text, selectedTrainer.TrainerId);
         }
 
         private void SetupTrainerEditor()
