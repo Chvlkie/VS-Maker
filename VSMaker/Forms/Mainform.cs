@@ -3093,5 +3093,10 @@ namespace VSMaker
             AboutBox about = new AboutBox();
             about.ShowDialog();
         }
+
+        private void openProjectGitHubToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Process.Start("https://github.com/Chvlkie/VS-Maker");
+        }
     }
 }

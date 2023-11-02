@@ -241,6 +241,7 @@ namespace VSMaker
             saveFileDialog1 = new SaveFileDialog();
             trainerMessageBindingSource1 = new BindingSource(components);
             trainerMessageBindingSource3 = new BindingSource(components);
+            openProjectGitHubToolStripMenuItem = new ToolStripMenuItem();
             main_toolstrip.SuspendLayout();
             statusStrip1.SuspendLayout();
             mainContent.SuspendLayout();
@@ -355,7 +356,7 @@ namespace VSMaker
             // 
             // mainToolStrip_help
             // 
-            mainToolStrip_help.DropDownItems.AddRange(new ToolStripItem[] { about_toolstrip });
+            mainToolStrip_help.DropDownItems.AddRange(new ToolStripItem[] { about_toolstrip, openProjectGitHubToolStripMenuItem });
             mainToolStrip_help.Name = "mainToolStrip_help";
             mainToolStrip_help.Size = new Size(44, 20);
             mainToolStrip_help.Text = "Help";
@@ -363,7 +364,7 @@ namespace VSMaker
             // about_toolstrip
             // 
             about_toolstrip.Name = "about_toolstrip";
-            about_toolstrip.Size = new Size(180, 22);
+            about_toolstrip.Size = new Size(184, 22);
             about_toolstrip.Text = "About";
             about_toolstrip.Click += about_toolstrip_Click;
             // 
@@ -2727,6 +2728,13 @@ namespace VSMaker
             panel2.Size = new Size(899, 517);
             panel2.TabIndex = 5;
             // 
+            // openProjectGitHubToolStripMenuItem
+            // 
+            openProjectGitHubToolStripMenuItem.Name = "openProjectGitHubToolStripMenuItem";
+            openProjectGitHubToolStripMenuItem.Size = new Size(184, 22);
+            openProjectGitHubToolStripMenuItem.Text = "Open Project GitHub";
+            openProjectGitHubToolStripMenuItem.Click += openProjectGitHubToolStripMenuItem_Click;
+            // 
             // Mainform
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -3044,5 +3052,6 @@ namespace VSMaker
         private ListBox trainer_TrainerClass_listBox;
         private ToolStripSeparator toolStripSeparator5;
         private ToolStripButton openTextEditor_btn;
+        private ToolStripMenuItem openProjectGitHubToolStripMenuItem;
     }
 }
