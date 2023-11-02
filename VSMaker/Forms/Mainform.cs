@@ -1,10 +1,12 @@
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Ekona.Images;
 using Images;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using NarcAPI;
 using System.Data;
 using System.Diagnostics;
+using System.Windows.Controls;
 using VSMaker.CommonFunctions;
 using VSMaker.Data;
 using VSMaker.Fonts;
@@ -13,7 +15,9 @@ using VSMaker.ROMFiles;
 using static VSMaker.CommonFunctions.DSUtils;
 using static VSMaker.CommonFunctions.RomInfo;
 using Application = System.Windows.Forms.Application;
+using ComboBox = System.Windows.Forms.ComboBox;
 using Font = System.Drawing.Font;
+using Color = System.Drawing.Color;
 
 namespace VSMaker
 {
@@ -66,6 +70,8 @@ namespace VSMaker
         public bool hgEngine = false;
         public string romFileName;
         public string saveFileName;
+        public string excelFileName;
+        public int trainerTableCount;
         private int selectedTrainerTableRow = -1;
 
         #endregion Editor Data
@@ -262,9 +268,10 @@ namespace VSMaker
 
         private void OpenLoadingDialog(LoadingDataEnum loadType)
         {
-            loadingDialog = new LoadingDialog(this, loadType);
-            loadingDialog.StartPosition = FormStartPosition.CenterParent;
+            this.UseWaitCursor = true;
+            loadingDialog = new(this, loadType);
             loadingDialog.ShowDialog();
+            this.UseWaitCursor = false;
         }
 
         private async void OpenRom()
@@ -349,10 +356,12 @@ namespace VSMaker
             Text += $"  -  {fileName}";
         }
 
-        public void BeginLoadRomData()
+        public void BeginLoadRomData(IProgress<int> progress)
         {
             CheckROMLanguage();
+            progress?.Report(50);
             ReadROMInitData();
+            progress?.Report(100);
         }
 
         public void BeginUnpackRomData()
@@ -366,12 +375,13 @@ namespace VSMaker
             ARM9.EditSize(-12);
         }
 
-        public void BeginUnpackNarcs()
+        public void BeginUnpackNarcs(IProgress<int> progress)
         {
-            UnpackEssentialNarcs();
+            UnpackEssentialNarcs(progress);
+            progress?.Report(100);
         }
 
-        public void BeginSetupEditor()
+        public void BeginSetupEditor(IProgress<int> progress)
         {
             GetData();
             SetupTrainerClassEditor();
@@ -1133,7 +1143,7 @@ namespace VSMaker
 
         #region Unpack NARCs
 
-        private void UnpackEssentialNarcs()
+        private void UnpackEssentialNarcs(IProgress<int> progress)
         {
             /* Extract essential NARCs sub-archives*/
             statusLabelMessage("Unpacking essential NARCs...");
@@ -1146,23 +1156,28 @@ namespace VSMaker
                 DirNames.personalPokeData,
                 DirNames.trainerTextTable,
                 DirNames.trainerTextOffset,
-            });
+            }, progress);
             GetTrainerClassEncounterMusic();
+            progress?.Report(75);
             try
             {
                 ReadTrainerTable();
+                progress?.Report(80);
             }
             catch (Exception ex)
             {
+                progress?.Report(100);
                 MessageBox.Show(ex.Message);
             }
 
             try
             {
                 ReadPrizeMoneyTable();
+                progress?.Report(95);
             }
             catch (Exception ex)
             {
+                progress?.Report(100);
                 MessageBox.Show(ex.Message);
             }
         }
@@ -1551,15 +1566,71 @@ namespace VSMaker
                                                        string.Empty;
         }
 
+        public void BeginExportExcel(IProgress<int> progress)
+        {
+            // Setup DataTable for Export
+            var dataTable = new DataTable();
+            foreach (DataGridViewColumn col in trainerTextTable_dataGrid.Columns)
+            {
+                dataTable.Columns.Add(col.HeaderText);
+            }
+            foreach (DataGridViewRow row in trainerTextTable_dataGrid.Rows)
+            {
+                dataTable.Rows.Add(row);
+                foreach (DataGridViewCell cell in row.Cells)
+                {
+                    string value = cell.Value.ToString();
+                    if (cell.ColumnIndex == 1)
+                    {
+                        value = value.Remove(0, 1).Remove(3);
+                    }
+                    else if (cell.ColumnIndex == 2)
+                    {
+                        value = (messageTriggers.Find(x => x.MessageTriggerName == value).MessageTriggerId + 1).ToString();
+                    }
+                    dataTable.Rows[row.Index][cell.ColumnIndex] = value;
+                }
+                progress?.Report(row.Index);
+            }
+
+            // Setup Spreadsheet.
+            using XLWorkbook workbook = new();
+            var trainerText = workbook.Worksheets.Add(dataTable, "Trainer Text");
+            // Add Message Trigger List to new Sheet
+            var messageTriggerTypes = workbook.Worksheets.Add("Message Triggers");
+            messageTriggerTypes.Cell("A1").Value = "Message Trigger ID";
+            messageTriggerTypes.Cell("B1").Value = "Message Trigger Name";
+            for (int i = 0; i < messageTriggers.Count; i++)
+            {
+                string cellNumber = (i + 2).ToString();
+                messageTriggerTypes.Cell("A" + cellNumber).Value = (messageTriggers[i].MessageTriggerId + 1).ToString("D2");
+                messageTriggerTypes.Cell("B" + cellNumber).Value = messageTriggers[i].MessageTriggerName;
+            }
+            trainerText.Columns().AdjustToContents();
+            messageTriggerTypes.Columns().AdjustToContents();
+            progress?.Report(trainerTableCount + (trainerTableCount / 3));
+            // Try save Spreadsheet
+            try
+            {
+                workbook.SaveAs(excelFileName);
+                progress?.Report(trainerTableCount + (trainerTableCount / 2));
+                MessageBox.Show("Speadsheet exported to\n\n" + excelFileName, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                progress?.Report(trainerTableCount + (trainerTableCount / 2));
+                MessageBox.Show("Speadsheet not exported.\n\n" + ex.Message, "Unable to Export", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         /// <summary>
         /// Export given DataGridView to an Excel file.
         /// </summary>
-        /// <param name="dataGrid"></param>
         /// <returns>Success/Failure bool and File Path</returns>
-        private (bool Success, string FilePath) ExportToExcel(DataGridView dataGrid)
+        private void ExportToExcel()
         {
             // Do nothing if no data.
-            if (dataGrid.Rows.Count > 0)
+            if (trainerTextTable_dataGrid.Rows.Count > 0)
             {
                 SaveFileDialog sfd = new()
                 {
@@ -1568,62 +1639,10 @@ namespace VSMaker
                 };
                 if (sfd.ShowDialog() == DialogResult.OK)
                 {
-                    string filePath = sfd.FileName;
-
-                    // Setup DataTable for Export
-                    var dataTable = new DataTable();
-                    foreach (DataGridViewColumn col in dataGrid.Columns)
-                    {
-                        dataTable.Columns.Add(col.HeaderText);
-                    }
-                    foreach (DataGridViewRow row in dataGrid.Rows)
-                    {
-                        dataTable.Rows.Add(row);
-                        foreach (DataGridViewCell cell in row.Cells)
-                        {
-                            string value = cell.Value.ToString();
-                            if (cell.ColumnIndex == 1)
-                            {
-                                value = value.Remove(0, 1).Remove(3);
-                            }
-                            else if (cell.ColumnIndex == 2)
-                            {
-                                value = (messageTriggers.Find(x => x.MessageTriggerName == value).MessageTriggerId + 1).ToString();
-                            }
-                            dataTable.Rows[row.Index][cell.ColumnIndex] = value;
-                        }
-                    }
-
-                    // Setup Spreadsheet.
-                    using XLWorkbook workbook = new();
-                    var trainerText = workbook.Worksheets.Add(dataTable, "Trainer Text");
-                    // Add Message Trigger List to new Sheet
-                    var messageTriggerTypes = workbook.Worksheets.Add("Message Triggers");
-                    messageTriggerTypes.Cell("A1").Value = "Message Trigger ID";
-                    messageTriggerTypes.Cell("B1").Value = "Message Trigger Name";
-                    for (int i = 0; i < messageTriggers.Count; i++)
-                    {
-                        string cellNumber = (i + 2).ToString();
-                        messageTriggerTypes.Cell("A" + cellNumber).Value = (messageTriggers[i].MessageTriggerId + 1).ToString("D2");
-                        messageTriggerTypes.Cell("B" + cellNumber).Value = messageTriggers[i].MessageTriggerName;
-                    }
-                    trainerText.Columns().AdjustToContents();
-                    messageTriggerTypes.Columns().AdjustToContents();
-
-                    // Try save Spreadsheet
-                    try
-                    {
-                        workbook.SaveAs(filePath);
-                        return (true, filePath);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("Speadsheet not exported.\n\n" + ex.Message, "Unable to Export", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return (false, filePath);
-                    }
+                    excelFileName = sfd.FileName;
                 }
+                OpenLoadingDialog(LoadingDataEnum.ExportTextTable);
             }
-            return (false, string.Empty);
         }
 
         private void eyeContact_help_btn_Click(object sender, EventArgs e)
@@ -1875,10 +1894,12 @@ namespace VSMaker
             OpenLoadingDialog(LoadingDataEnum.SaveRom);
         }
 
-        public void BeginSaveRomChanges()
+        public void BeginSaveRomChanges(IProgress<int> progress)
         {
             statusLabelMessage("Repacking NARCS...");
 
+            int count = 0;
+            int increment = 100 / gameDirs.Count;
             // Repack NARCs
             foreach (KeyValuePair<DirNames, (string packedDir, string unpackedDir)> kvp in gameDirs)
             {
@@ -1887,6 +1908,7 @@ namespace VSMaker
                 {
                     Narc.FromFolder(kvp.Value.unpackedDir).Save(kvp.Value.packedDir); // Make new NARC from folder
                 }
+                progress?.Report(count += increment);
             }
 
             if (ARM9.CheckCompressionMark())
@@ -1896,14 +1918,19 @@ namespace VSMaker
                     "This will prevent your ROM from working on native hardware.\n\n" +
                 "Do you want to mark the ARM9 as uncompressed?", "ARM9 compression mismatch detected",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
+                progress?.Report(0);
                 if (d == DialogResult.Yes)
                 {
                     ARM9.WriteBytes(new byte[4] { 0, 0, 0, 0 }, (uint)(gameFamily == gFamEnum.DP ? 0xB7C : 0xBB4));
+                    for (int i = 0; i < 100; i += 10)
+                    {
+                        progress?.Report(i);
+                    }
                 }
             }
 
             statusLabelMessage("Repacking ROM...");
+            progress?.Report(0);
 
             if (CheckOverlayHasCompressionFlag(1))
             {
@@ -1924,6 +1951,7 @@ namespace VSMaker
             {
                 CompressOverlay(initialMoneyOverlayNumber);
             }
+            progress?.Report(90);
 
             RepackROM(saveFileName);
 
@@ -1935,8 +1963,9 @@ namespace VSMaker
                 }
             }
 
-            // Properties.Settings.Default.Save();
             statusLabelMessage();
+            progress?.Report(100);
+            MessageBox.Show("ROM File saved to " + saveFileName, "Success!");
         }
 
         private void saveTrainerAll_btn_Click(object sender, EventArgs e)
@@ -2725,11 +2754,8 @@ namespace VSMaker
 
         private void trainerText_Export_btn_Click(object sender, EventArgs e)
         {
-            var (success, filePath) = ExportToExcel(trainerTextTable_dataGrid);
-            if (success)
-            {
-                MessageBox.Show("Speadsheet exported to\n\n" + filePath, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
+            trainerTableCount = trainerTextTable_dataGrid.RowCount;
+            ExportToExcel();
         }
 
         private void trainerText_sort_Click(object sender, EventArgs e)
@@ -2899,32 +2925,40 @@ namespace VSMaker
             }
             else if (dialogResult == DialogResult.Yes)
             {
-                statusLabelMessage("Saving changes...");
-
-                string filePath = $"{gameDirs[DirNames.trainerTextTable].unpackedDir}\\{0.ToString("D4")}";
-                var trainerTextArchive = new TextArchive(trainerTextMessageNumber);
-                trainerTextArchive.Messages.Clear();
-                for (int i = 0; i < trainerTextTable_dataGrid.Rows.Count; i++)
-                {
-                    string messageText = trainerTextTable_dataGrid.Rows[i].Cells[3].Value.ToString();
-                    trainerTextArchive.Messages.Add(messageText);
-                    var selectedMessageTrigger = trainerTextTable_dataGrid.Rows[i].Cells[2].Value.ToString();
-                    var selectedTrainer = trainerTextTable_dataGrid.Rows[i].Cells[1].Value.ToString();
-                    int trainerId = int.Parse(selectedTrainer.Remove(0, 1).Remove(3));
-                    int messageTriggerId = messageTriggers.Find(x => x.MessageTriggerName == selectedMessageTrigger).MessageTriggerId;
-                    using (EasyWriter wr = new EasyWriter(filePath, 4 * i))
-                    {
-                        wr.Write((ushort)trainerId);
-                        wr.Write((ushort)messageTriggerId);
-                    };
-                }
-                trainerTextArchive.SaveToFileDefaultDir(trainerTextMessageNumber);
-                statusLabelMessage("Trainer Texts saved successfully");
-
-                SetUnsavedChanges(false);
-                ReadTrainerTable();
-                RefreshTrainerMessages();
+                trainerTableCount = trainerTextTable_dataGrid.Rows.Count;
+                OpenLoadingDialog(LoadingDataEnum.SaveTrainerTextTable);
             }
+        }
+
+        public void BeginSaveTrainerTextTable(IProgress<int> progress)
+        {
+            statusLabelMessage("Saving changes...");
+
+            string filePath = $"{gameDirs[DirNames.trainerTextTable].unpackedDir}\\{0.ToString("D4")}";
+            var trainerTextArchive = new TextArchive(trainerTextMessageNumber);
+            trainerTextArchive.Messages.Clear();
+            for (int i = 0; i < trainerTextTable_dataGrid.Rows.Count; i++)
+            {
+                string messageText = trainerTextTable_dataGrid.Rows[i].Cells[3].Value.ToString();
+                trainerTextArchive.Messages.Add(messageText);
+                var selectedMessageTrigger = trainerTextTable_dataGrid.Rows[i].Cells[2].Value.ToString();
+                var selectedTrainer = trainerTextTable_dataGrid.Rows[i].Cells[1].Value.ToString();
+                int trainerId = int.Parse(selectedTrainer.Remove(0, 1).Remove(3));
+                int messageTriggerId = messageTriggers.Find(x => x.MessageTriggerName == selectedMessageTrigger).MessageTriggerId;
+                using (EasyWriter wr = new EasyWriter(filePath, 4 * i))
+                {
+                    wr.Write((ushort)trainerId);
+                    wr.Write((ushort)messageTriggerId);
+                };
+                progress?.Report(i);
+            }
+            trainerTextArchive.SaveToFileDefaultDir(trainerTextMessageNumber);
+            progress?.Report(trainerTableCount + (trainerTableCount / 2));
+            statusLabelMessage("Trainer Texts saved successfully");
+
+            SetUnsavedChanges(false);
+            ReadTrainerTable();
+            RefreshTrainerMessages();
         }
 
         private void trainreText_Import_btn_Click(object sender, EventArgs e)

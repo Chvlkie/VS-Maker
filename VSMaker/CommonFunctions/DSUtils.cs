@@ -542,25 +542,22 @@ namespace VSMaker.CommonFunctions
             return b;
         }
 
-        public static void TryUnpackNarcs(List<DirNames> IDs)
+        public static void TryUnpackNarcs(List<DirNames> IDs, IProgress<int> progress)
         {
+            int count = 0;
+            int increment = 70 / IDs.Count();
             Parallel.ForEach(IDs, id => {
                 if (gameDirs.TryGetValue(id, out (string packedPath, string unpackedPath) paths))
                 {
-                    DirectoryInfo di = new DirectoryInfo(paths.unpackedPath);
+                    DirectoryInfo di = new(paths.unpackedPath);
 
                     if (!di.Exists || di.GetFiles().Length == 0)
                     {
-                        Narc opened = Narc.Open(paths.packedPath);
-
-                        if (opened is null)
-                        {
-                            throw new NullReferenceException();
-                        }
-
+                        Narc opened = Narc.Open(paths.packedPath) ?? throw new NullReferenceException();
                         opened.ExtractToFolder(paths.unpackedPath);
                     }
                 }
+                progress?.Report(count+=increment);
             });
         }
         public static void ForceUnpackNarcs(List<DirNames> IDs)

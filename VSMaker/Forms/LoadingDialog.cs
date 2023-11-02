@@ -17,31 +17,49 @@ namespace VSMaker.Forms
 
         public void LoadData()
         {
+            progressBar1.Value = 0;
             switch (loadType)
             {
                 case LoadingDataEnum.UnpackRom:
                     Text = "Unpacking ROM Data";
+                    progressBar1.Style = ProgressBarStyle.Marquee;
                     UnpackRom();
                     break;
 
                 case LoadingDataEnum.LoadRomData:
                     Text = "Loading ROM Data";
+                    progressBar1.Maximum = 100;
                     LoadRomData();
                     break;
 
                 case LoadingDataEnum.UnpackNarcs:
                     Text = "Unpacking Essential NARCs";
+                    progressBar1.Maximum = 100;
                     UnpackNarcs();
                     break;
 
                 case LoadingDataEnum.SetupEditor:
                     Text = "Setting Up Editor";
+                    progressBar1.Maximum = 100;
                     SetupEditor();
                     break;
 
                 case LoadingDataEnum.SaveRom:
                     Text = "Saving ROM";
+                    progressBar1.Maximum = 100;
                     SaveRom();
+                    break;
+
+                case LoadingDataEnum.ExportTextTable:
+                    Text = "Export Excel Sheet";
+                    progressBar1.Maximum = mainform.trainerTableCount + (mainform.trainerTableCount / 2);
+                    ExportExcel();
+                    break;
+
+                case LoadingDataEnum.SaveTrainerTextTable:
+                    Text = "Saving Trainer Text Table";
+                    progressBar1.Maximum = mainform.trainerTableCount + (mainform.trainerTableCount / 2);
+                    SaveTrainerTextTable();
                     break;
 
                 default:
@@ -55,6 +73,8 @@ namespace VSMaker.Forms
         {
             await Task.Delay(200);
             await Task.Run(() => mainform.BeginUnpackRomData());
+            progressBar1.Style = ProgressBarStyle.Continuous;
+            progressBar1.Value = 100;
             FormClosing -= new FormClosingEventHandler(LoadingDialog_FormClosing);
             Close();
         }
@@ -62,7 +82,8 @@ namespace VSMaker.Forms
         public async Task LoadRomData()
         {
             await Task.Delay(200);
-            await Task.Run(() => mainform.BeginLoadRomData());
+            var progress = new Progress<int>(value => { progressBar1.Value = value; });
+            await Task.Run(() => mainform.BeginLoadRomData(progress));
             FormClosing -= new FormClosingEventHandler(LoadingDialog_FormClosing);
             Close();
         }
@@ -70,7 +91,8 @@ namespace VSMaker.Forms
         public async Task UnpackNarcs()
         {
             await Task.Delay(200);
-            await Task.Run(() => mainform.BeginUnpackNarcs());
+            var progress = new Progress<int>(value => { progressBar1.Value = value; });
+            await Task.Run(() => mainform.BeginUnpackNarcs(progress));
             FormClosing -= new FormClosingEventHandler(LoadingDialog_FormClosing);
             Close();
         }
@@ -78,7 +100,8 @@ namespace VSMaker.Forms
         public async Task SetupEditor()
         {
             await Task.Delay(200);
-            await Task.Run(() => mainform.BeginSetupEditor());
+            var progress = new Progress<int>(value => { progressBar1.Value = value; });
+            await Task.Run(() => mainform.BeginSetupEditor(progress));
             FormClosing -= new FormClosingEventHandler(LoadingDialog_FormClosing);
             Close();
         }
@@ -86,7 +109,26 @@ namespace VSMaker.Forms
         public async Task SaveRom()
         {
             await Task.Delay(200);
-            await Task.Run(() => mainform.BeginSaveRomChanges());
+            var progress = new Progress<int>(value => { progressBar1.Value = value; });
+            await Task.Run(() => mainform.BeginSaveRomChanges(progress));
+            FormClosing -= new FormClosingEventHandler(LoadingDialog_FormClosing);
+            Close();
+        }
+
+        public async Task ExportExcel()
+        {
+            await Task.Delay(200);
+            var progress = new Progress<int>(value => { progressBar1.Value = value; });
+            await Task.Run(() => mainform.BeginExportExcel(progress));
+            FormClosing -= new FormClosingEventHandler(LoadingDialog_FormClosing);
+            Close();
+        }
+
+        public async Task SaveTrainerTextTable()
+        {
+            await Task.Delay(200);
+            var progress = new Progress<int>(value => { progressBar1.Value = value; });
+            await Task.Run(() => mainform.BeginSaveTrainerTextTable(progress));
             FormClosing -= new FormClosingEventHandler(LoadingDialog_FormClosing);
             Close();
         }

@@ -41,9 +41,8 @@
             progressBar1.Location = new Point(48, 12);
             progressBar1.Name = "progressBar1";
             progressBar1.Size = new Size(380, 30);
-            progressBar1.Style = ProgressBarStyle.Marquee;
+            progressBar1.Style = ProgressBarStyle.Continuous;
             progressBar1.TabIndex = 0;
-            progressBar1.Value = 100;
             // 
             // pictureBox1
             // 
@@ -79,9 +78,13 @@
             Controls.Add(statusStrip1);
             Controls.Add(pictureBox1);
             Controls.Add(progressBar1);
-            Cursor = Cursors.AppStarting;
+            Cursor = Cursors.WaitCursor;
             FormBorderStyle = FormBorderStyle.FixedDialog;
+            MaximizeBox = false;
+            MinimizeBox = false;
             Name = "LoadingDialog";
+            ShowIcon = false;
+            ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
             Text = "LoadingDialog";
             FormClosing += LoadingDialog_FormClosing;
