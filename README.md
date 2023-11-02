@@ -8,6 +8,9 @@ Originally starting as a personal Quality of Life add-on the DS Pokemon ROM Edit
 
 # Features
 ## **TRAINER CLASS EDITOR**
+![image](https://github.com/Chvlkie/VS-Maker/assets/120563328/a351a86c-0906-4b70-807d-22b76d15b04b)
+
+
 An advanced Trainer Class Editor. Expanded from DSPRE's Trainer Editor.
 <br/>VS-Maker can edit:
 <br/>• Trainer Class Names
@@ -23,6 +26,10 @@ An advanced Trainer Class Editor. Expanded from DSPRE's Trainer Editor.
 <br/>• Diamond & Pearl: Show Trainer Class sprites (currently compressed)
 <br/>
 ## **TRAINER EDITOR**
+![image](https://github.com/Chvlkie/VS-Maker/assets/120563328/d36834a9-151a-4ad3-80c0-8f2ef26a73bf)
+![image](https://github.com/Chvlkie/VS-Maker/assets/120563328/3abea4ac-2e1a-48a8-81d6-037e72f39c71)
+![image](https://github.com/Chvlkie/VS-Maker/assets/120563328/5dd0a121-8eb0-4590-90ac-649e063c8433)
+
 A more streamlined Trainer Editor expanded from DSPRE. Able to easily view and Edit a Trainer's text.
 <br/>VS-Maker's Trainer Editor can edit:
 <br/>• Trainer Names
@@ -43,8 +50,11 @@ A more streamlined Trainer Editor expanded from DSPRE. Able to easily view and E
 ### **PLANNED FEATURES**
 • ADD NEW TRAINERS
 <br/>• Pokemon Editor: Show Pokemon front & back sprites (change when choose form/gender)
-<br/>
+<br/>• Move Editor: View move's description and stats etc
 ## **TRAINER TEXT TABLE**
+![image](https://github.com/Chvlkie/VS-Maker/assets/120563328/54e8ceba-3b39-4216-8fd6-0b8bb5a136aa)
+![image](https://github.com/Chvlkie/VS-Maker/assets/120563328/3c1da7a7-915c-4569-ac7b-b976af44da0b)
+
 A new function that reads data from a ROMs Trainer Table to edit in-battle messages and triggers.
 <br/>VS-Maker allows you to add new lines and also Sort & Repoint the Trainer Text Offset table.
 <br/>The Trainer Text Table editor is able to:
