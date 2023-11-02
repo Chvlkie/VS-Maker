@@ -3096,7 +3096,13 @@ namespace VSMaker
 
         private void openProjectGitHubToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Process.Start("https://github.com/Chvlkie/VS-Maker");
+            var uri = "https://github.com/Chvlkie/VS-Maker";
+            var psi = new System.Diagnostics.ProcessStartInfo
+            {
+                UseShellExecute = true,
+                FileName = uri
+            };
+            System.Diagnostics.Process.Start(psi);
         }
     }
 }

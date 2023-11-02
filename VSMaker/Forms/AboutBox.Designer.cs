@@ -29,12 +29,12 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AboutBox));
             tableLayoutPanel = new TableLayoutPanel();
-            logoPictureBox = new PictureBox();
             labelProductName = new Label();
             labelVersion = new Label();
             labelCompanyName = new Label();
             okButton = new Button();
             richTextBox1 = new RichTextBox();
+            logoPictureBox = new PictureBox();
             tableLayoutPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)logoPictureBox).BeginInit();
             SuspendLayout();
@@ -63,19 +63,6 @@
             tableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 10F));
             tableLayoutPanel.Size = new Size(487, 307);
             tableLayoutPanel.TabIndex = 0;
-            // 
-            // logoPictureBox
-            // 
-            logoPictureBox.Dock = DockStyle.Fill;
-            logoPictureBox.Image = (Image)resources.GetObject("logoPictureBox.Image");
-            logoPictureBox.Location = new Point(4, 3);
-            logoPictureBox.Margin = new Padding(4, 3, 4, 3);
-            logoPictureBox.Name = "logoPictureBox";
-            tableLayoutPanel.SetRowSpan(logoPictureBox, 6);
-            logoPictureBox.Size = new Size(152, 301);
-            logoPictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
-            logoPictureBox.TabIndex = 12;
-            logoPictureBox.TabStop = false;
             // 
             // labelProductName
             // 
@@ -133,6 +120,19 @@
             richTextBox1.TabIndex = 25;
             richTextBox1.Text = resources.GetString("richTextBox1.Text");
             // 
+            // logoPictureBox
+            // 
+            logoPictureBox.Dock = DockStyle.Fill;
+            logoPictureBox.Image = (Image)resources.GetObject("logoPictureBox.Image");
+            logoPictureBox.Location = new Point(4, 3);
+            logoPictureBox.Margin = new Padding(4, 3, 4, 3);
+            logoPictureBox.Name = "logoPictureBox";
+            tableLayoutPanel.SetRowSpan(logoPictureBox, 6);
+            logoPictureBox.Size = new Size(152, 301);
+            logoPictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
+            logoPictureBox.TabIndex = 12;
+            logoPictureBox.TabStop = false;
+            // 
             // AboutBox
             // 
             AcceptButton = okButton;
@@ -158,11 +158,11 @@
         #endregion
 
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel;
-        private System.Windows.Forms.PictureBox logoPictureBox;
         private System.Windows.Forms.Label labelProductName;
         private System.Windows.Forms.Label labelVersion;
         private System.Windows.Forms.Button okButton;
         private Label labelCompanyName;
         private RichTextBox richTextBox1;
+        private PictureBox logoPictureBox;
     }
 }
