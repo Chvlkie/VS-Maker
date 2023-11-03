@@ -80,6 +80,7 @@ namespace VSMaker
         private ImageBase trainerTile;
 
         private int defaultTrainersCount;
+
         #endregion Editor Data
 
         #region Forms
@@ -402,7 +403,6 @@ namespace VSMaker
             progress?.Report(95);
             SetupTrainerClassEditor();
             progress?.Report(100);
-
         }
 
         private async void OpenRomFolder()
@@ -1900,7 +1900,7 @@ namespace VSMaker
                 string trainerListItem = $"[{trainer.DisplayTrainerId}] - {trainer.TrainerName}";
                 int index = -1;
                 bool search = true;
-                while (search)
+                while (search == true)
                 {
                     for (int i = 0; i < dataGrid.Rows.Count; i++)
                     {
@@ -2890,7 +2890,7 @@ namespace VSMaker
                 progress?.Report(i);
             }
             progress?.Report(max);
-            trainerTextArchive.SaveToFileDefaultDir(trainerTextMessageNumber);
+            trainerTextArchive.SaveToFileDefaultDir(trainerTextMessageNumber, false);
         }
 
         private void trainerTextTable_addRow_btn_Click(object sender, EventArgs e)
@@ -3029,7 +3029,7 @@ namespace VSMaker
             }
             progress?.Report(trainerTableCount + 10);
 
-            trainerTextArchive.SaveToFileDefaultDir(trainerTextMessageNumber);
+            trainerTextArchive.SaveToFileDefaultDir(trainerTextMessageNumber, false);
             statusLabelMessage("Trainer Texts saved successfully");
         }
 
@@ -3197,7 +3197,7 @@ namespace VSMaker
 
             File.Copy(baseTrainerProperties, newTrainerProperties);
             File.Copy(baseTrainerParty, newTrainerParty);
-            RomFileSystem.UpdateCurrentTrainerName(newName, trainerNameArchive.Messages.Count -1);
+            RomFileSystem.UpdateCurrentTrainerName(newName, trainerNameArchive.Messages.Count - 1);
             trainers.Clear();
             selectedTrainer = null;
             GetTrainers();
@@ -3234,6 +3234,8 @@ namespace VSMaker
                 int newSelectTrainerId = trainerId - 2;
                 trainerTextTable_dataGrid.Rows.Clear();
                 trainers_list.SelectedIndex = newSelectTrainerId < 0 ? 0 : newSelectTrainerId;
+                MessageBox.Show("Trainer removed successfully!\n\nIf you had made any changes to Trainer text, it is recommended to run Sort & Repoint.", "Trainer Removed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
             }
         }
     }
