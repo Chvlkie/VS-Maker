@@ -3182,8 +3182,9 @@ namespace VSMaker
 
         private void InsertNewTrainer()
         {
+            string newName = "New";
             var trainerNameArchive = new TextArchive(trainerNamesMessageNumber);
-            trainerNameArchive.Messages.Add("New Trainer");
+            trainerNameArchive.Messages.Add(newName);
             trainerNameArchive.SaveToFileDefaultDir(trainerNamesMessageNumber, false);
             string baseSuffix = $"\\{0:D4}";
             string newSuffix = $"\\{trainerNameArchive.Messages.Count - 1:D4}";
@@ -3196,10 +3197,12 @@ namespace VSMaker
 
             File.Copy(baseTrainerProperties, newTrainerProperties);
             File.Copy(baseTrainerParty, newTrainerParty);
+            RomFileSystem.UpdateCurrentTrainerName(newName, trainerNameArchive.Messages.Count -1);
             trainers.Clear();
             selectedTrainer = null;
             GetTrainers();
             SetupTrainerEditor();
+            trainerTextTable_dataGrid.Rows.Clear();
             trainers_list.SelectedIndex = trainers_list.Items.Count - 1;
         }
 
@@ -3229,6 +3232,7 @@ namespace VSMaker
                 GetTrainers();
                 SetupTrainerEditor();
                 int newSelectTrainerId = trainerId - 2;
+                trainerTextTable_dataGrid.Rows.Clear();
                 trainers_list.SelectedIndex = newSelectTrainerId < 0 ? 0 : newSelectTrainerId;
             }
         }
