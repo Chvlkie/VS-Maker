@@ -1102,6 +1102,7 @@ namespace VSMaker
         private void SaveTrainerName()
         {
             RomFileSystem.UpdateCurrentTrainerName(trainer_Name.Text, selectedTrainer.TrainerId);
+            trainerTextTable_dataGrid.Rows.Clear();
         }
 
         private void SetupTrainerEditor()
@@ -3151,7 +3152,6 @@ namespace VSMaker
                     if (choice == DialogResult.Yes)
                     {
                         SetUnsavedChanges(false);
-                        undoTrainer_btn.Enabled = true;
                         RemoveSelectedTrainer(selectedTrainer.TrainerId);
                     }
                 }
@@ -3170,7 +3170,6 @@ namespace VSMaker
                 if (choice == DialogResult.Yes)
                 {
                     SetUnsavedChanges(false);
-                    undoTrainer_btn.Enabled = true;
                     InsertNewTrainer();
                 }
             }

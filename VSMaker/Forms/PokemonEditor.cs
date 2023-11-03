@@ -186,13 +186,27 @@ namespace VSMaker.Forms
 
         private void pokeStat_Dv_slider_Scroll(object sender, EventArgs e)
         {
-            pokeStat_Dv_num.Value = pokeStat_Dv_slider.Value;
+            if (!loadingData)
+            {
+                if (!mainform.unsavedChanges)
+                {
+                    mainform.SetUnsavedChanges(true);
+                }
+                pokeStat_Dv_num.Value = pokeStat_Dv_slider.Value;
+            }
         }
 
         private void pokeStat_Dv_num_ValueChanged(object sender, EventArgs e)
         {
-            pokeStat_Dv_slider.Value = (int)pokeStat_Dv_num.Value;
-            trainerFile.party[partyIndex].difficulty = (byte)pokeStat_Dv_slider.Value;
+            if (!loadingData)
+            {
+                if (!mainform.unsavedChanges)
+                {
+                    mainform.SetUnsavedChanges(true);
+                }
+                pokeStat_Dv_slider.Value = (int)pokeStat_Dv_num.Value;
+                trainerFile.party[partyIndex].difficulty = (byte)pokeStat_Dv_slider.Value;
+            }
         }
 
         private void SetPokemonGender()
