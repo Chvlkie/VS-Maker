@@ -55,4 +55,14 @@
         public bool TagTeam { get; set; }
         public bool WeatherEffect { get; set; }
     };
+
+    /// <summary>
+    /// The Default amount of Trainers in Vanilla roms. Used to prevent removal of Core game trainers.
+    /// </summary>
+    public static class DefaultTrainersAmount
+    {
+        public const int DiamondPearl = 850;
+        public const int HeartGoldSoulSilver = 738;
+        public const int Platinum = 928;
+    }
 }

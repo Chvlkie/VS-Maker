@@ -1180,7 +1180,7 @@ namespace VSMaker.CommonFunctions
 
         public static List<string> GetLocationNames() => new TextArchive(locationNamesTextNumber).Messages;
 
-        public static string[] GetSimpleTrainerNames() => new TextArchive(trainerNamesMessageNumber).Messages.ToArray();
+        public static List<string> GetSimpleTrainerNames() => new TextArchive(trainerNamesMessageNumber).Messages;
 
         public static string[] GetTrainerMessages() => new TextArchive(trainerTextMessageNumber).Messages.ToArray();
 

@@ -79,6 +79,7 @@ namespace VSMaker
         private bool trainerSpriteMessage;
         private ImageBase trainerTile;
 
+        private int defaultTrainersCount;
         #endregion Editor Data
 
         #region Forms
@@ -385,8 +386,23 @@ namespace VSMaker
 
         public void BeginSetupEditor(IProgress<int> progress)
         {
-            GetData();
+            GetData(progress);
+            if (gameFamily == gFamEnum.DP)
+            {
+                defaultTrainersCount = DefaultTrainersAmount.DiamondPearl;
+            }
+            else if (gameFamily == gFamEnum.HGSS)
+            {
+                defaultTrainersCount = DefaultTrainersAmount.HeartGoldSoulSilver;
+            }
+            else if (gameFamily == gFamEnum.Plat)
+            {
+                defaultTrainersCount = DefaultTrainersAmount.Platinum;
+            }
+            progress?.Report(95);
             SetupTrainerClassEditor();
+            progress?.Report(100);
+
         }
 
         private async void OpenRomFolder()
@@ -1206,53 +1222,67 @@ namespace VSMaker
             abilityNames = GetAbilityNames();
         }
 
-        private void GetData()
+        private void GetData(IProgress<int> progress = null)
         {
             loadingData = true;
             if (eyeContactMusics.Count == 0)
             {
                 GetEyeContactMusicLists();
             }
+            progress?.Report(8);
+
             if (trainers.Count == 0)
             {
                 GetTrainers();
             }
+            progress?.Report(16);
+
             if (trainerClasses.Count == 0)
             {
                 GetTrainerClasses();
             }
+            progress?.Report(24);
+
             if (messageTriggers.Count == 0)
             {
                 GetMessageTriggers();
             }
+            progress?.Report(32);
             if (trainerMessages.Count == 0)
             {
                 GetTrainerMessages();
             }
+            progress?.Report(40);
             if (itemNames.Count == 0)
             {
                 GetItems();
             }
+            progress?.Report(48);
             if (moveNames.Count == 0)
             {
                 GetMoves();
             }
+            progress?.Report(56);
             if (abilityNames.Length == 0)
             {
                 GetAbilities();
             }
+            progress?.Report(64);
             if (pokemons.Count == 0)
             {
                 GetPokemon();
             }
+            progress?.Report(72);
             if (prizeMoneyList.Count == 0)
             {
                 GetPrizeMoneyData();
             }
+            progress?.Report(80);
             if (gameFamily != gFamEnum.DP && classGenderList.Count == 0)
             {
                 GetTrainerClassGenders();
             }
+            progress?.Report(90);
             loadingData = false;
         }
 
@@ -1432,9 +1462,9 @@ namespace VSMaker
 
             statusLabelMessage("Getting Trainers...");
 
-            string[] trainerNames = GetSimpleTrainerNames();
+            List<string> trainerNames = GetSimpleTrainerNames();
 
-            for (int i = 0; i < trainerNames.Length; i++)
+            for (int i = 0; i < trainerNames.Count; i++)
             {
                 string suffix = "\\" + i.ToString("D4");
                 var trainerProperties = new TrainerProperties((ushort)i, new FileStream($"{gameDirs[DirNames.trainerProperties].unpackedDir}{suffix}", FileMode.Open));
@@ -2743,7 +2773,6 @@ namespace VSMaker
             if (!loadingData)
             {
                 int index = trainers_list.SelectedIndex;
-
                 if (selectedTrainerIndex == -1)
                 {
                     ChangeTrainer();
@@ -2778,6 +2807,8 @@ namespace VSMaker
                     var text = trainers_list.Items[index].ToString();
                     int trainerId = int.Parse(text.Remove(0, 1).Remove(3));
                     trainer_MessageTrigger_list.SelectedIndex = -1;
+                    removeTrainer_btn.Enabled = true;
+
                     GetTrainerInfo(trainerId);
                 }
             }
@@ -2861,6 +2892,7 @@ namespace VSMaker
             progress?.Report(max);
             trainerTextArchive.SaveToFileDefaultDir(trainerTextMessageNumber);
         }
+
         private void trainerTextTable_addRow_btn_Click(object sender, EventArgs e)
         {
             int index = trainerTextTable_dataGrid.Rows.Count - 1;
@@ -3100,12 +3132,105 @@ namespace VSMaker
         private void openProjectGitHubToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var uri = "https://github.com/Chvlkie/VS-Maker";
-            var psi = new System.Diagnostics.ProcessStartInfo
+            var psi = new ProcessStartInfo
             {
                 UseShellExecute = true,
                 FileName = uri
             };
-            System.Diagnostics.Process.Start(psi);
+            Process.Start(psi);
+        }
+
+        private void removeTrainer_btn_Click(object sender, EventArgs e)
+        {
+            var confirmDel = MessageBox.Show("This will completely remove selected Trainer.\nIf this trainer is used in-game, then there will be errors!\n\nDo you wish to coninue?", "Delete Trainer", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (confirmDel == DialogResult.Yes)
+            {
+                if (unsavedChanges)
+                {
+                    var choice = MessageBox.Show("You have unsaved changes.\nDo you wish to discard these changes?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (choice == DialogResult.Yes)
+                    {
+                        SetUnsavedChanges(false);
+                        undoTrainer_btn.Enabled = true;
+                        RemoveSelectedTrainer(selectedTrainer.TrainerId);
+                    }
+                }
+                else
+                {
+                    RemoveSelectedTrainer(selectedTrainer.TrainerId);
+                }
+            }
+        }
+
+        private void addTrainer_btn_Click(object sender, EventArgs e)
+        {
+            if (unsavedChanges)
+            {
+                var choice = MessageBox.Show("You have unsaved changes.\nDo you wish to discard these changes?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (choice == DialogResult.Yes)
+                {
+                    SetUnsavedChanges(false);
+                    undoTrainer_btn.Enabled = true;
+                    InsertNewTrainer();
+                }
+            }
+            else
+            {
+                InsertNewTrainer();
+            }
+        }
+
+        private void InsertNewTrainer()
+        {
+            var trainerNameArchive = new TextArchive(trainerNamesMessageNumber);
+            trainerNameArchive.Messages.Add("New Trainer");
+            trainerNameArchive.SaveToFileDefaultDir(trainerNamesMessageNumber, false);
+            string baseSuffix = $"\\{0:D4}";
+            string newSuffix = $"\\{trainerNameArchive.Messages.Count - 1:D4}";
+
+            string baseTrainerProperties = gameDirs[DirNames.trainerProperties].unpackedDir + baseSuffix;
+            string newTrainerProperties = gameDirs[DirNames.trainerProperties].unpackedDir + newSuffix;
+
+            string baseTrainerParty = gameDirs[DirNames.trainerParty].unpackedDir + baseSuffix;
+            string newTrainerParty = gameDirs[DirNames.trainerParty].unpackedDir + newSuffix;
+
+            File.Copy(baseTrainerProperties, newTrainerProperties);
+            File.Copy(baseTrainerParty, newTrainerParty);
+            trainers.Clear();
+            selectedTrainer = null;
+            GetTrainers();
+            SetupTrainerEditor();
+            trainers_list.SelectedIndex = trainers_list.Items.Count - 1;
+        }
+
+        private void RemoveSelectedTrainer(int trainerId)
+        {
+            if (trainerId < defaultTrainersCount)
+            {
+                MessageBox.Show("Unable to remove Trainer as it is a core Trainer\n\nThis is a Trainer from the original Vanilla ROM.", "Unable to Remove Trainer", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            else if (trainerMessages.Any(x => x.TrainerId == trainerId))
+            {
+                MessageBox.Show("Unable to remove Trainer as there is Trainer Text set.\n\nPlease delete this Trainer's text entries first!", "Unable to Remove Trainer", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            else
+            {
+                var trainerNameArchive = new TextArchive(trainerNamesMessageNumber);
+                trainerNameArchive.Messages.RemoveAt(trainerId);
+                trainerNameArchive.SaveToFileDefaultDir(trainerNamesMessageNumber, false);
+
+                string suffix = $"\\{trainerId:D4}";
+                File.Delete(gameDirs[DirNames.trainerProperties].unpackedDir + suffix);
+                File.Delete(gameDirs[DirNames.trainerParty].unpackedDir + suffix);
+                trainers.Clear();
+                selectedTrainer = null;
+                GetTrainers();
+                SetupTrainerEditor();
+                int newSelectTrainerId = trainerId - 2;
+                trainers_list.SelectedIndex = newSelectTrainerId < 0 ? 0 : newSelectTrainerId;
+            }
         }
     }
 }

@@ -42,6 +42,7 @@ namespace VSMaker
             save_toolstrip = new ToolStripMenuItem();
             mainToolStrip_help = new ToolStripMenuItem();
             about_toolstrip = new ToolStripMenuItem();
+            openProjectGitHubToolStripMenuItem = new ToolStripMenuItem();
             statusStrip1 = new StatusStrip();
             statusLabel = new ToolStripStatusLabel();
             mainContent = new TabControl();
@@ -189,6 +190,8 @@ namespace VSMaker
             label3 = new Label();
             trainerPicBox = new PictureBox();
             panel5 = new Panel();
+            removeTrainer_btn = new Button();
+            addTrainer_btn = new Button();
             trainer_Player_help_btn = new Button();
             label2 = new Label();
             trainers_list = new ListBox();
@@ -215,7 +218,7 @@ namespace VSMaker
             openTextEditor_btn = new ToolStripButton();
             mainContent_trainerTheme = new TabPage();
             panel14 = new Panel();
-            button10 = new Button();
+            addTrainer_btn0 = new Button();
             comboBox8 = new ComboBox();
             label17 = new Label();
             comboBox7 = new ComboBox();
@@ -241,7 +244,6 @@ namespace VSMaker
             saveFileDialog1 = new SaveFileDialog();
             trainerMessageBindingSource1 = new BindingSource(components);
             trainerMessageBindingSource3 = new BindingSource(components);
-            openProjectGitHubToolStripMenuItem = new ToolStripMenuItem();
             main_toolstrip.SuspendLayout();
             statusStrip1.SuspendLayout();
             mainContent.SuspendLayout();
@@ -367,6 +369,13 @@ namespace VSMaker
             about_toolstrip.Size = new Size(184, 22);
             about_toolstrip.Text = "About";
             about_toolstrip.Click += about_toolstrip_Click;
+            // 
+            // openProjectGitHubToolStripMenuItem
+            // 
+            openProjectGitHubToolStripMenuItem.Name = "openProjectGitHubToolStripMenuItem";
+            openProjectGitHubToolStripMenuItem.Size = new Size(184, 22);
+            openProjectGitHubToolStripMenuItem.Text = "Open Project GitHub";
+            openProjectGitHubToolStripMenuItem.Click += openProjectGitHubToolStripMenuItem_Click;
             // 
             // statusStrip1
             // 
@@ -2215,6 +2224,8 @@ namespace VSMaker
             // 
             // panel5
             // 
+            panel5.Controls.Add(removeTrainer_btn);
+            panel5.Controls.Add(addTrainer_btn);
             panel5.Controls.Add(trainer_Player_help_btn);
             panel5.Controls.Add(label2);
             panel5.Controls.Add(trainers_list);
@@ -2225,6 +2236,32 @@ namespace VSMaker
             panel5.Name = "panel5";
             panel5.Size = new Size(200, 483);
             panel5.TabIndex = 0;
+            // 
+            // removeTrainer_btn
+            // 
+            removeTrainer_btn.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            removeTrainer_btn.Image = Properties.Resources.minusIconSm;
+            removeTrainer_btn.ImageAlign = ContentAlignment.MiddleLeft;
+            removeTrainer_btn.Location = new Point(5, 457);
+            removeTrainer_btn.Name = "removeTrainer_btn";
+            removeTrainer_btn.Size = new Size(190, 23);
+            removeTrainer_btn.TabIndex = 10;
+            removeTrainer_btn.Text = "Remove Trainer";
+            removeTrainer_btn.UseVisualStyleBackColor = true;
+            removeTrainer_btn.Enabled = false;
+            removeTrainer_btn.Click += removeTrainer_btn_Click;
+            // 
+            // addTrainer_btn
+            // 
+            addTrainer_btn.Image = Properties.Resources.plusIconSm;
+            addTrainer_btn.ImageAlign = ContentAlignment.MiddleLeft;
+            addTrainer_btn.Location = new Point(5, 429);
+            addTrainer_btn.Name = "addTrainer_btn";
+            addTrainer_btn.Size = new Size(190, 23);
+            addTrainer_btn.TabIndex = 9;
+            addTrainer_btn.Text = "Insert Trainer";
+            addTrainer_btn.UseVisualStyleBackColor = true;
+            addTrainer_btn.Click += addTrainer_btn_Click;
             // 
             // trainer_Player_help_btn
             // 
@@ -2259,7 +2296,7 @@ namespace VSMaker
             trainers_list.ItemHeight = 15;
             trainers_list.Location = new Point(5, 104);
             trainers_list.Name = "trainers_list";
-            trainers_list.Size = new Size(190, 364);
+            trainers_list.Size = new Size(190, 319);
             trainers_list.TabIndex = 6;
             trainers_list.SelectedIndexChanged += trainers_list_SelectedIndexChanged;
             // 
@@ -2504,7 +2541,7 @@ namespace VSMaker
             // 
             // panel14
             // 
-            panel14.Controls.Add(button10);
+            panel14.Controls.Add(addTrainer_btn0);
             panel14.Controls.Add(comboBox8);
             panel14.Controls.Add(label17);
             panel14.Controls.Add(comboBox7);
@@ -2517,16 +2554,16 @@ namespace VSMaker
             panel14.Size = new Size(685, 483);
             panel14.TabIndex = 7;
             // 
-            // button10
+            // addTrainer_btn0
             // 
-            button10.Image = Properties.Resources.saveIconSm;
-            button10.Location = new Point(288, 259);
-            button10.Name = "button10";
-            button10.Size = new Size(56, 23);
-            button10.TabIndex = 44;
-            button10.Text = "Save";
-            button10.TextImageRelation = TextImageRelation.ImageBeforeText;
-            button10.UseVisualStyleBackColor = true;
+            addTrainer_btn0.Image = Properties.Resources.saveIconSm;
+            addTrainer_btn0.Location = new Point(288, 259);
+            addTrainer_btn0.Name = "addTrainer_btn0";
+            addTrainer_btn0.Size = new Size(56, 23);
+            addTrainer_btn0.TabIndex = 44;
+            addTrainer_btn0.Text = "Save";
+            addTrainer_btn0.TextImageRelation = TextImageRelation.ImageBeforeText;
+            addTrainer_btn0.UseVisualStyleBackColor = true;
             // 
             // comboBox8
             // 
@@ -2728,13 +2765,6 @@ namespace VSMaker
             panel2.Size = new Size(899, 517);
             panel2.TabIndex = 5;
             // 
-            // openProjectGitHubToolStripMenuItem
-            // 
-            openProjectGitHubToolStripMenuItem.Name = "openProjectGitHubToolStripMenuItem";
-            openProjectGitHubToolStripMenuItem.Size = new Size(184, 22);
-            openProjectGitHubToolStripMenuItem.Text = "Open Project GitHub";
-            openProjectGitHubToolStripMenuItem.Click += openProjectGitHubToolStripMenuItem_Click;
-            // 
             // Mainform
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -2927,7 +2957,7 @@ namespace VSMaker
         private Panel panel14;
         private Label label16;
         private PictureBox pictureBox1;
-        private Button button10;
+        private Button addTrainer_btn0;
         private ComboBox comboBox8;
         private Label label17;
         private ComboBox comboBox7;
@@ -3053,5 +3083,7 @@ namespace VSMaker
         private ToolStripSeparator toolStripSeparator5;
         private ToolStripButton openTextEditor_btn;
         private ToolStripMenuItem openProjectGitHubToolStripMenuItem;
+        private Button removeTrainer_btn;
+        private Button addTrainer_btn;
     }
 }
