@@ -44,7 +44,7 @@
             label25 = new Label();
             label26 = new Label();
             label27 = new Label();
-            richTextBox4 = new RichTextBox();
+            moveInfoText4 = new RichTextBox();
             textBox12 = new TextBox();
             panel4 = new Panel();
             pictureBox5 = new PictureBox();
@@ -59,7 +59,7 @@
             label18 = new Label();
             label19 = new Label();
             label20 = new Label();
-            richTextBox3 = new RichTextBox();
+            moveInfoText3 = new RichTextBox();
             textBox9 = new TextBox();
             panel3 = new Panel();
             pictureBox3 = new PictureBox();
@@ -74,7 +74,7 @@
             label11 = new Label();
             label12 = new Label();
             label13 = new Label();
-            richTextBox2 = new RichTextBox();
+            moveInfoText2 = new RichTextBox();
             textBox6 = new TextBox();
             panel2 = new Panel();
             pictureBox2 = new PictureBox();
@@ -89,7 +89,7 @@
             label2 = new Label();
             label1 = new Label();
             trainerClassName_Label = new Label();
-            richTextBox1 = new RichTextBox();
+            moveInfoText1 = new RichTextBox();
             textBox1 = new TextBox();
             panel1.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
@@ -154,6 +154,7 @@
             // 
             // panel5
             // 
+            panel5.BackColor = SystemColors.Control;
             panel5.Controls.Add(pictureBox7);
             panel5.Controls.Add(pictureBox8);
             panel5.Controls.Add(textBox10);
@@ -166,7 +167,7 @@
             panel5.Controls.Add(label25);
             panel5.Controls.Add(label26);
             panel5.Controls.Add(label27);
-            panel5.Controls.Add(richTextBox4);
+            panel5.Controls.Add(moveInfoText4);
             panel5.Controls.Add(textBox12);
             panel5.Dock = DockStyle.Fill;
             panel5.Location = new Point(403, 207);
@@ -192,6 +193,7 @@
             // 
             // textBox10
             // 
+            textBox10.BackColor = Color.White;
             textBox10.Location = new Point(321, 32);
             textBox10.Name = "textBox10";
             textBox10.ReadOnly = true;
@@ -201,6 +203,7 @@
             // 
             // textBox11
             // 
+            textBox11.BackColor = Color.White;
             textBox11.Location = new Point(248, 32);
             textBox11.Name = "textBox11";
             textBox11.ReadOnly = true;
@@ -304,17 +307,19 @@
             label27.Text = "Move 4";
             label27.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // richTextBox4
+            // moveInfoText4
             // 
-            richTextBox4.Location = new Point(180, 97);
-            richTextBox4.Name = "richTextBox4";
-            richTextBox4.ReadOnly = true;
-            richTextBox4.Size = new Size(198, 80);
-            richTextBox4.TabIndex = 49;
-            richTextBox4.Text = "";
+            moveInfoText4.BackColor = Color.White;
+            moveInfoText4.Location = new Point(180, 97);
+            moveInfoText4.Name = "moveInfoText4";
+            moveInfoText4.ReadOnly = true;
+            moveInfoText4.Size = new Size(198, 80);
+            moveInfoText4.TabIndex = 49;
+            moveInfoText4.Text = "";
             // 
             // textBox12
             // 
+            textBox12.BackColor = Color.White;
             textBox12.Location = new Point(180, 32);
             textBox12.Name = "textBox12";
             textBox12.ReadOnly = true;
@@ -336,7 +341,7 @@
             panel4.Controls.Add(label18);
             panel4.Controls.Add(label19);
             panel4.Controls.Add(label20);
-            panel4.Controls.Add(richTextBox3);
+            panel4.Controls.Add(moveInfoText3);
             panel4.Controls.Add(textBox9);
             panel4.Dock = DockStyle.Fill;
             panel4.Location = new Point(3, 207);
@@ -362,6 +367,7 @@
             // 
             // textBox7
             // 
+            textBox7.BackColor = Color.White;
             textBox7.Location = new Point(321, 32);
             textBox7.Name = "textBox7";
             textBox7.ReadOnly = true;
@@ -371,6 +377,7 @@
             // 
             // textBox8
             // 
+            textBox8.BackColor = Color.White;
             textBox8.Location = new Point(248, 32);
             textBox8.Name = "textBox8";
             textBox8.ReadOnly = true;
@@ -474,17 +481,19 @@
             label20.Text = "Move 3";
             label20.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // richTextBox3
+            // moveInfoText3
             // 
-            richTextBox3.Location = new Point(180, 97);
-            richTextBox3.Name = "richTextBox3";
-            richTextBox3.ReadOnly = true;
-            richTextBox3.Size = new Size(198, 80);
-            richTextBox3.TabIndex = 49;
-            richTextBox3.Text = "";
+            moveInfoText3.BackColor = Color.White;
+            moveInfoText3.Location = new Point(180, 97);
+            moveInfoText3.Name = "moveInfoText3";
+            moveInfoText3.ReadOnly = true;
+            moveInfoText3.Size = new Size(198, 80);
+            moveInfoText3.TabIndex = 49;
+            moveInfoText3.Text = "";
             // 
             // textBox9
             // 
+            textBox9.BackColor = Color.White;
             textBox9.Location = new Point(180, 32);
             textBox9.Name = "textBox9";
             textBox9.ReadOnly = true;
@@ -506,7 +515,7 @@
             panel3.Controls.Add(label11);
             panel3.Controls.Add(label12);
             panel3.Controls.Add(label13);
-            panel3.Controls.Add(richTextBox2);
+            panel3.Controls.Add(moveInfoText2);
             panel3.Controls.Add(textBox6);
             panel3.Dock = DockStyle.Fill;
             panel3.Location = new Point(403, 3);
@@ -532,6 +541,7 @@
             // 
             // textBox4
             // 
+            textBox4.BackColor = Color.White;
             textBox4.Location = new Point(321, 32);
             textBox4.Name = "textBox4";
             textBox4.ReadOnly = true;
@@ -541,6 +551,7 @@
             // 
             // textBox5
             // 
+            textBox5.BackColor = Color.White;
             textBox5.Location = new Point(248, 32);
             textBox5.Name = "textBox5";
             textBox5.ReadOnly = true;
@@ -644,17 +655,19 @@
             label13.Text = "Move 2";
             label13.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // richTextBox2
+            // moveInfoText2
             // 
-            richTextBox2.Location = new Point(180, 97);
-            richTextBox2.Name = "richTextBox2";
-            richTextBox2.ReadOnly = true;
-            richTextBox2.Size = new Size(198, 80);
-            richTextBox2.TabIndex = 49;
-            richTextBox2.Text = "";
+            moveInfoText2.BackColor = Color.White;
+            moveInfoText2.Location = new Point(180, 97);
+            moveInfoText2.Name = "moveInfoText2";
+            moveInfoText2.ReadOnly = true;
+            moveInfoText2.Size = new Size(198, 80);
+            moveInfoText2.TabIndex = 49;
+            moveInfoText2.Text = "";
             // 
             // textBox6
             // 
+            textBox6.BackColor = Color.White;
             textBox6.Location = new Point(180, 32);
             textBox6.Name = "textBox6";
             textBox6.ReadOnly = true;
@@ -676,7 +689,7 @@
             panel2.Controls.Add(label2);
             panel2.Controls.Add(label1);
             panel2.Controls.Add(trainerClassName_Label);
-            panel2.Controls.Add(richTextBox1);
+            panel2.Controls.Add(moveInfoText1);
             panel2.Controls.Add(textBox1);
             panel2.Dock = DockStyle.Fill;
             panel2.Location = new Point(3, 3);
@@ -702,6 +715,7 @@
             // 
             // textBox3
             // 
+            textBox3.BackColor = Color.White;
             textBox3.Location = new Point(321, 32);
             textBox3.Name = "textBox3";
             textBox3.ReadOnly = true;
@@ -711,6 +725,7 @@
             // 
             // textBox2
             // 
+            textBox2.BackColor = Color.White;
             textBox2.Location = new Point(248, 32);
             textBox2.Name = "textBox2";
             textBox2.ReadOnly = true;
@@ -814,17 +829,19 @@
             trainerClassName_Label.Text = "Move 1";
             trainerClassName_Label.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // richTextBox1
+            // moveInfoText1
             // 
-            richTextBox1.Location = new Point(180, 97);
-            richTextBox1.Name = "richTextBox1";
-            richTextBox1.ReadOnly = true;
-            richTextBox1.Size = new Size(198, 80);
-            richTextBox1.TabIndex = 49;
-            richTextBox1.Text = "";
+            moveInfoText1.BackColor = Color.White;
+            moveInfoText1.Location = new Point(180, 97);
+            moveInfoText1.Name = "moveInfoText1";
+            moveInfoText1.ReadOnly = true;
+            moveInfoText1.Size = new Size(198, 80);
+            moveInfoText1.TabIndex = 49;
+            moveInfoText1.Text = "";
             // 
             // textBox1
             // 
+            textBox1.BackColor = Color.White;
             textBox1.Location = new Point(180, 32);
             textBox1.Name = "textBox1";
             textBox1.ReadOnly = true;
@@ -882,7 +899,7 @@
         private Label label25;
         private Label label26;
         private Label label27;
-        private RichTextBox richTextBox4;
+        private RichTextBox moveInfoText4;
         private TextBox textBox12;
         private Panel panel4;
         private PictureBox pictureBox5;
@@ -897,7 +914,7 @@
         private Label label18;
         private Label label19;
         private Label label20;
-        private RichTextBox richTextBox3;
+        private RichTextBox moveInfoText3;
         private TextBox textBox9;
         private Panel panel3;
         private PictureBox pictureBox3;
@@ -912,7 +929,7 @@
         private Label label11;
         private Label label12;
         private Label label13;
-        private RichTextBox richTextBox2;
+        private RichTextBox moveInfoText2;
         private TextBox textBox6;
         private Panel panel2;
         private PictureBox pictureBox2;
@@ -927,7 +944,7 @@
         private Label label2;
         private Label label1;
         private Label trainerClassName_Label;
-        private RichTextBox richTextBox1;
+        private RichTextBox moveInfoText1;
         private TextBox textBox1;
     }
 }
