@@ -26,12 +26,13 @@ An advanced Trainer Class Editor. Expanded from DSPRE's Trainer Editor.
 <br/>• Diamond & Pearl: Show Trainer Class sprites (currently compressed)
 <br/>
 ## **TRAINER EDITOR**
-![image](https://github.com/Chvlkie/VS-Maker/assets/120563328/d36834a9-151a-4ad3-80c0-8f2ef26a73bf)
+![image](https://github.com/Chvlkie/VS-Maker/assets/120563328/f5b324cc-2de8-4e45-99ee-ed705a85073f)
 ![image](https://github.com/Chvlkie/VS-Maker/assets/120563328/3abea4ac-2e1a-48a8-81d6-037e72f39c71)
 ![image](https://github.com/Chvlkie/VS-Maker/assets/120563328/5dd0a121-8eb0-4590-90ac-649e063c8433)
 
 A more streamlined Trainer Editor expanded from DSPRE. Able to easily view and Edit a Trainer's text.
 <br/>VS-Maker's Trainer Editor can edit:
+<br/>• ADD NEW TRAINERS
 <br/>• Trainer Names
 <br/>• Trainer's Class
 <br/>• Trainer's in-battle messages
@@ -48,7 +49,6 @@ A more streamlined Trainer Editor expanded from DSPRE. Able to easily view and E
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;• Difficulty value
 <br/>     
 ### **PLANNED FEATURES**
-• ADD NEW TRAINERS
 <br/>• Pokemon Editor: Show Pokemon front & back sprites (change when choose form/gender)
 <br/>• Move Editor: View move's description and stats etc
 ## **TRAINER TEXT TABLE**
