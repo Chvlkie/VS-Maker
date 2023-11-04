@@ -9,6 +9,7 @@ namespace VSMaker.Forms
         private int partyIndex;
         private TrainerFile trainerFile;
         private List<ComboBox> moveComboBoxes;
+        private List<RichTextBox> moveInfos;
         private bool loadingData = false;
 
         public ChooseMoves(Mainform mainform, int partyIndex, TrainerFile trainerFile)
@@ -25,6 +26,13 @@ namespace VSMaker.Forms
                 move2_comboBox,
                 move3_comboBox,
                 move4_comboBox,
+            };
+            moveInfos = new List<RichTextBox>
+            {
+                moveInfoText1,
+                moveInfoText2,
+                moveInfoText3,
+                moveInfoText4,
             };
             SetupMoves();
             loadingData = false;
@@ -47,7 +55,10 @@ namespace VSMaker.Forms
                     moveComboBoxes[i].Items.Clear();
                 }
                 moveComboBoxes[i].Items.Add("-----");
-                mainform.moveNames.Where(x => x != "-").ToList().ForEach(x => moveComboBoxes[i].Items.Add(x));
+                foreach (var item in mainform.moves.Where(x => x.MoveId > 0).ToList())
+                {
+                    moveComboBoxes[i].Items.Add(item.MoveName);
+                }
 
                 if (trainerFile.party[partyIndex].moves == null)
                 {
@@ -57,6 +68,8 @@ namespace VSMaker.Forms
                 {
                     moveComboBoxes[i].SelectedIndex = trainerFile.party[partyIndex].moves[i];
                 }
+
+                moveInfos[i].Text = mainform.moves[moveComboBoxes[i].SelectedIndex].DisplayMoveInfo;
             }
         }
 
@@ -69,6 +82,7 @@ namespace VSMaker.Forms
                     mainform.SetUnsavedChanges(true);
                 }
                 trainerFile.party[partyIndex].moves[0] = (ushort)move1_comboBox.SelectedIndex;
+                moveInfos[0].Text = mainform.moves[moveComboBoxes[0].SelectedIndex].DisplayMoveInfo;
             }
         }
 
@@ -81,6 +95,7 @@ namespace VSMaker.Forms
                     mainform.SetUnsavedChanges(true);
                 }
                 trainerFile.party[partyIndex].moves[1] = (ushort)move2_comboBox.SelectedIndex;
+                moveInfos[1].Text = mainform.moves[moveComboBoxes[1].SelectedIndex].DisplayMoveInfo;
             }
         }
 
@@ -93,6 +108,7 @@ namespace VSMaker.Forms
                     mainform.SetUnsavedChanges(true);
                 }
                 trainerFile.party[partyIndex].moves[2] = (ushort)move3_comboBox.SelectedIndex;
+                moveInfos[2].Text = mainform.moves[moveComboBoxes[2].SelectedIndex].DisplayMoveInfo;
             }
         }
 
@@ -105,6 +121,7 @@ namespace VSMaker.Forms
                     mainform.SetUnsavedChanges(true);
                 }
                 trainerFile.party[partyIndex].moves[3] = (ushort)move4_comboBox.SelectedIndex;
+                moveInfos[3].Text = mainform.moves[moveComboBoxes[3].SelectedIndex].DisplayMoveInfo;
             }
         }
     }

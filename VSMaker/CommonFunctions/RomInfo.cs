@@ -67,6 +67,7 @@ namespace VSMaker.CommonFunctions
         public static int trainerNamesMessageNumber { get; private set; }
         public static int trainerTextMessageNumber { get; private set; }
         public static int locationNamesTextNumber { get; private set; }
+        public static int moveInfoTextNumber { get; private set; }
 
         public static string internalNamesLocation { get; private set; }
         public static readonly byte internalNameLength = 16;
@@ -205,7 +206,7 @@ namespace VSMaker.CommonFunctions
             SetTrainerNamesMessageNumber();
             SetTrainerClassMessageNumber();
             SetTrainerTextMessageNumber();
-
+            SetMoveInfoTextNumber();
             /* System */
             ScriptCommandParametersDict = BuildCommandParametersDatabase(gameFamily);
 
@@ -1022,6 +1023,27 @@ namespace VSMaker.CommonFunctions
             }
         }
 
+        private void SetMoveInfoTextNumber()
+        {
+            switch (gameFamily)
+            {
+                case gFamEnum.DP:
+                    moveInfoTextNumber = 587;
+                    break;
+
+                case gFamEnum.Plat:
+                    moveInfoTextNumber = 646;
+                    break;
+
+                case gFamEnum.HGSS:
+                    moveInfoTextNumber = 749;
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
         private void SetAttackNamesTextNumber()
         {
             switch (gameFamily)
@@ -1198,6 +1220,7 @@ namespace VSMaker.CommonFunctions
 
         public static string[] GetPokemonNames(int messageNumber = 0) => new TextArchive(pokemonNamesTextNumbers[messageNumber]).Messages.ToArray();
 
+        public static List<string> GetMoveInfo() => new TextArchive(moveInfoTextNumber).Messages;
         public static string[] GetAbilityNames() => new TextArchive(abilityNamesTextNumber).Messages.ToArray();
 
         public static string[] GetAttackNames() => new TextArchive(attackNamesTextNumber).Messages.ToArray();

@@ -60,6 +60,8 @@ namespace VSMaker
         private List<string> itemNames = new();
         private List<MessageTrigger> messageTriggers = new();
         public List<string> moveNames = new();
+        public List<string> moveInfo = new();
+        public List<Move> moves = new();
         private List<ComboBox> pokeComboBoxes;
         private List<ComboBox> pokeItemComboBoxes;
         private List<NumericUpDown> pokeLevels;
@@ -1340,6 +1342,21 @@ namespace VSMaker
             statusLabelMessage("Getting Moves...");
 
             moveNames = GetAttackNames().ToList();
+            moveInfo = GetMoveInfo();
+
+            moves = new();
+
+            for (int i = 0; i < moveNames.Count; i++)
+            {
+                var move = new Move
+                {
+                    MoveId = i,
+                    MoveInfo = moveInfo[i],
+                    MoveName = moveNames[i]
+                };
+
+                moves.Add(move);
+            }
         }
 
         private void GetPokemon()
