@@ -1,4 +1,5 @@
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Ekona.Images;
 using Images;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -671,10 +672,13 @@ namespace VSMaker
         private void GoToTrainer()
         {
             int index = trainerClass_Uses_list.SelectedIndex;
-            var text = trainerClass_Uses_list.Items[index].ToString();
-            int id = int.Parse(text.Remove(0, 1).Remove(3));
-            selectedTrainer = trainers.SingleOrDefault(x => x.TrainerId == id);
-            mainContent.SelectedTab = mainContent_trainer;
+            if (index > -1)
+            {
+                var text = trainerClass_Uses_list.Items[index].ToString();
+                int id = int.Parse(text.Remove(0, 1).Remove(3));
+                selectedTrainer = trainers.SingleOrDefault(x => x.TrainerId == id);
+                mainContent.SelectedTab = mainContent_trainer;
+            }
         }
 
         private void SaveTrainerClassName()
@@ -1431,6 +1435,14 @@ namespace VSMaker
             }
         }
 
+        private void UpdateTrainerClass_UsedByTrainers()
+        {
+            foreach (var item in trainerClasses)
+            {
+                item.UsedByTrainers.Clear();
+                item.UsedByTrainers.AddRange(trainers.Where(x => x.TrainerClassId == item.TrainerClassId && !x.IsPlayerTrainer));
+            }
+        }
         private void GetTrainerMessages()
         {
             trainerMessages = new List<TrainerMessage>();
@@ -2048,6 +2060,8 @@ namespace VSMaker
         private void SaveTrainerClass()
         {
             trainerFile.trp.trainerClass = (byte)trainer_TrainerClass_listBox.SelectedIndex;
+            trainers[selectedTrainer.TrainerId].TrainerClassId = trainer_TrainerClass_listBox.SelectedIndex;
+            UpdateTrainerClass_UsedByTrainers();
         }
 
         private void saveTrainerClassAll_btn_Click(object sender, EventArgs e)
@@ -3201,6 +3215,7 @@ namespace VSMaker
             selectedTrainer = null;
             GetTrainers();
             SetupTrainerEditor();
+            UpdateTrainerClass_UsedByTrainers();
             trainerTextTable_dataGrid.Rows.Clear();
             trainers_list.SelectedIndex = trainers_list.Items.Count - 1;
         }
@@ -3230,6 +3245,7 @@ namespace VSMaker
                 selectedTrainer = null;
                 GetTrainers();
                 SetupTrainerEditor();
+                UpdateTrainerClass_UsedByTrainers();
                 int newSelectTrainerId = trainerId - 2;
                 trainerTextTable_dataGrid.Rows.Clear();
                 trainers_list.SelectedIndex = newSelectTrainerId < 0 ? 0 : newSelectTrainerId;
