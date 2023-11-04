@@ -2239,6 +2239,8 @@ namespace VSMaker
             // 
             // removeTrainer_btn
             // 
+            removeTrainer_btn.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            removeTrainer_btn.Enabled = false;
             removeTrainer_btn.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             removeTrainer_btn.Image = Properties.Resources.minusIconSm;
             removeTrainer_btn.ImageAlign = ContentAlignment.MiddleLeft;
@@ -2248,11 +2250,11 @@ namespace VSMaker
             removeTrainer_btn.TabIndex = 10;
             removeTrainer_btn.Text = "Remove Trainer";
             removeTrainer_btn.UseVisualStyleBackColor = true;
-            removeTrainer_btn.Enabled = false;
             removeTrainer_btn.Click += removeTrainer_btn_Click;
             // 
             // addTrainer_btn
             // 
+            addTrainer_btn.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             addTrainer_btn.Image = Properties.Resources.plusIconSm;
             addTrainer_btn.ImageAlign = ContentAlignment.MiddleLeft;
             addTrainer_btn.Location = new Point(5, 429);
