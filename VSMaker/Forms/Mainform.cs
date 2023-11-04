@@ -3082,7 +3082,7 @@ namespace VSMaker
                     MessageBox.Show("You must select a valid Pokemon!", "Unable to Save Pokemon", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
                 }
-                if (trainer_Poke_Moves_checkBox.Checked && trainerFile.party[i].moves[0] == 0 && trainerFile.party[i].moves[1] == 0 && trainerFile.party[i].moves[2] == 0 && trainerFile.party[i].moves[3] == 0)
+                if (ChooseMovesValidationError(trainer_Poke_Moves_checkBox.Checked, i))
                 {
                     MessageBox.Show("Choose Pokemon moves is selected.\n\nYou must select at least one move.", "Unable to Save Pokemon", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
@@ -3090,6 +3090,31 @@ namespace VSMaker
             }
             SetUnsavedChanges(false);
             return true;
+        }
+
+        private bool ChooseMovesValidationError(bool chooseMoves, int partyIndex)
+        {
+            if (chooseMoves)
+            {
+                if (trainerFile.party[partyIndex].moves == null)
+                {
+                    return true;
+                }
+
+                if (trainerFile.party[partyIndex].moves[0] == 0 &&
+                trainerFile.party[partyIndex].moves[1] == 0 &&
+                trainerFile.party[partyIndex].moves[2] == 0 &&
+                trainerFile.party[partyIndex].moves[3] == 0)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         private (bool Valid, int Row) VerifyTrainerTextTable()
