@@ -19,9 +19,6 @@ namespace VSMaker.Forms
         //private ImageBase pokemonTile;
 
         private List<PokemonForm> pokemonForms = new();
-        private const int TRAINER_PARTY_POKEMON_GENDER_DEFAULT_INDEX = 0;
-        private const int TRAINER_PARTY_POKEMON_GENDER_MALE_INDEX = 1;
-        private const int TRAINER_PARTY_POKEMON_GENDER_FEMALE_INDEX = 2;
 
         private const int TRAINER_PARTY_POKEMON_ABILITY_SLOT1_INDEX = 0;
         private const int TRAINER_PARTY_POKEMON_ABILITY_SLOT2_INDEX = 1;
@@ -35,12 +32,22 @@ namespace VSMaker.Forms
             loadingData = true;
             InitializeComponent();
             SetupStatEditor();
+            SetupPokemonAbility();
             SetupGenderComboBox();
             SetupForm();
             SetupPokemonSprite();
-            SetupPokemonAbility();
             SetupBallSeals();
+            SetPokemonAbility();
+            SetPokemonGender();
             loadingData = false;
+        }
+
+        private void SetPokemonAbility()
+        {
+            if (trainerFile.party[partyIndex].genderAndAbilityFlags.HasFlag(PartyPokemon.GenderAndAbilityFlags.ABILITY_SLOT2))
+                pokeStat_Ability_comboBox.SelectedIndex = TRAINER_PARTY_POKEMON_ABILITY_SLOT2_INDEX;
+            else
+                pokeStat_Ability_comboBox.SelectedIndex = TRAINER_PARTY_POKEMON_ABILITY_SLOT1_INDEX;
         }
 
         private void SetupPokemonSprite()
@@ -57,80 +64,31 @@ namespace VSMaker.Forms
                     pokeId = PokemonForms.GetPokemonForms(pokeId, mainform.hgEngine).Find(x => x.FormId == formId).SpeciesId;
                 }
             }
-
-            //LoadPokeSpirte(pokeId);
-            //UpdatePokeSprite(pokeSprite);
         }
 
-        private void SetupPokemonNature()
-        {
-        }
-
-        private void SetupPokemonAbility()
-        {
-            (string Ability1, string Ability2) pokeAbilities = GetPokemonAbilityNames(trainerFile.party[partyIndex].pokeID ?? 0);
-            pokeStat_Ability_comboBox.Items.Clear();
-            pokeStat_Ability_comboBox.Items.Add(pokeAbilities.Ability1);
-
-            //if the name " -" is returned for ability 2 then there is no ability 2
-            if (pokeAbilities.Ability2.Equals(" -") || pokeAbilities.Ability2.Equals(pokeAbilities.Ability1) || gameFamily != gFamEnum.HGSS)
-            {
-                pokeStat_Ability_comboBox.Enabled = false;
-            }
-            else
-            {
-                pokeStat_Ability_comboBox.Items.Add(pokeAbilities.Ability2);
-                pokeStat_Ability_comboBox.Enabled = true;
-            }
-
-            pokeStat_Ability_comboBox.SelectedIndex = TRAINER_PARTY_POKEMON_ABILITY_SLOT1_INDEX;
-        }
-
-        private (string Ability1, string Ability2) GetPokemonAbilityNames(int pokemonID)
+        private (string ability1, string ability2) GetPokemonAbilityNames(int pokemonID)
         {
             return (mainform.abilityNames[mainform.pokemonSpeciesAbilities[pokemonID].Item1],
                     mainform.abilityNames[mainform.pokemonSpeciesAbilities[pokemonID].Item2]);
         }
 
-        //private int LoadPokeSpirte(int speciesId)
-        //{
-        //    if (gameFamily == gFamEnum.DP)
-        //    {
-        //        if (!trainerSpriteMessage)
-        //        {
-        //            MessageBox.Show("Diamond and Pearl trainer sprites are compressed.\nAt the moment they cannot be viewed.", "Unable To View Trainer Sprite", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //            trainerSpriteMessage = true;
-        //        }
-        //        return 0;
-        //    }
+        private void SetupPokemonAbility()
+        {
+            (string ability1, string ability2) currentPartyPokemonAbilities = GetPokemonAbilityNames(trainerFile.party[partyIndex].pokeID ?? 0);
+            pokeStat_Ability_comboBox.Items.Clear();
+            pokeStat_Ability_comboBox.Items.Add(currentPartyPokemonAbilities.ability1);
 
-        //    int tilesFileId = speciesId * 5;
-        //    int paletteFileID = (tilesFileId + 1);
-        //    string paletteFilename = paletteFileID.ToString("D4");
-        //    pokemonPalette = new NCLR(gameDirs[DirNames.monSprites].unpackedDir + "\\" + paletteFilename, paletteFileID, paletteFilename);
-
-        //    string tilesFilename = tilesFileId.ToString("D4");
-        //    pokemonTile = new NCGR(gameDirs[DirNames.monSprites].unpackedDir + "\\" + tilesFilename, tilesFileId, tilesFilename);
-
-        //    int spriteFileID = (tilesFileId + 2);
-        //    string spriteFilename = spriteFileID.ToString("D4");
-        //    pokemonSprite = new NCER(gameDirs[DirNames.monSprites].unpackedDir + "\\" + spriteFilename, spriteFileID, spriteFilename);
-
-        //    return pokemonSprite.Banks.Length - 1;
-        //}
-
-        //private void UpdatePokeSprite(PictureBox pictureBox, int frameNumber = 0)
-        //{
-        //if (pokemonSprite == null)
-        //{
-        //    Console.WriteLine("Sprite is null!");
-        //    return;
-        //}
-
-        //frameNumber = Math.Min(pokemonSprite.Banks.Length - 1, frameNumber);
-        //pictureBox.Image = pokemonSprite.Get_Image(pokemonTile, pokemonPalette, frameNumber, pictureBox.Width, pictureBox.Height, false, false, false, true, true, -1, OAMenabled);
-        //pictureBox.Update();
-        //}
+            //if the name " -" is returned for ability 2 then there is no ability 2
+            if (currentPartyPokemonAbilities.ability2.Equals(" -") || currentPartyPokemonAbilities.ability2.Equals(currentPartyPokemonAbilities.ability1) || gameFamily != gFamEnum.HGSS)
+            {
+                pokeStat_Ability_comboBox.Enabled = false;
+            }
+            else
+            {
+                pokeStat_Ability_comboBox.Items.Add(currentPartyPokemonAbilities.ability2);
+                pokeStat_Ability_comboBox.Enabled = true;
+            }
+        }
 
         private void SetupBallSeals()
         {
@@ -161,7 +119,6 @@ namespace VSMaker.Forms
             pokeStat_Gender_comboBox.Items.Add(Gender.Descriptions.Default);
             pokeStat_Gender_comboBox.Items.Add(Gender.Descriptions.Male);
             pokeStat_Gender_comboBox.Items.Add(Gender.Descriptions.Female);
-            SetPokemonGender();
         }
 
         private void SetupForm()
@@ -211,6 +168,7 @@ namespace VSMaker.Forms
 
         private void SetPokemonGender()
         {
+            int pokemonId = trainerFile.party[partyIndex].pokeID ?? 0;
             int currentPokemonGenderRatio = mainform.pokemonSpecies[pokemonId].GenderRatioMaleToFemale;
             PartyPokemon.GenderAndAbilityFlags currentPokemonGenderAndAbilityFlags = trainerFile.party[partyIndex].genderAndAbilityFlags;
 
@@ -219,35 +177,28 @@ namespace VSMaker.Forms
                 switch (currentPokemonGenderRatio)
                 {
                     case GENDER_RATIO_MALE:
-                        pokeStat_Gender_comboBox.SelectedIndex = TRAINER_PARTY_POKEMON_GENDER_MALE_INDEX;
+                        pokeStat_Gender_comboBox.SelectedIndex = Gender.PokemonGenders.Male;
                         pokeStat_Gender_comboBox.Enabled = false;
                         break;
-
                     case GENDER_RATIO_FEMALE:
-                        pokeStat_Gender_comboBox.SelectedIndex = TRAINER_PARTY_POKEMON_GENDER_FEMALE_INDEX;
+                        pokeStat_Gender_comboBox.SelectedIndex = Gender.PokemonGenders.Female;
                         pokeStat_Gender_comboBox.Enabled = false;
                         break;
-
                     case GENDER_RATIO_GENDERLESS:
-                        pokeStat_Gender_comboBox.SelectedIndex = TRAINER_PARTY_POKEMON_GENDER_DEFAULT_INDEX;
+                        pokeStat_Gender_comboBox.SelectedIndex = Gender.PokemonGenders.Default;
                         pokeStat_Gender_comboBox.Enabled = false;
                         break;
-
                     default:
                         pokeStat_Gender_comboBox.Enabled = true;
 
                         if (currentPokemonGenderAndAbilityFlags.HasFlag(PartyPokemon.GenderAndAbilityFlags.FORCE_MALE))
-                            pokeStat_Gender_comboBox.SelectedIndex = TRAINER_PARTY_POKEMON_GENDER_MALE_INDEX;
+                            pokeStat_Gender_comboBox.SelectedIndex = Gender.PokemonGenders.Male;
                         else if (currentPokemonGenderAndAbilityFlags.HasFlag(PartyPokemon.GenderAndAbilityFlags.FORCE_FEMALE))
-                            pokeStat_Gender_comboBox.SelectedIndex = TRAINER_PARTY_POKEMON_GENDER_FEMALE_INDEX;
+                            pokeStat_Gender_comboBox.SelectedIndex = Gender.PokemonGenders.Female;
                         else
-                            pokeStat_Gender_comboBox.SelectedIndex = TRAINER_PARTY_POKEMON_GENDER_DEFAULT_INDEX;
+                            pokeStat_Gender_comboBox.SelectedIndex = Gender.PokemonGenders.Default;
                         break;
                 }
-            }
-            else
-            {
-                pokeStat_Gender_comboBox.Enabled = false;
             }
         }
 
@@ -277,26 +228,28 @@ namespace VSMaker.Forms
                 {
                     mainform.SetUnsavedChanges(true);
                 }
+
                 if (hasMoreThanOneGender((int)trainerFile.party[partyIndex].pokeID, mainform.pokemonSpecies) && gameFamily == gFamEnum.HGSS)
                 {
                     switch (pokeStat_Gender_comboBox.SelectedIndex)
                     {
-                        case TRAINER_PARTY_POKEMON_GENDER_DEFAULT_INDEX:
+                        case Gender.PokemonGenders.Default:
                             trainerFile.party[partyIndex].genderAndAbilityFlags = PartyPokemon.GenderAndAbilityFlags.NO_FLAGS;
                             break;
-
-                        case TRAINER_PARTY_POKEMON_GENDER_MALE_INDEX:
+                        case Gender.PokemonGenders.Male:
                             trainerFile.party[partyIndex].genderAndAbilityFlags = PartyPokemon.GenderAndAbilityFlags.FORCE_MALE;
                             break;
-
-                        case TRAINER_PARTY_POKEMON_GENDER_FEMALE_INDEX:
+                        case Gender.PokemonGenders.Female:
                             trainerFile.party[partyIndex].genderAndAbilityFlags = PartyPokemon.GenderAndAbilityFlags.FORCE_FEMALE;
                             break;
                     }
                 }
                 else
-                {
                     trainerFile.party[partyIndex].genderAndAbilityFlags = PartyPokemon.GenderAndAbilityFlags.NO_FLAGS;
+
+                if (pokeStat_Ability_comboBox.SelectedIndex == TRAINER_PARTY_POKEMON_ABILITY_SLOT2_INDEX)
+                {
+                    trainerFile.party[partyIndex].genderAndAbilityFlags |= PartyPokemon.GenderAndAbilityFlags.ABILITY_SLOT2;
                 }
             }
         }
@@ -310,16 +263,27 @@ namespace VSMaker.Forms
                     mainform.SetUnsavedChanges(true);
                 }
 
+                if (hasMoreThanOneGender((int)trainerFile.party[partyIndex].pokeID, mainform.pokemonSpecies) && gameFamily == gFamEnum.HGSS)
+                {
+                    switch (pokeStat_Gender_comboBox.SelectedIndex)
+                    {
+                        case Gender.PokemonGenders.Default:
+                            trainerFile.party[partyIndex].genderAndAbilityFlags = PartyPokemon.GenderAndAbilityFlags.NO_FLAGS;
+                            break;
+                        case Gender.PokemonGenders.Male:
+                            trainerFile.party[partyIndex].genderAndAbilityFlags = PartyPokemon.GenderAndAbilityFlags.FORCE_MALE;
+                            break;
+                        case Gender.PokemonGenders.Female:
+                            trainerFile.party[partyIndex].genderAndAbilityFlags = PartyPokemon.GenderAndAbilityFlags.FORCE_FEMALE;
+                            break;
+                    }
+                }
+                else
+                    trainerFile.party[partyIndex].genderAndAbilityFlags = PartyPokemon.GenderAndAbilityFlags.NO_FLAGS;
+
                 if (pokeStat_Ability_comboBox.SelectedIndex == TRAINER_PARTY_POKEMON_ABILITY_SLOT2_INDEX)
                 {
                     trainerFile.party[partyIndex].genderAndAbilityFlags |= PartyPokemon.GenderAndAbilityFlags.ABILITY_SLOT2;
-                }
-                //ability slot 1 flag must be set if the pokemon's gender is forced to male or female, otherwise the pokemon will have ability2 even if the ability2 flag is not set
-                //the ability 1 flag should not be set if neither of the gender flags are set, otherwise this will cause a problem with using alternate forms
-                else if (trainerFile.party[partyIndex].genderAndAbilityFlags.HasFlag(PartyPokemon.GenderAndAbilityFlags.FORCE_MALE)
-                        || trainerFile.party[partyIndex].genderAndAbilityFlags.HasFlag(PartyPokemon.GenderAndAbilityFlags.FORCE_FEMALE))
-                {
-                    trainerFile.party[partyIndex].genderAndAbilityFlags |= PartyPokemon.GenderAndAbilityFlags.ABILITY_SLOT1;
                 }
             }
         }

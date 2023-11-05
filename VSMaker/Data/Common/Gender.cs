@@ -26,5 +26,22 @@ namespace VSMaker.Data
                 _ => Descriptions.None,
             };
         }
+
+        public static string GetPokemonGenderById(int genderId)
+        {
+            return genderId switch
+            {
+                0 => Descriptions.Default,
+                1 => Descriptions.Male,
+                2 => Descriptions.Female,
+            };
+        }
+
+        public static class PokemonGenders
+        {
+            public const int Default = 0;
+            public const int Male = 1;
+            public const int Female = 2;
+        }
     }
 }
