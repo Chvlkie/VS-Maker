@@ -2182,6 +2182,10 @@ namespace VSMaker
                 trainerFile.party[i].pokeID = pokemonId;
                 trainerFile.party[i].level = (ushort)pokeLevels[i].Value;
                 trainerFile.party[i].heldItem = trainer_Poke_HeldItem_checkBox.Checked ? (ushort)pokeItemComboBoxes[i].SelectedIndex : null;
+                if (!trainer_Poke_Moves_checkBox.Checked)
+                {
+                    trainerFile.party[i].moves = null;
+                }
             }
         }
 
@@ -2722,8 +2726,24 @@ namespace VSMaker
         {
             /*Write to File*/
             string indexStr = $"\\{selectedTrainer.TrainerId:D4}";
-            File.WriteAllBytes(gameDirs[DirNames.trainerProperties].unpackedDir + indexStr, trainerFile.trp.ToByteArray());
-            File.WriteAllBytes(gameDirs[DirNames.trainerParty].unpackedDir + indexStr, trainerFile.party.ToByteArray());
+            try
+            {
+                File.WriteAllBytes(gameDirs[DirNames.trainerProperties].unpackedDir + indexStr, trainerFile.trp.ToByteArray());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Something went wrong when saving Trainer Property data.\n\n" + ex.Message, "Unable to Save Trainer", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            try
+            {
+                File.WriteAllBytes(gameDirs[DirNames.trainerParty].unpackedDir + indexStr, trainerFile.party.ToByteArray());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Something went wrong when saving Trainer Party data.\n\n" + ex.Message, "Unable to Save Trainer", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
         }
 
         private void trainerClass_EyeContact_Day_comboBox_SelectedIndexChanged(object sender, EventArgs e)
