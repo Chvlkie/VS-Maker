@@ -1,4 +1,5 @@
-﻿using VSMaker.Resources;
+﻿using VSMaker.Data;
+using VSMaker.Resources;
 using VSMaker.ROMFiles;
 
 namespace VSMaker.CommonFunctions
@@ -53,6 +54,7 @@ namespace VSMaker.CommonFunctions
         public static string OWtablePath { get; private set; }
 
         public static string TrainerTablePath { get; private set; }
+        public static string MoveTablePath { get; private set; }
 
         public static uint monIconPalTableAddress { get; private set; }
         public static uint monSpritePalTableAddress { get; private set; }
@@ -63,6 +65,7 @@ namespace VSMaker.CommonFunctions
         public static int[] pokemonNamesTextNumbers { get; private set; }
         public static int itemNamesTextNumber { get; private set; }
         public static int itemScriptFileNumber { get; internal set; }
+        public static int typeNamesMessageNumber { get; private set; }
         public static int trainerClassMessageNumber { get; private set; }
         public static int trainerNamesMessageNumber { get; private set; }
         public static int trainerTextMessageNumber { get; private set; }
@@ -152,6 +155,8 @@ namespace VSMaker.CommonFunctions
             monIcons,
             monSprites,
 
+            moveData,
+
             interiorBuildingModels,
             learnsets,
 
@@ -207,6 +212,7 @@ namespace VSMaker.CommonFunctions
             SetTrainerClassMessageNumber();
             SetTrainerTextMessageNumber();
             SetMoveInfoTextNumber();
+            SetTypeNames();
             /* System */
             ScriptCommandParametersDict = BuildCommandParametersDatabase(gameFamily);
 
@@ -646,6 +652,11 @@ namespace VSMaker.CommonFunctions
         public static void SetTrainerTable()
         {
             TrainerTablePath = workDir + "\\unpacked\\trainerTextTable\\0000";
+        }
+
+        public static void SetMoveTablePath()
+        {
+            MoveTablePath = workDir + "\\unpacked\\moveData";
         }
 
         public static void SetConditionalMusicTableOffsetToRAMAddress()
@@ -1142,6 +1153,33 @@ namespace VSMaker.CommonFunctions
             }
         }
 
+        private void SetTypeNames()
+        {
+            switch (gameFamily)
+            {
+                case gFamEnum.DP:
+                    typeNamesMessageNumber = 565;
+                    //if (gameLanguage.Equals(gLangEnum.Japanese))
+                    //{
+                    //    typeNamesMessageNumber -= 9;
+                    //}
+                    break;
+
+                case gFamEnum.Plat:
+                    typeNamesMessageNumber = 624;
+                    break;
+
+                case gFamEnum.HGSS:
+                default:
+                    typeNamesMessageNumber = 735;
+                    //if (gameLanguage.Equals(gLangEnum.Japanese))
+                    //{
+                    //    typeNamesMessageNumber -= 10;
+                    //}
+                    break;
+            }
+        }
+
         private void SetTrainerClassMessageNumber()
         {
             switch (gameFamily)
@@ -1203,6 +1241,7 @@ namespace VSMaker.CommonFunctions
         public static List<string> GetLocationNames() => new TextArchive(locationNamesTextNumber).Messages;
 
         public static List<string> GetSimpleTrainerNames() => new TextArchive(trainerNamesMessageNumber).Messages;
+        public static List<string> GetTypeNames() => new TextArchive(typeNamesMessageNumber).Messages;
 
         public static string[] GetTrainerMessages() => new TextArchive(trainerTextMessageNumber).Messages.ToArray();
 
@@ -1362,6 +1401,8 @@ namespace VSMaker.CommonFunctions
 
                         [DirNames.monIcons] = @"data\poketool\icongra\poke_icon.narc",
 
+                        [DirNames.moveData] = @"data\poketool\waza\waza_tbl.narc",
+
                         [DirNames.encounters] = @"data\fielddata\encountdata\" + char.ToLower(gameVersion.ToString()[0]) + '_' + "enc_data.narc",
                         [DirNames.learnsets] = workDir + @"data\poketool\personal\wotbl.narc",
                     };
@@ -1397,6 +1438,7 @@ namespace VSMaker.CommonFunctions
                         [DirNames.trainerTextOffset] = @"data\poketool\trmsg\trtblofs.narc",
 
                         [DirNames.monIcons] = @"data\poketool\icongra\pl_poke_icon.narc",
+                        [DirNames.moveData] = @"data\poketool\waza\pl_waza_tbl.narc",
 
                         [DirNames.encounters] = @"data\fielddata\encountdata\" + gameVersion.ToString().Substring(0, 2).ToLower() + '_' + "enc_data.narc",
                         [DirNames.learnsets] = @"data\poketool\personal\wotbl.narc",
@@ -1433,6 +1475,7 @@ namespace VSMaker.CommonFunctions
                         [DirNames.trainerTextOffset] = @"data\a\1\3\1",
 
                         [DirNames.monIcons] = @"data\a\0\2\0",
+                        [DirNames.moveData] = @"data\a\0\1\1",
 
                         [DirNames.interiorBuildingModels] = @"data\a\1\4\8",
                         [DirNames.learnsets] = @"data\a\0\3\3",
@@ -1468,6 +1511,33 @@ namespace VSMaker.CommonFunctions
             }
 
             TrainerMessageIds = TrainerTable.Keys.ToArray();
+        }
+
+        public static Move ReadMoveData(int moveId)
+        {
+            string suffix = $"\\{moveId:D4}";
+            using BinaryReader idReader = new(new FileStream(MoveTablePath + suffix, FileMode.Open));
+            var move = new Move();
+            while (idReader.BaseStream.Position != idReader.BaseStream.Length)
+            {
+                idReader.ReadByte();
+                idReader.ReadByte();
+                move.Category = idReader.ReadByte();
+                move.Power = idReader.ReadByte();
+                move.Type = idReader.ReadByte();
+                move.Accuracy = idReader.ReadByte();
+                move.PP = idReader.ReadByte();
+                idReader.ReadByte();
+                idReader.ReadByte();
+                idReader.ReadByte();
+                idReader.ReadByte();
+                idReader.ReadByte();
+                idReader.ReadByte();
+                idReader.ReadByte();
+                idReader.ReadByte();
+                idReader.ReadByte();
+            }
+            return move;
         }
 
         public static void ReadPrizeMoneyTable()

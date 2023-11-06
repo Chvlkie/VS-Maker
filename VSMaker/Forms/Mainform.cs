@@ -1047,34 +1047,37 @@ namespace VSMaker
             trainer_Poke_HeldItem_checkBox.Checked = selectedTrainer.HeldItems;
             trainer_Poke_Moves_checkBox.Checked = selectedTrainer.ChooseMoves;
 
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < trainerFile.trp.partyCount; i++)
             {
                 var partyPokemon = trainerFile.party[i];
-                int heldItemId = partyPokemon.heldItem.HasValue ? partyPokemon.heldItem.Value : 0;
-                int pokemonId = partyPokemon.pokeID ?? 0;
-                string pokeName = pokeNames[pokemonId];
+                if (partyPokemon != null)
+                {
+                    int heldItemId = partyPokemon.heldItem.HasValue ? partyPokemon.heldItem.Value : 0;
+                    int pokemonId = partyPokemon.pokeID ?? 0;
+                    string pokeName = pokeNames[pokemonId];
 
-                int selectedIndex = pokeComboBoxes[i].FindString(pokeName);
-                if (selectedIndex < 0)
-                {
-                    selectedIndex = 0;
-                }
-                pokeComboBoxes[i].SelectedIndex = selectedIndex;
-                pokeItemComboBoxes[i].SelectedIndex = heldItemId;
-                pokeLevels[i].Value = (int?)partyPokemon.level ?? 0;
-                if (partyPokemon?.pokeID.HasValue == true)
-                {
-                    var pokemon = new Pokemon
+                    int selectedIndex = pokeComboBoxes[i].FindString(pokeName);
+                    if (selectedIndex < 0)
                     {
-                        PokemonId = pokemonId,
-                        FormId = partyPokemon.formID,
-                        PokemonName = pokeName,
-                        DV = partyPokemon.difficulty,
-                        Level = (short)partyPokemon.level,
-                        HeldItemId = heldItemId
-                    };
-                    selectedTrainer.Pokemon.Add(pokemon);
-                    pokeLevels[i].Value = partyPokemon.level;
+                        selectedIndex = 0;
+                    }
+                    pokeComboBoxes[i].SelectedIndex = selectedIndex;
+                    pokeItemComboBoxes[i].SelectedIndex = heldItemId;
+                    pokeLevels[i].Value = (int?)partyPokemon.level ?? 0;
+                    if (partyPokemon?.pokeID.HasValue == true)
+                    {
+                        var pokemon = new Pokemon
+                        {
+                            PokemonId = pokemonId,
+                            FormId = partyPokemon.formID,
+                            PokemonName = pokeName,
+                            DV = partyPokemon.difficulty,
+                            Level = (short)partyPokemon.level,
+                            HeldItemId = heldItemId
+                        };
+                        selectedTrainer.Pokemon.Add(pokemon);
+                        pokeLevels[i].Value = partyPokemon.level;
+                    }
                 }
             }
 
@@ -1184,6 +1187,7 @@ namespace VSMaker
                 DirNames.personalPokeData,
                 DirNames.trainerTextTable,
                 DirNames.trainerTextOffset,
+                DirNames.moveData,
             }, progress);
             GetTrainerClassEncounterMusic();
             progress?.Report(75);
@@ -1208,6 +1212,7 @@ namespace VSMaker
                 progress?.Report(100);
                 MessageBox.Show(ex.Message);
             }
+            SetMoveTablePath();
         }
 
         #endregion Unpack NARCs

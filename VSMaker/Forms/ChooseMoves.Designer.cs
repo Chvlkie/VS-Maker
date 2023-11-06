@@ -28,14 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
-            allowAllMoves_checkBox = new CheckBox();
             panel1 = new Panel();
             tableLayoutPanel1 = new TableLayoutPanel();
             panel5 = new Panel();
-            pictureBox7 = new PictureBox();
-            pictureBox8 = new PictureBox();
-            textBox10 = new TextBox();
-            textBox11 = new TextBox();
+            cat4 = new TextBox();
+            type4 = new TextBox();
+            acc4 = new TextBox();
+            power4 = new TextBox();
             label21 = new Label();
             label22 = new Label();
             move4_comboBox = new ComboBox();
@@ -45,12 +44,12 @@
             label26 = new Label();
             label27 = new Label();
             moveInfoText4 = new RichTextBox();
-            textBox12 = new TextBox();
+            pp4 = new TextBox();
             panel4 = new Panel();
-            pictureBox5 = new PictureBox();
-            pictureBox6 = new PictureBox();
-            textBox7 = new TextBox();
-            textBox8 = new TextBox();
+            cat3 = new TextBox();
+            type3 = new TextBox();
+            acc3 = new TextBox();
+            power3 = new TextBox();
             label14 = new Label();
             label15 = new Label();
             move3_comboBox = new ComboBox();
@@ -60,12 +59,12 @@
             label19 = new Label();
             label20 = new Label();
             moveInfoText3 = new RichTextBox();
-            textBox9 = new TextBox();
+            pp3 = new TextBox();
             panel3 = new Panel();
-            pictureBox3 = new PictureBox();
-            pictureBox4 = new PictureBox();
-            textBox4 = new TextBox();
-            textBox5 = new TextBox();
+            cat2 = new TextBox();
+            type2 = new TextBox();
+            acc2 = new TextBox();
+            power2 = new TextBox();
             label7 = new Label();
             label8 = new Label();
             move2_comboBox = new ComboBox();
@@ -75,12 +74,12 @@
             label12 = new Label();
             label13 = new Label();
             moveInfoText2 = new RichTextBox();
-            textBox6 = new TextBox();
+            pp2 = new TextBox();
             panel2 = new Panel();
-            pictureBox2 = new PictureBox();
-            pictureBox1 = new PictureBox();
-            textBox3 = new TextBox();
-            textBox2 = new TextBox();
+            category1 = new TextBox();
+            type1 = new TextBox();
+            accuracy1 = new TextBox();
+            power1 = new TextBox();
             label6 = new Label();
             label5 = new Label();
             move1_comboBox = new ComboBox();
@@ -90,39 +89,16 @@
             label1 = new Label();
             trainerClassName_Label = new Label();
             moveInfoText1 = new RichTextBox();
-            textBox1 = new TextBox();
-            panel1.SuspendLayout();
+            pp1 = new TextBox();
             tableLayoutPanel1.SuspendLayout();
             panel5.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox7).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox8).BeginInit();
             panel4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox5).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox6).BeginInit();
             panel3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
             panel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
-            // 
-            // allowAllMoves_checkBox
-            // 
-            allowAllMoves_checkBox.AutoSize = true;
-            allowAllMoves_checkBox.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            allowAllMoves_checkBox.Location = new Point(667, 11);
-            allowAllMoves_checkBox.Name = "allowAllMoves_checkBox";
-            allowAllMoves_checkBox.RightToLeft = RightToLeft.Yes;
-            allowAllMoves_checkBox.Size = new Size(114, 19);
-            allowAllMoves_checkBox.TabIndex = 48;
-            allowAllMoves_checkBox.Text = "Allow All Moves";
-            allowAllMoves_checkBox.UseVisualStyleBackColor = true;
-            allowAllMoves_checkBox.Visible = false;
             // 
             // panel1
             // 
-            panel1.Controls.Add(allowAllMoves_checkBox);
             panel1.Dock = DockStyle.Bottom;
             panel1.Location = new Point(0, 408);
             panel1.Name = "panel1";
@@ -155,10 +131,10 @@
             // panel5
             // 
             panel5.BackColor = SystemColors.Control;
-            panel5.Controls.Add(pictureBox7);
-            panel5.Controls.Add(pictureBox8);
-            panel5.Controls.Add(textBox10);
-            panel5.Controls.Add(textBox11);
+            panel5.Controls.Add(cat4);
+            panel5.Controls.Add(type4);
+            panel5.Controls.Add(acc4);
+            panel5.Controls.Add(power4);
             panel5.Controls.Add(label21);
             panel5.Controls.Add(label22);
             panel5.Controls.Add(move4_comboBox);
@@ -168,55 +144,63 @@
             panel5.Controls.Add(label26);
             panel5.Controls.Add(label27);
             panel5.Controls.Add(moveInfoText4);
-            panel5.Controls.Add(textBox12);
+            panel5.Controls.Add(pp4);
             panel5.Dock = DockStyle.Fill;
             panel5.Location = new Point(403, 207);
             panel5.Name = "panel5";
             panel5.Size = new Size(394, 198);
             panel5.TabIndex = 3;
             // 
-            // pictureBox7
+            // cat4
             // 
-            pictureBox7.Location = new Point(92, 97);
-            pictureBox7.Name = "pictureBox7";
-            pictureBox7.Size = new Size(59, 27);
-            pictureBox7.TabIndex = 65;
-            pictureBox7.TabStop = false;
+            cat4.BackColor = Color.White;
+            cat4.Enabled = false;
+            cat4.Location = new Point(319, 140);
+            cat4.Name = "cat4";
+            cat4.ReadOnly = true;
+            cat4.Size = new Size(59, 23);
+            cat4.TabIndex = 73;
+            cat4.Text = "--";
             // 
-            // pictureBox8
+            // type4
             // 
-            pictureBox8.Location = new Point(9, 97);
-            pictureBox8.Name = "pictureBox8";
-            pictureBox8.Size = new Size(59, 27);
-            pictureBox8.TabIndex = 64;
-            pictureBox8.TabStop = false;
+            type4.BackColor = Color.White;
+            type4.Enabled = false;
+            type4.Location = new Point(248, 140);
+            type4.Name = "type4";
+            type4.ReadOnly = true;
+            type4.Size = new Size(59, 23);
+            type4.TabIndex = 72;
+            type4.Text = "--";
             // 
-            // textBox10
+            // acc4
             // 
-            textBox10.BackColor = Color.White;
-            textBox10.Location = new Point(321, 32);
-            textBox10.Name = "textBox10";
-            textBox10.ReadOnly = true;
-            textBox10.Size = new Size(49, 23);
-            textBox10.TabIndex = 63;
-            textBox10.Text = "--";
+            acc4.BackColor = Color.White;
+            acc4.Enabled = false;
+            acc4.Location = new Point(319, 85);
+            acc4.Name = "acc4";
+            acc4.ReadOnly = true;
+            acc4.Size = new Size(59, 23);
+            acc4.TabIndex = 63;
+            acc4.Text = "--";
             // 
-            // textBox11
+            // power4
             // 
-            textBox11.BackColor = Color.White;
-            textBox11.Location = new Point(248, 32);
-            textBox11.Name = "textBox11";
-            textBox11.ReadOnly = true;
-            textBox11.Size = new Size(49, 23);
-            textBox11.TabIndex = 62;
-            textBox11.Text = "--";
+            power4.BackColor = Color.White;
+            power4.Enabled = false;
+            power4.Location = new Point(248, 85);
+            power4.Name = "power4";
+            power4.ReadOnly = true;
+            power4.Size = new Size(59, 23);
+            power4.TabIndex = 62;
+            power4.Text = "--";
             // 
             // label21
             // 
             label21.AutoSize = true;
             label21.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label21.ImageAlign = ContentAlignment.MiddleLeft;
-            label21.Location = new Point(321, 14);
+            label21.Location = new Point(319, 67);
             label21.Name = "label21";
             label21.Size = new Size(57, 15);
             label21.TabIndex = 61;
@@ -228,7 +212,7 @@
             label22.AutoSize = true;
             label22.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label22.ImageAlign = ContentAlignment.MiddleLeft;
-            label22.Location = new Point(92, 77);
+            label22.Location = new Point(319, 120);
             label22.Name = "label22";
             label22.Size = new Size(57, 15);
             label22.TabIndex = 60;
@@ -243,7 +227,7 @@
             move4_comboBox.FormattingEnabled = true;
             move4_comboBox.Location = new Point(9, 32);
             move4_comboBox.Name = "move4_comboBox";
-            move4_comboBox.Size = new Size(140, 23);
+            move4_comboBox.Size = new Size(220, 23);
             move4_comboBox.TabIndex = 55;
             move4_comboBox.SelectedIndexChanged += move4_comboBox_SelectedIndexChanged;
             // 
@@ -252,7 +236,7 @@
             label23.AutoSize = true;
             label23.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label23.ImageAlign = ContentAlignment.MiddleLeft;
-            label23.Location = new Point(180, 77);
+            label23.Location = new Point(9, 67);
             label23.Name = "label23";
             label23.Size = new Size(65, 15);
             label23.TabIndex = 54;
@@ -264,7 +248,7 @@
             label24.AutoSize = true;
             label24.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label24.ImageAlign = ContentAlignment.MiddleLeft;
-            label24.Location = new Point(248, 14);
+            label24.Location = new Point(248, 67);
             label24.Name = "label24";
             label24.Size = new Size(43, 15);
             label24.TabIndex = 53;
@@ -276,7 +260,7 @@
             label25.AutoSize = true;
             label25.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label25.ImageAlign = ContentAlignment.MiddleLeft;
-            label25.Location = new Point(9, 77);
+            label25.Location = new Point(248, 120);
             label25.Name = "label25";
             label25.Size = new Size(33, 15);
             label25.TabIndex = 52;
@@ -288,7 +272,7 @@
             label26.AutoSize = true;
             label26.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label26.ImageAlign = ContentAlignment.MiddleLeft;
-            label26.Location = new Point(180, 14);
+            label26.Location = new Point(248, 14);
             label26.Name = "label26";
             label26.Size = new Size(21, 15);
             label26.TabIndex = 51;
@@ -310,29 +294,30 @@
             // moveInfoText4
             // 
             moveInfoText4.BackColor = Color.White;
-            moveInfoText4.Location = new Point(180, 97);
+            moveInfoText4.Location = new Point(9, 85);
             moveInfoText4.Name = "moveInfoText4";
             moveInfoText4.ReadOnly = true;
-            moveInfoText4.Size = new Size(198, 80);
+            moveInfoText4.Size = new Size(220, 101);
             moveInfoText4.TabIndex = 49;
             moveInfoText4.Text = "";
             // 
-            // textBox12
+            // pp4
             // 
-            textBox12.BackColor = Color.White;
-            textBox12.Location = new Point(180, 32);
-            textBox12.Name = "textBox12";
-            textBox12.ReadOnly = true;
-            textBox12.Size = new Size(49, 23);
-            textBox12.TabIndex = 48;
-            textBox12.Text = "--";
+            pp4.BackColor = Color.White;
+            pp4.Enabled = false;
+            pp4.Location = new Point(248, 32);
+            pp4.Name = "pp4";
+            pp4.ReadOnly = true;
+            pp4.Size = new Size(59, 23);
+            pp4.TabIndex = 48;
+            pp4.Text = "--";
             // 
             // panel4
             // 
-            panel4.Controls.Add(pictureBox5);
-            panel4.Controls.Add(pictureBox6);
-            panel4.Controls.Add(textBox7);
-            panel4.Controls.Add(textBox8);
+            panel4.Controls.Add(cat3);
+            panel4.Controls.Add(type3);
+            panel4.Controls.Add(acc3);
+            panel4.Controls.Add(power3);
             panel4.Controls.Add(label14);
             panel4.Controls.Add(label15);
             panel4.Controls.Add(move3_comboBox);
@@ -342,55 +327,63 @@
             panel4.Controls.Add(label19);
             panel4.Controls.Add(label20);
             panel4.Controls.Add(moveInfoText3);
-            panel4.Controls.Add(textBox9);
+            panel4.Controls.Add(pp3);
             panel4.Dock = DockStyle.Fill;
             panel4.Location = new Point(3, 207);
             panel4.Name = "panel4";
             panel4.Size = new Size(394, 198);
             panel4.TabIndex = 2;
             // 
-            // pictureBox5
+            // cat3
             // 
-            pictureBox5.Location = new Point(92, 97);
-            pictureBox5.Name = "pictureBox5";
-            pictureBox5.Size = new Size(59, 27);
-            pictureBox5.TabIndex = 65;
-            pictureBox5.TabStop = false;
+            cat3.BackColor = Color.White;
+            cat3.Enabled = false;
+            cat3.Location = new Point(321, 138);
+            cat3.Name = "cat3";
+            cat3.ReadOnly = true;
+            cat3.Size = new Size(59, 23);
+            cat3.TabIndex = 71;
+            cat3.Text = "--";
             // 
-            // pictureBox6
+            // type3
             // 
-            pictureBox6.Location = new Point(9, 97);
-            pictureBox6.Name = "pictureBox6";
-            pictureBox6.Size = new Size(59, 27);
-            pictureBox6.TabIndex = 64;
-            pictureBox6.TabStop = false;
+            type3.BackColor = Color.White;
+            type3.Enabled = false;
+            type3.Location = new Point(248, 138);
+            type3.Name = "type3";
+            type3.ReadOnly = true;
+            type3.Size = new Size(59, 23);
+            type3.TabIndex = 70;
+            type3.Text = "--";
             // 
-            // textBox7
+            // acc3
             // 
-            textBox7.BackColor = Color.White;
-            textBox7.Location = new Point(321, 32);
-            textBox7.Name = "textBox7";
-            textBox7.ReadOnly = true;
-            textBox7.Size = new Size(49, 23);
-            textBox7.TabIndex = 63;
-            textBox7.Text = "--";
+            acc3.BackColor = Color.White;
+            acc3.Enabled = false;
+            acc3.Location = new Point(321, 85);
+            acc3.Name = "acc3";
+            acc3.ReadOnly = true;
+            acc3.Size = new Size(59, 23);
+            acc3.TabIndex = 63;
+            acc3.Text = "--";
             // 
-            // textBox8
+            // power3
             // 
-            textBox8.BackColor = Color.White;
-            textBox8.Location = new Point(248, 32);
-            textBox8.Name = "textBox8";
-            textBox8.ReadOnly = true;
-            textBox8.Size = new Size(49, 23);
-            textBox8.TabIndex = 62;
-            textBox8.Text = "--";
+            power3.BackColor = Color.White;
+            power3.Enabled = false;
+            power3.Location = new Point(248, 85);
+            power3.Name = "power3";
+            power3.ReadOnly = true;
+            power3.Size = new Size(59, 23);
+            power3.TabIndex = 62;
+            power3.Text = "--";
             // 
             // label14
             // 
             label14.AutoSize = true;
             label14.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label14.ImageAlign = ContentAlignment.MiddleLeft;
-            label14.Location = new Point(321, 14);
+            label14.Location = new Point(321, 67);
             label14.Name = "label14";
             label14.Size = new Size(57, 15);
             label14.TabIndex = 61;
@@ -402,7 +395,7 @@
             label15.AutoSize = true;
             label15.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label15.ImageAlign = ContentAlignment.MiddleLeft;
-            label15.Location = new Point(92, 77);
+            label15.Location = new Point(321, 120);
             label15.Name = "label15";
             label15.Size = new Size(57, 15);
             label15.TabIndex = 60;
@@ -417,7 +410,7 @@
             move3_comboBox.FormattingEnabled = true;
             move3_comboBox.Location = new Point(9, 32);
             move3_comboBox.Name = "move3_comboBox";
-            move3_comboBox.Size = new Size(140, 23);
+            move3_comboBox.Size = new Size(224, 23);
             move3_comboBox.TabIndex = 55;
             move3_comboBox.SelectedIndexChanged += move3_comboBox_SelectedIndexChanged;
             // 
@@ -426,7 +419,7 @@
             label16.AutoSize = true;
             label16.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label16.ImageAlign = ContentAlignment.MiddleLeft;
-            label16.Location = new Point(180, 77);
+            label16.Location = new Point(9, 67);
             label16.Name = "label16";
             label16.Size = new Size(65, 15);
             label16.TabIndex = 54;
@@ -438,7 +431,7 @@
             label17.AutoSize = true;
             label17.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label17.ImageAlign = ContentAlignment.MiddleLeft;
-            label17.Location = new Point(248, 14);
+            label17.Location = new Point(248, 67);
             label17.Name = "label17";
             label17.Size = new Size(43, 15);
             label17.TabIndex = 53;
@@ -450,7 +443,7 @@
             label18.AutoSize = true;
             label18.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label18.ImageAlign = ContentAlignment.MiddleLeft;
-            label18.Location = new Point(9, 77);
+            label18.Location = new Point(248, 120);
             label18.Name = "label18";
             label18.Size = new Size(33, 15);
             label18.TabIndex = 52;
@@ -462,7 +455,7 @@
             label19.AutoSize = true;
             label19.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label19.ImageAlign = ContentAlignment.MiddleLeft;
-            label19.Location = new Point(180, 14);
+            label19.Location = new Point(248, 14);
             label19.Name = "label19";
             label19.Size = new Size(21, 15);
             label19.TabIndex = 51;
@@ -484,29 +477,30 @@
             // moveInfoText3
             // 
             moveInfoText3.BackColor = Color.White;
-            moveInfoText3.Location = new Point(180, 97);
+            moveInfoText3.Location = new Point(9, 85);
             moveInfoText3.Name = "moveInfoText3";
             moveInfoText3.ReadOnly = true;
-            moveInfoText3.Size = new Size(198, 80);
+            moveInfoText3.Size = new Size(224, 101);
             moveInfoText3.TabIndex = 49;
             moveInfoText3.Text = "";
             // 
-            // textBox9
+            // pp3
             // 
-            textBox9.BackColor = Color.White;
-            textBox9.Location = new Point(180, 32);
-            textBox9.Name = "textBox9";
-            textBox9.ReadOnly = true;
-            textBox9.Size = new Size(49, 23);
-            textBox9.TabIndex = 48;
-            textBox9.Text = "--";
+            pp3.BackColor = Color.White;
+            pp3.Enabled = false;
+            pp3.Location = new Point(248, 32);
+            pp3.Name = "pp3";
+            pp3.ReadOnly = true;
+            pp3.Size = new Size(59, 23);
+            pp3.TabIndex = 48;
+            pp3.Text = "--";
             // 
             // panel3
             // 
-            panel3.Controls.Add(pictureBox3);
-            panel3.Controls.Add(pictureBox4);
-            panel3.Controls.Add(textBox4);
-            panel3.Controls.Add(textBox5);
+            panel3.Controls.Add(cat2);
+            panel3.Controls.Add(type2);
+            panel3.Controls.Add(acc2);
+            panel3.Controls.Add(power2);
             panel3.Controls.Add(label7);
             panel3.Controls.Add(label8);
             panel3.Controls.Add(move2_comboBox);
@@ -516,55 +510,63 @@
             panel3.Controls.Add(label12);
             panel3.Controls.Add(label13);
             panel3.Controls.Add(moveInfoText2);
-            panel3.Controls.Add(textBox6);
+            panel3.Controls.Add(pp2);
             panel3.Dock = DockStyle.Fill;
             panel3.Location = new Point(403, 3);
             panel3.Name = "panel3";
             panel3.Size = new Size(394, 198);
             panel3.TabIndex = 1;
             // 
-            // pictureBox3
+            // cat2
             // 
-            pictureBox3.Location = new Point(92, 97);
-            pictureBox3.Name = "pictureBox3";
-            pictureBox3.Size = new Size(59, 27);
-            pictureBox3.TabIndex = 65;
-            pictureBox3.TabStop = false;
+            cat2.BackColor = Color.White;
+            cat2.Enabled = false;
+            cat2.Location = new Point(321, 140);
+            cat2.Name = "cat2";
+            cat2.ReadOnly = true;
+            cat2.Size = new Size(59, 23);
+            cat2.TabIndex = 69;
+            cat2.Text = "--";
             // 
-            // pictureBox4
+            // type2
             // 
-            pictureBox4.Location = new Point(9, 97);
-            pictureBox4.Name = "pictureBox4";
-            pictureBox4.Size = new Size(59, 27);
-            pictureBox4.TabIndex = 64;
-            pictureBox4.TabStop = false;
+            type2.BackColor = Color.White;
+            type2.Enabled = false;
+            type2.Location = new Point(248, 140);
+            type2.Name = "type2";
+            type2.ReadOnly = true;
+            type2.Size = new Size(59, 23);
+            type2.TabIndex = 68;
+            type2.Text = "--";
             // 
-            // textBox4
+            // acc2
             // 
-            textBox4.BackColor = Color.White;
-            textBox4.Location = new Point(321, 32);
-            textBox4.Name = "textBox4";
-            textBox4.ReadOnly = true;
-            textBox4.Size = new Size(49, 23);
-            textBox4.TabIndex = 63;
-            textBox4.Text = "--";
+            acc2.BackColor = Color.White;
+            acc2.Enabled = false;
+            acc2.Location = new Point(321, 85);
+            acc2.Name = "acc2";
+            acc2.ReadOnly = true;
+            acc2.Size = new Size(59, 23);
+            acc2.TabIndex = 63;
+            acc2.Text = "--";
             // 
-            // textBox5
+            // power2
             // 
-            textBox5.BackColor = Color.White;
-            textBox5.Location = new Point(248, 32);
-            textBox5.Name = "textBox5";
-            textBox5.ReadOnly = true;
-            textBox5.Size = new Size(49, 23);
-            textBox5.TabIndex = 62;
-            textBox5.Text = "--";
+            power2.BackColor = Color.White;
+            power2.Enabled = false;
+            power2.Location = new Point(248, 85);
+            power2.Name = "power2";
+            power2.ReadOnly = true;
+            power2.Size = new Size(59, 23);
+            power2.TabIndex = 62;
+            power2.Text = "--";
             // 
             // label7
             // 
             label7.AutoSize = true;
             label7.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label7.ImageAlign = ContentAlignment.MiddleLeft;
-            label7.Location = new Point(321, 14);
+            label7.Location = new Point(321, 67);
             label7.Name = "label7";
             label7.Size = new Size(57, 15);
             label7.TabIndex = 61;
@@ -576,7 +578,7 @@
             label8.AutoSize = true;
             label8.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label8.ImageAlign = ContentAlignment.MiddleLeft;
-            label8.Location = new Point(92, 77);
+            label8.Location = new Point(321, 120);
             label8.Name = "label8";
             label8.Size = new Size(57, 15);
             label8.TabIndex = 60;
@@ -591,7 +593,7 @@
             move2_comboBox.FormattingEnabled = true;
             move2_comboBox.Location = new Point(9, 32);
             move2_comboBox.Name = "move2_comboBox";
-            move2_comboBox.Size = new Size(140, 23);
+            move2_comboBox.Size = new Size(220, 23);
             move2_comboBox.TabIndex = 55;
             move2_comboBox.SelectedIndexChanged += move2_comboBox_SelectedIndexChanged;
             // 
@@ -600,7 +602,7 @@
             label9.AutoSize = true;
             label9.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label9.ImageAlign = ContentAlignment.MiddleLeft;
-            label9.Location = new Point(180, 77);
+            label9.Location = new Point(9, 67);
             label9.Name = "label9";
             label9.Size = new Size(65, 15);
             label9.TabIndex = 54;
@@ -612,7 +614,7 @@
             label10.AutoSize = true;
             label10.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label10.ImageAlign = ContentAlignment.MiddleLeft;
-            label10.Location = new Point(248, 14);
+            label10.Location = new Point(248, 67);
             label10.Name = "label10";
             label10.Size = new Size(43, 15);
             label10.TabIndex = 53;
@@ -624,7 +626,7 @@
             label11.AutoSize = true;
             label11.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label11.ImageAlign = ContentAlignment.MiddleLeft;
-            label11.Location = new Point(9, 77);
+            label11.Location = new Point(248, 120);
             label11.Name = "label11";
             label11.Size = new Size(33, 15);
             label11.TabIndex = 52;
@@ -636,7 +638,7 @@
             label12.AutoSize = true;
             label12.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label12.ImageAlign = ContentAlignment.MiddleLeft;
-            label12.Location = new Point(180, 14);
+            label12.Location = new Point(248, 14);
             label12.Name = "label12";
             label12.Size = new Size(21, 15);
             label12.TabIndex = 51;
@@ -658,29 +660,30 @@
             // moveInfoText2
             // 
             moveInfoText2.BackColor = Color.White;
-            moveInfoText2.Location = new Point(180, 97);
+            moveInfoText2.Location = new Point(9, 87);
             moveInfoText2.Name = "moveInfoText2";
             moveInfoText2.ReadOnly = true;
-            moveInfoText2.Size = new Size(198, 80);
+            moveInfoText2.Size = new Size(220, 98);
             moveInfoText2.TabIndex = 49;
             moveInfoText2.Text = "";
             // 
-            // textBox6
+            // pp2
             // 
-            textBox6.BackColor = Color.White;
-            textBox6.Location = new Point(180, 32);
-            textBox6.Name = "textBox6";
-            textBox6.ReadOnly = true;
-            textBox6.Size = new Size(49, 23);
-            textBox6.TabIndex = 48;
-            textBox6.Text = "--";
+            pp2.BackColor = Color.White;
+            pp2.Enabled = false;
+            pp2.Location = new Point(248, 32);
+            pp2.Name = "pp2";
+            pp2.ReadOnly = true;
+            pp2.Size = new Size(59, 23);
+            pp2.TabIndex = 48;
+            pp2.Text = "--";
             // 
             // panel2
             // 
-            panel2.Controls.Add(pictureBox2);
-            panel2.Controls.Add(pictureBox1);
-            panel2.Controls.Add(textBox3);
-            panel2.Controls.Add(textBox2);
+            panel2.Controls.Add(category1);
+            panel2.Controls.Add(type1);
+            panel2.Controls.Add(accuracy1);
+            panel2.Controls.Add(power1);
             panel2.Controls.Add(label6);
             panel2.Controls.Add(label5);
             panel2.Controls.Add(move1_comboBox);
@@ -690,55 +693,63 @@
             panel2.Controls.Add(label1);
             panel2.Controls.Add(trainerClassName_Label);
             panel2.Controls.Add(moveInfoText1);
-            panel2.Controls.Add(textBox1);
+            panel2.Controls.Add(pp1);
             panel2.Dock = DockStyle.Fill;
             panel2.Location = new Point(3, 3);
             panel2.Name = "panel2";
             panel2.Size = new Size(394, 198);
             panel2.TabIndex = 0;
             // 
-            // pictureBox2
+            // category1
             // 
-            pictureBox2.Location = new Point(92, 97);
-            pictureBox2.Name = "pictureBox2";
-            pictureBox2.Size = new Size(59, 27);
-            pictureBox2.TabIndex = 65;
-            pictureBox2.TabStop = false;
+            category1.BackColor = Color.White;
+            category1.Enabled = false;
+            category1.Location = new Point(321, 140);
+            category1.Name = "category1";
+            category1.ReadOnly = true;
+            category1.Size = new Size(59, 23);
+            category1.TabIndex = 67;
+            category1.Text = "--";
             // 
-            // pictureBox1
+            // type1
             // 
-            pictureBox1.Location = new Point(9, 97);
-            pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(59, 27);
-            pictureBox1.TabIndex = 64;
-            pictureBox1.TabStop = false;
+            type1.BackColor = Color.White;
+            type1.Enabled = false;
+            type1.Location = new Point(248, 140);
+            type1.Name = "type1";
+            type1.ReadOnly = true;
+            type1.Size = new Size(59, 23);
+            type1.TabIndex = 66;
+            type1.Text = "--";
             // 
-            // textBox3
+            // accuracy1
             // 
-            textBox3.BackColor = Color.White;
-            textBox3.Location = new Point(321, 32);
-            textBox3.Name = "textBox3";
-            textBox3.ReadOnly = true;
-            textBox3.Size = new Size(49, 23);
-            textBox3.TabIndex = 63;
-            textBox3.Text = "--";
+            accuracy1.BackColor = Color.White;
+            accuracy1.Enabled = false;
+            accuracy1.Location = new Point(321, 85);
+            accuracy1.Name = "accuracy1";
+            accuracy1.ReadOnly = true;
+            accuracy1.Size = new Size(57, 23);
+            accuracy1.TabIndex = 63;
+            accuracy1.Text = "--";
             // 
-            // textBox2
+            // power1
             // 
-            textBox2.BackColor = Color.White;
-            textBox2.Location = new Point(248, 32);
-            textBox2.Name = "textBox2";
-            textBox2.ReadOnly = true;
-            textBox2.Size = new Size(49, 23);
-            textBox2.TabIndex = 62;
-            textBox2.Text = "--";
+            power1.BackColor = Color.White;
+            power1.Enabled = false;
+            power1.Location = new Point(248, 85);
+            power1.Name = "power1";
+            power1.ReadOnly = true;
+            power1.Size = new Size(59, 23);
+            power1.TabIndex = 62;
+            power1.Text = "--";
             // 
             // label6
             // 
             label6.AutoSize = true;
             label6.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label6.ImageAlign = ContentAlignment.MiddleLeft;
-            label6.Location = new Point(321, 14);
+            label6.Location = new Point(321, 67);
             label6.Name = "label6";
             label6.Size = new Size(57, 15);
             label6.TabIndex = 61;
@@ -750,7 +761,7 @@
             label5.AutoSize = true;
             label5.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label5.ImageAlign = ContentAlignment.MiddleLeft;
-            label5.Location = new Point(92, 77);
+            label5.Location = new Point(321, 120);
             label5.Name = "label5";
             label5.Size = new Size(57, 15);
             label5.TabIndex = 60;
@@ -765,7 +776,7 @@
             move1_comboBox.FormattingEnabled = true;
             move1_comboBox.Location = new Point(9, 32);
             move1_comboBox.Name = "move1_comboBox";
-            move1_comboBox.Size = new Size(140, 23);
+            move1_comboBox.Size = new Size(224, 23);
             move1_comboBox.TabIndex = 55;
             move1_comboBox.SelectedIndexChanged += move1_comboBox_SelectedIndexChanged;
             // 
@@ -774,7 +785,7 @@
             label4.AutoSize = true;
             label4.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label4.ImageAlign = ContentAlignment.MiddleLeft;
-            label4.Location = new Point(180, 77);
+            label4.Location = new Point(9, 67);
             label4.Name = "label4";
             label4.Size = new Size(65, 15);
             label4.TabIndex = 54;
@@ -786,7 +797,7 @@
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label3.ImageAlign = ContentAlignment.MiddleLeft;
-            label3.Location = new Point(248, 14);
+            label3.Location = new Point(248, 67);
             label3.Name = "label3";
             label3.Size = new Size(43, 15);
             label3.TabIndex = 53;
@@ -798,7 +809,7 @@
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label2.ImageAlign = ContentAlignment.MiddleLeft;
-            label2.Location = new Point(9, 77);
+            label2.Location = new Point(248, 120);
             label2.Name = "label2";
             label2.Size = new Size(33, 15);
             label2.TabIndex = 52;
@@ -810,7 +821,7 @@
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             label1.ImageAlign = ContentAlignment.MiddleLeft;
-            label1.Location = new Point(180, 14);
+            label1.Location = new Point(248, 14);
             label1.Name = "label1";
             label1.Size = new Size(21, 15);
             label1.TabIndex = 51;
@@ -832,22 +843,23 @@
             // moveInfoText1
             // 
             moveInfoText1.BackColor = Color.White;
-            moveInfoText1.Location = new Point(180, 97);
+            moveInfoText1.Location = new Point(9, 86);
             moveInfoText1.Name = "moveInfoText1";
             moveInfoText1.ReadOnly = true;
-            moveInfoText1.Size = new Size(198, 80);
+            moveInfoText1.Size = new Size(224, 99);
             moveInfoText1.TabIndex = 49;
             moveInfoText1.Text = "";
             // 
-            // textBox1
+            // pp1
             // 
-            textBox1.BackColor = Color.White;
-            textBox1.Location = new Point(180, 32);
-            textBox1.Name = "textBox1";
-            textBox1.ReadOnly = true;
-            textBox1.Size = new Size(49, 23);
-            textBox1.TabIndex = 48;
-            textBox1.Text = "--";
+            pp1.BackColor = Color.White;
+            pp1.Enabled = false;
+            pp1.Location = new Point(248, 32);
+            pp1.Name = "pp1";
+            pp1.ReadOnly = true;
+            pp1.Size = new Size(59, 23);
+            pp1.TabIndex = 48;
+            pp1.Text = "--";
             // 
             // ChooseMoves
             // 
@@ -859,38 +871,24 @@
             Name = "ChooseMoves";
             StartPosition = FormStartPosition.CenterParent;
             Text = "Pokemon Moves";
-            panel1.ResumeLayout(false);
-            panel1.PerformLayout();
             tableLayoutPanel1.ResumeLayout(false);
             panel5.ResumeLayout(false);
             panel5.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox7).EndInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox8).EndInit();
             panel4.ResumeLayout(false);
             panel4.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox5).EndInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox6).EndInit();
             panel3.ResumeLayout(false);
             panel3.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
             panel2.ResumeLayout(false);
             panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
         }
 
         #endregion
-
-        private CheckBox allowAllMoves_checkBox;
         private Panel panel1;
         private TableLayoutPanel tableLayoutPanel1;
         private Panel panel5;
-        private PictureBox pictureBox7;
-        private PictureBox pictureBox8;
-        private TextBox textBox10;
-        private TextBox textBox11;
+        private TextBox acc4;
+        private TextBox power4;
         private Label label21;
         private Label label22;
         private ComboBox move4_comboBox;
@@ -900,12 +898,10 @@
         private Label label26;
         private Label label27;
         private RichTextBox moveInfoText4;
-        private TextBox textBox12;
+        private TextBox pp4;
         private Panel panel4;
-        private PictureBox pictureBox5;
-        private PictureBox pictureBox6;
-        private TextBox textBox7;
-        private TextBox textBox8;
+        private TextBox acc3;
+        private TextBox power3;
         private Label label14;
         private Label label15;
         private ComboBox move3_comboBox;
@@ -915,12 +911,10 @@
         private Label label19;
         private Label label20;
         private RichTextBox moveInfoText3;
-        private TextBox textBox9;
+        private TextBox pp3;
         private Panel panel3;
-        private PictureBox pictureBox3;
-        private PictureBox pictureBox4;
-        private TextBox textBox4;
-        private TextBox textBox5;
+        private TextBox acc2;
+        private TextBox power2;
         private Label label7;
         private Label label8;
         private ComboBox move2_comboBox;
@@ -930,12 +924,10 @@
         private Label label12;
         private Label label13;
         private RichTextBox moveInfoText2;
-        private TextBox textBox6;
+        private TextBox pp2;
         private Panel panel2;
-        private PictureBox pictureBox2;
-        private PictureBox pictureBox1;
-        private TextBox textBox3;
-        private TextBox textBox2;
+        private TextBox accuracy1;
+        private TextBox power1;
         private Label label6;
         private Label label5;
         private ComboBox move1_comboBox;
@@ -945,6 +937,14 @@
         private Label label1;
         private Label trainerClassName_Label;
         private RichTextBox moveInfoText1;
-        private TextBox textBox1;
+        private TextBox pp1;
+        private TextBox cat4;
+        private TextBox type4;
+        private TextBox cat3;
+        private TextBox type3;
+        private TextBox cat2;
+        private TextBox type2;
+        private TextBox category1;
+        private TextBox type1;
     }
 }
