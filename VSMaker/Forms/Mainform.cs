@@ -1,5 +1,4 @@
 using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
 using Ekona.Images;
 using Images;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -887,7 +886,7 @@ namespace VSMaker
 
         private void EnablePokemon()
         {
-            switch (trainer_NumPoke_num.Value)
+            switch (trainerFile.trp.partyCount)
             {
                 case 1:
                     EnableButtons(true);
@@ -1047,7 +1046,7 @@ namespace VSMaker
             trainer_Poke_HeldItem_checkBox.Checked = selectedTrainer.HeldItems;
             trainer_Poke_Moves_checkBox.Checked = selectedTrainer.ChooseMoves;
 
-            for (int i = 0; i < trainerFile.trp.partyCount; i++)
+            for (int i = 0; i < 6; i++)
             {
                 var partyPokemon = trainerFile.party[i];
                 if (partyPokemon != null)
@@ -1465,6 +1464,7 @@ namespace VSMaker
                 item.UsedByTrainers.AddRange(trainers.Where(x => x.TrainerClassId == item.TrainerClassId && !x.IsPlayerTrainer));
             }
         }
+
         private void GetTrainerMessages()
         {
             trainerMessages = new List<TrainerMessage>();
@@ -2066,16 +2066,20 @@ namespace VSMaker
 
         private void saveTrainerAll_btn_Click(object sender, EventArgs e)
         {
-            bool valid = ValidateTrainerName() && ValidateTrainerPokemon();
-            if (valid)
+            var choice = MessageBox.Show("This will overwrite selected Trainer.\n\nAre you sure?", "Save Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (choice == DialogResult.Yes)
             {
-                SaveTrainerName();
-                SaveTrainerPokemon();
-                SaveTrainerProperties();
-                SaveTrainerClass();
-                TrainerChangesCommit();
-                GetTrainers();
-                SetupTrainerEditor();
+                bool valid = ValidateTrainerName() && ValidateTrainerPokemon();
+                if (valid)
+                {
+                    SaveTrainerName();
+                    SaveTrainerPokemon();
+                    SaveTrainerProperties();
+                    SaveTrainerClass();
+                    TrainerChangesCommit();
+                    GetTrainers();
+                    SetupTrainerEditor();
+                }
             }
         }
 
@@ -2088,16 +2092,21 @@ namespace VSMaker
 
         private void saveTrainerClassAll_btn_Click(object sender, EventArgs e)
         {
-            bool valid = ValidateTrainerClassName() && ValidateEyeContactMusic();
-            if (valid)
+            var choice = MessageBox.Show("This will overwrite selected Trainer Class.\n\nAre you sure?", "Save Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (choice == DialogResult.Yes)
             {
-                SaveTrainerClassEyeContact();
-                SaveTrainerClassName();
-                SaveTrainerClassPrizeMoney();
-                SaveTrainerClassGender();
-                GetTrainerClassEncounterMusic();
-                GetTrainerClasses();
-                SetupTrainerClassEditor();
+                bool valid = ValidateTrainerClassName() && ValidateEyeContactMusic();
+
+                if (valid)
+                {
+                    SaveTrainerClassEyeContact();
+                    SaveTrainerClassName();
+                    SaveTrainerClassPrizeMoney();
+                    SaveTrainerClassGender();
+                    GetTrainerClassEncounterMusic();
+                    GetTrainerClasses();
+                    SetupTrainerClassEditor();
+                }
             }
         }
 
@@ -2171,20 +2180,24 @@ namespace VSMaker
 
         private void SaveTrainerPokemon()
         {
+
             trainerFile.trp.doubleBattle = trainer_Double_checkBox.Checked;
             trainerFile.trp.chooseItems = trainer_Poke_HeldItem_checkBox.Checked;
             trainerFile.trp.chooseMoves = trainer_Poke_Moves_checkBox.Checked;
             trainerFile.trp.partyCount = (byte)trainer_NumPoke_num.Value;
 
-            for (int i = 0; i < trainer_NumPoke_num.Value; i++)
+            for (int i = 0; i < trainerFile.trp.partyCount; i++)
             {
                 ushort pokemonId = (ushort)pokeNames.FindIndex(x => x == pokeComboBoxes[i].SelectedItem.ToString());
                 trainerFile.party[i].pokeID = pokemonId;
                 trainerFile.party[i].level = (ushort)pokeLevels[i].Value;
-                trainerFile.party[i].heldItem = trainer_Poke_HeldItem_checkBox.Checked ? (ushort)pokeItemComboBoxes[i].SelectedIndex : null;
                 if (!trainer_Poke_Moves_checkBox.Checked)
                 {
                     trainerFile.party[i].moves = null;
+                }
+                if (trainer_Poke_HeldItem_checkBox.Checked)
+                {
+                    trainerFile.party[i].heldItem = trainer_Poke_HeldItem_checkBox.Checked ? (ushort)pokeItemComboBoxes[i].SelectedIndex : null;
                 }
             }
         }
@@ -2543,6 +2556,7 @@ namespace VSMaker
                 {
                     SetUnsavedChanges(true);
                 }
+                trainerFile.trp.partyCount = (byte)trainer_NumPoke_num.Value;
                 EnablePokemon();
             }
         }
@@ -3115,7 +3129,7 @@ namespace VSMaker
 
         private bool ValidateTrainerPokemon()
         {
-            for (int i = 0; i < trainer_NumPoke_num.Value; i++)
+            for (int i = 0; i < trainerFile.trp.partyCount; i++)
             {
                 string pokeName = pokeComboBoxes[i].SelectedItem.ToString().ToLower();
                 bool validName = !ExcludePokeNames.ExcludeNames.Contains(pokeName);
@@ -3317,7 +3331,6 @@ namespace VSMaker
                 trainerTextTable_dataGrid.Rows.Clear();
                 trainers_list.SelectedIndex = newSelectTrainerId < 0 ? 0 : newSelectTrainerId;
                 MessageBox.Show("Trainer removed successfully!\n\nIf you had made any changes to Trainer text, it is recommended to run Sort & Repoint.", "Trainer Removed", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
             }
         }
     }
