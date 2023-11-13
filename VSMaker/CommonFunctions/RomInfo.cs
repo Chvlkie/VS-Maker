@@ -1549,6 +1549,7 @@ namespace VSMaker.CommonFunctions
             if (DSUtils.OverlayIsCompressed(prizeMoneyTableOverlayNumber) && gameFamily == gFamEnum.HGSS)
             {
                 DSUtils.DecompressOverlay(prizeMoneyTableOverlayNumber);
+                DSUtils.SetOverlayCompressionInTable(prizeMoneyTableOverlayNumber, 0);
             }
             using BinaryReader idReader = new(new FileStream(DSUtils.GetOverlayPath(prizeMoneyTableOverlayNumber), FileMode.Open));
             idReader.BaseStream.Position = prizeMoneyTableOffset;
