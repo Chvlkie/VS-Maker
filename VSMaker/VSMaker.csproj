@@ -8,8 +8,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ApplicationIcon>Resources\Graphics\app.ico</ApplicationIcon>
-    <FileVersion>0.3.1.0</FileVersion>
-    <Version>0.3.1.0</Version>
+    <FileVersion>0.3.1</FileVersion>
+    <Version>0.3.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
