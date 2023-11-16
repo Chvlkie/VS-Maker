@@ -94,6 +94,7 @@ namespace VSMaker
         public Mainform(VsMakerFont vsMakerFont)
         {
             this.vsMakerFont = vsMakerFont;
+          
             InitializeComponent();
             Text = $"{Text} - v{Application.ProductVersion}";
             vsMakerFont.InitializePokemonDsFont();
@@ -1159,15 +1160,29 @@ namespace VSMaker
 
         private bool ValidateTrainerName()
         {
-            if (trainer_Name.Text.Length > TrainerFile.maxNameLen)
+            if (!ROMToolboxDialog.flag_TrainerNamesExpanded && trainer_Name.Text.Length > TrainerFile.maxNameLen)
             {
-                MessageBox.Show($"Trainer name cannot exceed {TrainerFile.maxNameLen} characters.", "Trainer Name Length", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                DialogResult d2;
+                MessageBox.Show($"The length of this Trainer name exceeds {TrainerFile.maxNameLen} characters.",
+                    "Trainer data could not be saved!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                d2 = MessageBox.Show("You can expand this limit if you are working on an English or Spanish rom (for now).",
+                "Do you wish to expand this?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (d2 == DialogResult.Yes)
+                {
+                    using ROMToolboxDialog romToolbox = new();
+                    romToolbox.ExpandTrainerNames();
+                }
+            }
+
+            if (trainer_Name.Text.Length > ROMToolboxDialog.expandedTrainerNameLength)
+            {
+                MessageBox.Show($"The length of this Trainer name exceeds {ROMToolboxDialog.expandedTrainerNameLength} characters.",
+                    "Trainer data could not be saved!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
-            else
-            {
-                return true;
-            }
+
+            return true;
         }
 
         #endregion Trainer Editor
@@ -2181,7 +2196,6 @@ namespace VSMaker
 
         private void SaveTrainerPokemon()
         {
-
             trainerFile.trp.doubleBattle = trainer_Double_checkBox.Checked;
             trainerFile.trp.chooseItems = trainer_Poke_HeldItem_checkBox.Checked;
             trainerFile.trp.chooseMoves = trainer_Poke_Moves_checkBox.Checked;

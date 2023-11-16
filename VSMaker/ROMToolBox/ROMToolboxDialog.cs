@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using DocumentFormat.OpenXml.Office2019.Excel.RichData2;
+using Microsoft.Office.Interop.Excel;
+using System.Reflection;
 using System.Resources;
 using VSMaker.CommonFunctions;
 using VSMaker.Resources;
@@ -12,157 +14,29 @@ namespace VSMaker
     public partial class ROMToolboxDialog : Form
     {
         public static uint expandedARMfileID = ToolboxDB.syntheticOverlayFileNumbersDB[RomInfo.gameFamily];
-
-        public static bool flag_standardizedItems { get; private set; } = false;
         public static bool flag_arm9Expanded { get; private set; } = false;
-        public static bool flag_BDHCamPatchApplied { get; private set; } = false;
-        public static bool flag_DynamicHeadersPatchApplied { get; private set; } = false;
-        public static bool flag_MatrixExpansionApplied { get; private set; } = false;
-
         public static bool flag_MainComboTableRepointed { get; set; } = false;
         public static bool flag_TrainerClassBattleTableRepointed { get; set; } = false;
         public static bool flag_PokemonBattleTableRepointed { get; set; } = false;
-
+        public static bool flag_TrainerNamesExpanded { get; set; } = false;
         public static bool overlay1MustBeRestoredFromBackup { get; private set; } = true;
+        public static int expandedTrainerNameLength = 12;
 
         #region Constructor
-
         public ROMToolboxDialog()
         {
             InitializeComponent();
-                    
+
             if (RomInfo.gameLanguage == gLangEnum.English || RomInfo.gameLanguage == gLangEnum.Spanish)
             {
                 CheckARM9ExpansionApplied();
-            }
-            else
-            {
-                DisableARM9patch("Unsupported\nlanguage");
-                DisableBDHCamPatch("Unsupported\nlanguage");
-                DisableScrcmdRepointPatch("Unsupported\nlanguage");
-            }
-
-            switch (RomInfo.gameFamily)
-            {
-                case gFamEnum.DP:
-                    DisableOverlay1patch("Unsupported");
-                    DisableDynamicHeadersPatch("Unsupported");
-                    DisableMatrixExpansionPatch("Unsupported");
-                    DisableScrcmdRepointPatch("Unsupported");
-                    DisableKillTextureAnimationsPatch("Unsupported");
-                    break;
-
-                case gFamEnum.Plat:
-                    DisableOverlay1patch("Unsupported");
-                    DisableMatrixExpansionPatch("Unsupported");
-                    DisableScrcmdRepointPatch("Unsupported");
-                    DisableKillTextureAnimationsPatch("Unsupported");
-
-                    if (RomInfo.gameLanguage == gLangEnum.English || RomInfo.gameLanguage == gLangEnum.Spanish)
-                    {
-                        CheckBDHCamPatchApplied();
-                    }
-                    CheckDynamicHeadersPatchApplied();
-                    break;
-
-                case gFamEnum.HGSS:
-                    if (!DSUtils.CheckOverlayHasCompressionFlag(1))
-                    {
-                        DisableOverlay1patch("Already applied");
-                        overlay1CB.Visible = true;
-                    }
-
-                    if (RomInfo.gameLanguage == gLangEnum.English || RomInfo.gameLanguage == gLangEnum.Spanish)
-                    {
-                        CheckBDHCamPatchApplied();
-                        CheckMatrixExpansionApplied();
-                        CheckScrcmdRepointPatchApplied();
-                    }
-                    else
-                    {
-                        DisableMatrixExpansionPatch("Unsupported\nlanguage");
-                        DisableScrcmdRepointPatch("Unsupported\nlanguage");
-                    }
-
-                    CheckDynamicHeadersPatchApplied();
-                    break;
+                CheckExpandedTrainerNamespatchApplied();
             }
         }
 
-        #region Patch Disable
+        #endregion
 
-        private void DisableOverlay1patch(string reason)
-        {
-            overlay1uncomprButton.Enabled = false;
-            overlay1uncompressedLBL.Enabled = false;
-            overlay1patchtextLBL.Enabled = false;
-            overlay1uncomprButton.Text = reason;
-        }
-
-        private void DisableBDHCamPatch(string reason)
-        {
-            BDHCamPatchButton.Enabled = false;
-            BDHCamPatchLBL.Enabled = false;
-            BDHCamPatchTextLBL.Enabled = false;
-            BDHCamARM9requiredLBL.Enabled = false;
-            BDHCamPatchButton.Text = reason;
-        }
-
-        private void DisableARM9patch(string reason)
-        {
-            applyARM9ExpansionButton.Enabled = false;
-            arm9expansionTextLBL.Enabled = false;
-            arm9expansionLBL.Enabled = false;
-            applyARM9ExpansionButton.Text = reason;
-        }
-
-        private void DisableDynamicHeadersPatch(string reason)
-        {
-            applyDynamicHeadersButton.Enabled = false;
-            dynamicHeadersTextLBL.Enabled = false;
-            dynamicHeadersLBL.Enabled = false;
-            applyDynamicHeadersButton.Text = reason;
-        }
-
-        private void DisableMatrixExpansionPatch(string reason)
-        {
-            expandMatrixButton.Enabled = false;
-            matrixExpansionLBL.Enabled = false;
-            matrixExpansionTextLBL.Enabled = false;
-            expandMatrixButton.Text = reason;
-        }
-
-        private void DisableStandardizeItemsPatch(string reason)
-        {
-            applyItemStandardizeButton.Enabled = false;
-            standardizePatchLBL.Enabled = false;
-            standardizePatchTextLBL.Enabled = false;
-            applyItemStandardizeButton.Text = reason;
-        }
-
-        private void DisableScrcmdRepointPatch(string reason)
-        {
-            repointScrcmdButton.Enabled = false;
-            repointScrcmdLBL.Enabled = false;
-            repointScrcmdTextLBL.Enabled = false;
-            scrcmdARM9requiredLBL.Enabled = false;
-            repointScrcmdButton.Text = reason;
-        }
-
-        private void DisableKillTextureAnimationsPatch(string reason)
-        {
-            disableTextureAnimationsButton.Enabled = false;
-            disableTextureAnimationsLBL.Enabled = false;
-            disableTextureAnimationsTextLBL.Enabled = false;
-            disableTextureAnimationsButton.Text = reason;
-        }
-
-        #endregion Patch Disable
-
-        #endregion Constructor
-
-        #region Patch
-
+        #region Patch 
         private static bool CheckFilesArm9ExpansionApplied()
         {
             ARM9PatchData data = new ARM9PatchData();
@@ -179,7 +53,6 @@ namespace VSMaker
 
             return true;
         }
-
         public static bool CheckFilesBDHCamPatchApplied()
         {
             BDHCAMPatchData data = new BDHCAMPatchData();
@@ -200,6 +73,7 @@ namespace VSMaker
             if (overlayCode1.Length != overlayCode1Read.Length || !overlayCode1.SequenceEqual(overlayCode1Read))
                 return false;
 
+
             byte[] overlayCode2 = DSUtils.HexStringToByteArray(data.overlayString2);
             byte[] overlayCode2Read = DSUtils.ReadFromFile(overlayFilePath, data.overlayOffset2, overlayCode2.Length); //Write new overlayCode1
             if (overlayCode2.Length != overlayCode2Read.Length || !overlayCode2.SequenceEqual(overlayCode2Read))
@@ -212,7 +86,6 @@ namespace VSMaker
 
             return true;
         }
-
         public static bool CheckFilesMatrixExpansionApplied()
         {
             foreach (KeyValuePair<uint[], string> kv in ToolboxDB.matrixExpansionDB)
@@ -233,27 +106,7 @@ namespace VSMaker
             }
             return true;
         }
-
-       
-     
-        public bool CheckMatrixExpansionApplied()
-        {
-            if (!ROMToolboxDialog.flag_MatrixExpansionApplied)
-            {
-                if (!ROMToolboxDialog.CheckFilesMatrixExpansionApplied())
-                {
-                    return false;
-                }
-            }
-
-            DisableMatrixExpansionPatch("Already applied");
-            ROMToolboxDialog.flag_MatrixExpansionApplied = true;
-            expandedMatrixCB.Visible = true;
-            return true;
-        }
-
         public string backupSuffix = ".backup";
-
         private bool CheckARM9ExpansionApplied()
         {
             if (!ROMToolboxDialog.flag_arm9Expanded)
@@ -265,8 +118,6 @@ namespace VSMaker
             }
 
             ROMToolboxDialog.flag_arm9Expanded = true;
-            arm9patchCB.Visible = true;
-            DisableARM9patch("Already applied");
 
             switch (RomInfo.gameFamily)
             {
@@ -282,214 +133,39 @@ namespace VSMaker
             return true;
         }
 
-        public bool CheckDynamicHeadersPatchApplied()
+        public void CheckExpandedTrainerNamespatchApplied()
         {
-            if (!flag_DynamicHeadersPatchApplied)
+            if (!flag_TrainerNamesExpanded)
             {
-                if (!ROMToolboxDialog.CheckFilesDynamicHeadersPatchApplied())
+                uint position = 0x6AC32;
+                switch (RomInfo.gameFamily)
                 {
-                    return false;
+                    case gFamEnum.DP:
+                        if (RomInfo.gameLanguage.Equals(gLangEnum.English)) position = 0x6AC32;
+                        else if (RomInfo.gameLanguage.Equals(gLangEnum.Spanish)) position = 0x6AC8E;
+                        break;
+                    case gFamEnum.Plat:
+                        if (RomInfo.gameLanguage.Equals(gLangEnum.English)) position = 0x791DE;
+                        else if (RomInfo.gameLanguage.Equals(gLangEnum.Spanish)) position = 0x7927E;
+                        break;
+                    case gFamEnum.HGSS:
+                        if (RomInfo.gameLanguage.Equals(gLangEnum.English) || RomInfo.gameVersion.Equals(gVerEnum.SoulSilver)) position = 0x7342E;
+                        else if (RomInfo.gameLanguage.Equals(gLangEnum.Spanish)) position = 0x73426;
+                        break;
+                }
+                byte initValue = DSUtils.ARM9.ReadByte(position);
+                if (initValue > (byte)TrainerFile.maxNameLen)
+                {
+                    ROMToolboxDialog.flag_TrainerNamesExpanded = true;
+                    ROMToolboxDialog.expandedTrainerNameLength = initValue;
                 }
             }
-
-            ROMToolboxDialog.flag_DynamicHeadersPatchApplied = true;
-            dynamicHeadersPatchCB.Visible = true;
-
-            DisableDynamicHeadersPatch("Already applied");
-            return true;
         }
-
-        public static bool CheckFilesDynamicHeadersPatchApplied()
-        {
-            DynamicHeadersPatchData data = new DynamicHeadersPatchData();
-            ushort initValue = BitConverter.ToUInt16(DSUtils.ARM9.ReadBytes(data.initOffset, 0x2), 0);
-            return initValue == 0xB500;
-        }
-
-        public bool CheckBDHCamPatchApplied()
-        {
-            if (!CheckARM9ExpansionApplied())
-            {
-                BDHCamARM9requiredLBL.Visible = true;
-                DisableBDHCamPatch("ARM9 not expanded!");
-                return false;
-            }
-
-            if (!ROMToolboxDialog.flag_BDHCamPatchApplied)
-            {
-                if (!ROMToolboxDialog.CheckFilesBDHCamPatchApplied())
-                {
-                    return false;
-                }
-            }
-            ROMToolboxDialog.flag_BDHCamPatchApplied = true;
-            BDHCamCB.Visible = true;
-
-            DisableBDHCamPatch("Already applied");
-            return true;
-        }
-
-        public void CheckScrcmdRepointPatchApplied()
-        {
-            //throw new NotImplementedException();
-        }
-
-        #endregion Patch
+        #endregion
 
         #region Button Actions
 
-        private void SentenceCasePatchButton_Click(object sender, EventArgs e)
-        {
-            DialogResult d;
-            d = MessageBox.Show("Confirming this process will apply the following changes:\n\n" +
-                "- Every Pokémon name will be converted to Sentence Case." + "\n\n" +
-                "Do you wish to continue?",
-                "Confirm to proceed", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-
-            if (d == DialogResult.Yes)
-            {
-                Parallel.ForEach(RomInfo.pokemonNamesTextNumbers, ID =>
-                {
-                    TextArchive pokeName = new TextArchive(ID);
-                    Parallel.For(1, pokeName.Messages.Count, i =>
-                    {
-                        if (pokeName.Messages[i].Length <= 1)
-                        {
-                            i++;
-                        }
-
-                        pokeName.Messages[i] = pokeName.Messages[i].Replace(PokeDatabase.System.pokeNames[(ushort)i].ToUpper(), PokeDatabase.System.pokeNames[(ushort)i]);
-                    });
-                    pokeName.SaveToFileDefaultDir(ID, showSuccessMessage: false);
-                });
-                //sentenceCaseCB.Visible = true;
-                MessageBox.Show("Pokémon names have been converted to Sentence Case.", "Operation successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            else
-            {
-                MessageBox.Show("No changes have been made.", "Operation canceled", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
-
-        private void BDHCAMPatchButton_Click(object sender, EventArgs e)
-        {
-            BDHCAMPatchData data = new BDHCAMPatchData();
-
-            if (RomInfo.gameFamily == gFamEnum.HGSS)
-            {
-                if (DSUtils.CheckOverlayHasCompressionFlag(data.overlayNumber))
-                {
-                    DialogResult d1 = MessageBox.Show("It is STRONGLY recommended to configure Overlay1 as uncompressed before proceeding.\n\n" +
-                        "More details in the following dialog.\n\n" + "Do you want to know more?",
-                        "Confirm to proceed", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-
-                    if (d1 == DialogResult.Yes)
-                    {
-                        overlay1uncomprButton_Click(null, null);
-                    }
-                }
-            }
-
-            DialogResult d2;
-            d2 = MessageBox.Show("This process will apply the following changes:\n\n" +
-                "- Backup ARM9 file (arm9.bin" + backupSuffix + " will be created)." + "\n\n" +
-                "- Backup Overlay" + data.overlayNumber + " file (overlay" + data.overlayNumber + ".bin" + backupSuffix + " will be created)." + "\n\n" +
-                "- Replace " + (data.branchString.Length / 3 + 1) + " bytes of data at arm9 offset 0x" + data.branchOffset.ToString("X") + " with " + '\n' + data.branchString + "\n\n" +
-                "- Replace " + (data.overlayString1.Length / 3 + 1) + " bytes of data at overlay" + data.overlayNumber + " offset 0x" + data.overlayOffset1.ToString("X") + " with " + '\n' + data.overlayString1 + "\n\n" +
-                "- Replace " + (data.overlayString2.Length / 3 + 1) + " bytes of data at overlay" + data.overlayNumber + " offset 0x" + data.overlayOffset2.ToString("X") + " with " + '\n' + data.overlayString2 + "\n\n" +
-                "- Modify file #" + expandedARMfileID + " inside " + '\n' + RomInfo.gameDirs[DirNames.synthOverlay].unpackedDir + '\n' + "to insert the BDHCAM routine (any data between 0x" + BDHCAMPatchData.BDHCamSubroutineOffset.ToString("X") + " and 0x" + (BDHCAMPatchData.BDHCamSubroutineOffset + data.subroutine.Length).ToString("X") + " will be overwritten)." + "\n\n" +
-                "Do you wish to continue?",
-                "Confirm to proceed", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-
-            if (d2 == DialogResult.Yes)
-            {
-                File.Copy(RomInfo.arm9Path, RomInfo.arm9Path + backupSuffix, overwrite: true);
-
-                try
-                {
-                    DSUtils.ARM9.WriteBytes(DSUtils.HexStringToByteArray(data.branchString), data.branchOffset); //Write new branchOffset
-
-                    /* Write to overlayfile */
-                    string overlayFilePath = DSUtils.GetOverlayPath(data.overlayNumber);
-                    if (DSUtils.OverlayIsCompressed(data.overlayNumber))
-                    {
-                        DSUtils.DecompressOverlay(data.overlayNumber);
-                    }
-
-                    DSUtils.WriteToFile(overlayFilePath, DSUtils.HexStringToByteArray(data.overlayString1), data.overlayOffset1); //Write new overlayCode1
-                    DSUtils.WriteToFile(overlayFilePath, DSUtils.HexStringToByteArray(data.overlayString2), data.overlayOffset2); //Write new overlayCode2
-                    overlay1MustBeRestoredFromBackup = false;
-
-                    String fullFilePath = RomInfo.gameDirs[DirNames.synthOverlay].unpackedDir + '\\' + expandedARMfileID.ToString("D4");
-
-                    /*Write Expanded ARM9 File*/
-                    DSUtils.WriteToFile(fullFilePath, data.subroutine, BDHCAMPatchData.BDHCamSubroutineOffset);
-                }
-                catch
-                {
-                    MessageBox.Show("Operation failed. It is strongly advised that you restore the arm9 and overlay from their respective backups.", "Something went wrong",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                overlay1MustBeRestoredFromBackup = false;
-                DisableBDHCamPatch("Already applied");
-                ROMToolboxDialog.flag_BDHCamPatchApplied = true;
-                BDHCamCB.Visible = true;
-
-                MessageBox.Show("The BDHCAM patch has been applied.", "Operation successful.", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            else
-            {
-                MessageBox.Show("No changes have been made.", "Operation canceled", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
-
-        private void overlay1uncomprButton_Click(object sender, EventArgs e)
-        {
-            if (ConfigureOverlay1Uncompressed())
-            {
-                DisableOverlay1patch("Already applied");
-                overlay1CB.Visible = true;
-            }
-        }
-
-        public static bool ConfigureOverlay1Uncompressed()
-        {
-            bool isCompressed = false;
-            string stringDecompressOverlay = "";
-
-            if (DSUtils.OverlayIsCompressed(1))
-            {
-                isCompressed = true;
-                stringDecompressOverlay = "- Overlay 1 will be decompressed.\n\n";
-            }
-
-            DialogResult d = MessageBox.Show("This process will apply the following changes:\n\n" +
-            stringDecompressOverlay +
-            "- Overlay 1 will be configured as \"uncompressed\" in the overlay table.\n\n" +
-            "Do you wish to continue?",
-            "Confirm to proceed", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-
-            if (d == DialogResult.Yes)
-            {
-                DSUtils.SetOverlayCompressionInTable(1, 0);
-                if (isCompressed)
-                {
-                    DSUtils.DecompressOverlay(1);
-                }
-
-                MessageBox.Show("Overlay1 is now configured as uncompressed.", "Operation successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return true;
-            }
-            else
-            {
-                MessageBox.Show("No changes have been made.", "Operation canceled", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return false;
-            }
-        }
-
-    private void ApplyARM9ExpansionButton_Click(object sender, EventArgs e)
+        private void ApplyARM9ExpansionButton_Click(object sender, EventArgs e)
         {
             ARM9PatchData data = new ARM9PatchData();
 
@@ -515,11 +191,9 @@ namespace VSMaker
                     using (BinaryWriter f = new BinaryWriter(File.Create(fullFilePath)))
                     {
                         for (int i = 0; i < 0x16000; i++)
-                            f.Write((byte)0x00); // Write Expanded ARM9 File
+                            f.Write((byte)0x00); // Write Expanded ARM9 File 
                     }
 
-                    DisableARM9patch("Already applied");
-                    arm9patchCB.Visible = true;
                     ROMToolboxDialog.flag_arm9Expanded = true;
 
                     switch (RomInfo.gameFamily)
@@ -548,235 +222,69 @@ namespace VSMaker
             }
         }
 
-        private void expandMatrixButton_Click(object sender, EventArgs e)
+        public void ExpandTrainerNames()
         {
-            string listOfChanges = "";
-            int languageOffset = 0;
-
-            if (RomInfo.romID == "IPKE" || RomInfo.romID == "IPGE" || RomInfo.romID == "IPGS")
-            {
-                languageOffset = +8;
-            }
-
-            foreach (KeyValuePair<uint[], string> kv in ToolboxDB.matrixExpansionDB)
-            {
-                listOfChanges += " - Replace " + (kv.Value.Length / 3 + 1) + " bytes of data at arm9 offset";
-                if (kv.Key.Length > 1)
-                    listOfChanges += "s";
-
-                for (int i = 0; i < kv.Key.Length; i++)
-                {
-                    listOfChanges += " 0x" + (kv.Key[i] - DSUtils.ARM9.address + languageOffset).ToString("X");
-
-                    if (i < kv.Key.Length - 1)
-                        listOfChanges += ",";
-                }
-                listOfChanges += " with " + '\n' + kv.Value + "\n\n";
-            }
-
+            // Pearl        USA     ARM9 at 0x6AC32     // TODO: Verify
+            // Pearl        Spain   ARM9 at 0x6AC8E     // TODO: Verify
+            // Diamond      USA     ARM9 at 0x6AC32
+            // Diamond      Spain   ARM9 at 0x6AC8E
+            // Platinum     USA     ARM9 at 0x791DE
+            // Platinum     Spain   ARM9 at 0x7927E
+            // HeartGold    USA     ARM9 at 0x7342E
+            // HeartGold    Spain   ARM9 at 0x73426
+            // SoulSilver   USA     ARM9 at 0x7342E
+            // SoulSilver   Spain   ARM9 at 0x7342E     // TODO: Verify
             DialogResult d;
-            d = MessageBox.Show("Confirming this process will apply the following changes:\n\n" +
-                listOfChanges +
-                "Do you wish to continue?",
+            int position = 0x7342E;
+            bool gameFamGood = true;
+            d = MessageBox.Show($"Applying this patch will set the Trainer Name max length to {ROMToolboxDialog.expandedTrainerNameLength}.\n" +
+                "Please note that if you have modified the ARM9 these offsets may be wrong.\n" +
+                "If you have done so we encourage you to seek in your ARM9 for where to make the modification as your offset might change.\n\n" +
+                "Are you sure you want to proceed?",
                 "Confirm to proceed", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
 
             if (d == DialogResult.Yes)
             {
-                try
+                switch (RomInfo.gameFamily)
                 {
-                    foreach (KeyValuePair<uint[], string> kv in ToolboxDB.matrixExpansionDB)
+                    case gFamEnum.DP:
+                        if (RomInfo.gameLanguage.Equals(gLangEnum.English)) position = 0x6AC32;
+                        else if (RomInfo.gameLanguage.Equals(gLangEnum.Spanish)) position = 0x6AC8E;
+                        else gameFamGood = false;
+                        break;
+                    case gFamEnum.Plat:
+                        if (RomInfo.gameLanguage.Equals(gLangEnum.English)) position = 0x791DE;
+                        else if (RomInfo.gameLanguage.Equals(gLangEnum.Spanish)) position = 0x7927E;
+                        else gameFamGood = false;
+                        break;
+                    case gFamEnum.HGSS:
+                        if (RomInfo.gameLanguage.Equals(gLangEnum.English) || RomInfo.gameVersion.Equals(gVerEnum.SoulSilver)) position = 0x7342E;
+                        else if (RomInfo.gameLanguage.Equals(gLangEnum.Spanish)) position = 0x73426;
+                        else gameFamGood = false;
+                        break;
+                }
+                if (gameFamGood)
+                {
+                    using (DSUtils.ARM9.Writer wr = new DSUtils.ARM9.Writer())
                     {
-                        foreach (uint offset in kv.Key)
-                        {
-                            DSUtils.ARM9.WriteBytes(DSUtils.HexStringToByteArray(kv.Value), (uint)(offset - DSUtils.ARM9.address + languageOffset));
-                        }
+                        wr.BaseStream.Position = position;
+                        wr.Write((byte)ROMToolboxDialog.expandedTrainerNameLength);
                     }
+                    ROMToolboxDialog.flag_TrainerNamesExpanded = true;
+                    MessageBox.Show("Trainer Names have been expanded.", "Operation successful.", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
-                catch
+                else
                 {
-                    MessageBox.Show("Operation failed. It is strongly advised that you restore the arm9 backup (arm9.bin" + backupSuffix + ").", "Something went wrong",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Sorry this game language does not have a recorded offset for this patch.\n\n" +
+                        "Reach out in our discord if you want to help researching it!",
+                        "Operation canceled", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
-                DisableMatrixExpansionPatch("Already applied");
-                expandedMatrixCB.Visible = true;
-                ROMToolboxDialog.flag_MatrixExpansionApplied = true;
-                MessageBox.Show("Matrix 0 can now be freely expanded up to twice its size.", "Operation successful.", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
                 MessageBox.Show("No changes have been made.", "Operation canceled", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
-
-        #region Mikelan's custom commands
-
-        private void applyCustomCommands(object sender, EventArgs e)
-        {
-            int expTableOffset = GetCommandTableOffset();
-
-            if (expTableOffset < 0)
-            {
-                DialogResult d;
-                d = MessageBox.Show("Script command table has not been repointed.\n\n" +
-                    "Do you wish to repoint it to the expanded ARM9 file?\n\n" +
-                    "By default it will be written from 0x200 to 0x1700.\n" +
-                    "If you already have something there, you must cancel this window and move these things to a new location, or you can manually repoint the script command table to a different free location in the expanded ARM9 file",
-                    "Confirm to proceed", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-
-                if (d == DialogResult.Yes)
-                {
-                    RepointCommandTable();
-                }
-                else
-                {
-                    return;
-                }
-            }
-
-            if (ImportCustomCommand())
-            {
-                MessageBox.Show("Script commands succesfully installed in the ROM", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
-
-        private int GetCommandTableOffset()
-        { // Checks if command table is repointed IN THE EXPANDED ARM9 FILE, returns pointer inside this file
-            ResourceManager customcmdDB = new ResourceManager("VSMaker.Resources.ROMToolboxDB.CustomScrCmdDB", Assembly.GetExecutingAssembly());
-            int pointerOffset = int.Parse(customcmdDB.GetString("pointerOffset" + "_" + RomInfo.gameVersion + "_" + RomInfo.gameLanguage));
-            using (DSUtils.ARM9.Reader r = new DSUtils.ARM9.Reader(pointerOffset))
-            {
-                uint cmdTable = r.ReadUInt32();
-                uint offset = cmdTable - synthOverlayLoadAddress;
-
-                if ((offset >= 0) && (offset <= 0x12B00))
-                {
-                    return (int)offset; // Table position inside the expanded arm9 file
-                }
-            }
-            return -1; // No table in expanded arm9 file
-        }
-
-        private void RepointCommandTable()
-        {
-            string expandedPath = RomInfo.gameDirs[DirNames.synthOverlay].unpackedDir + "\\0000";
-            ResourceManager customcmdDB = new ResourceManager("VSMaker.Resources.ROMToolboxDB.CustomScrCmdDB", Assembly.GetExecutingAssembly());
-
-            FileStream arm9FileStream = new FileStream(RomInfo.arm9Path, FileMode.Open); // I make a copy of the stream so the file is free for writing
-            MemoryStream arm9Stream = new MemoryStream();
-            arm9FileStream.CopyTo(arm9Stream);
-            byte[] cmdTbl = arm9Stream.ToArray();
-
-            using (BinaryWriter expArmWriter = new BinaryWriter(new FileStream(expandedPath, FileMode.Open)))
-            {
-                expArmWriter.BaseStream.Position = 0x200; // Command table default offset
-                expArmWriter.Write(cmdTbl, int.Parse(customcmdDB.GetString("originalTableOffset" + "_" + RomInfo.gameVersion + "_" + RomInfo.gameLanguage)), 4 * 0x355);
-            }
-
-            arm9FileStream.Close();
-
-            using (DSUtils.ARM9.Writer wr = new DSUtils.ARM9.Writer())
-            { // Change both the pointer and the limit
-                wr.BaseStream.Position = int.Parse(customcmdDB.GetString("pointerOffset" + "_" + RomInfo.gameVersion + "_" + RomInfo.gameLanguage));
-                wr.Write((uint)0x023C8200);
-
-                wr.BaseStream.Position = int.Parse(customcmdDB.GetString("limitOffset" + "_" + RomInfo.gameVersion + "_" + RomInfo.gameLanguage));
-                wr.Write((uint)0x053C);
-            }
-        }
-
-        private bool ImportCustomCommand()
-        {
-            string expandedPath = RomInfo.gameDirs[DirNames.synthOverlay].unpackedDir + "\\0000";
-            int appliedPatches = 0;
-
-            OpenFileDialog of = new OpenFileDialog();
-            of.Filter = "Custom Script Command File (*.scrcmd)|*.scrcmd";
-            if (of.ShowDialog(this) != DialogResult.OK)
-            {
-                return false;
-            }
-
-            FileStream expandedFileStream = new FileStream(expandedPath, FileMode.Open);
-            MemoryStream expandedStream = new MemoryStream();
-            expandedFileStream.CopyTo(expandedStream);
-            expandedFileStream.Close();
-
-            using (DSUtils.EasyWriter expandedWriter = new DSUtils.EasyWriter(expandedPath, fmode: FileMode.Open))
-            {
-                using (BinaryReader expandedReader = new BinaryReader(expandedStream))
-                {
-                    try
-                    {
-                        System.Xml.Linq.XDocument xmldoc = System.Xml.Linq.XDocument.Load(new FileStream(of.FileName, FileMode.Open));
-
-                        foreach (var node in xmldoc.Root.Elements("scriptcommand"))
-                        {
-                            ushort commandID = ushort.Parse(node.Attribute("ID").Value, System.Globalization.NumberStyles.HexNumber);
-                            string targetROM = node.Element("ROM").Value;
-                            string targetLang = node.Element("lang").Value;
-                            string commandName = node.Element("name").Value;
-                            string paramCount = node.Element("paramcount").Value;
-                            string paramCode = node.Element("paramcode").Value;
-                            int asmOffset = Int32.Parse(node.Element("asmoffset").Value, System.Globalization.NumberStyles.HexNumber);
-                            string asmCode = node.Element("asmcode").Value.Replace("\n", "").Replace("\t", "").Replace(" ", "");
-
-                            if (RomInfo.gameVersion.ToString().Equals(targetROM) && RomInfo.gameLanguage.Equals(targetLang))
-                            {
-                                expandedReader.BaseStream.Position = 0x200 + commandID * 4;
-                                if (expandedReader.ReadUInt32() != 0)
-                                {
-                                    DialogResult d;
-                                    d = MessageBox.Show("Script command " + commandID.ToString("X4") + " is already used.\n\n" +
-                                        "Do you really want to overwrite it?",
-                                        "Confirm to proceed", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                                    if (d == DialogResult.No)
-                                    {
-                                        continue;
-                                    }
-                                }
-
-                                expandedWriter.BaseStream.Position = 0x200 + commandID * 4;
-                                expandedWriter.Write((int)(synthOverlayLoadAddress + asmOffset + 1));
-
-                                byte[] asmCodeBytes = DSUtils.StringToByteArray(asmCode);
-                                expandedWriter.BaseStream.Position = asmOffset;
-                                expandedWriter.Write(asmCodeBytes);
-
-                                appliedPatches++;
-                            }
-                        }
-                    }
-                    catch
-                    {
-                        MessageBox.Show("Selected command installation file is corrupted.\n\n" +
-                        "Please, download it again or contact its creator.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                        return false;
-                    }
-                }
-            }
-
-            if (appliedPatches == 0)
-            {
-                MessageBox.Show("No command could be installed from this file.\n\n" +
-                "Make sure the command installation file supports your current ROM.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-
-            return true;
-        }
-
-        #endregion Mikelan's custom commands
-
-        #endregion Button Actions
-
-        #region Error Messsages
-
-        private void AlreadyApplied()
-        {
-            MessageBox.Show("This patch has already been applied.", "Can't reapply patch", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        #endregion Error Messsages
+        #endregion
     }
 }

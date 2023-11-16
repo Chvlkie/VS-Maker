@@ -146,7 +146,6 @@
             this.BDHCamPatchButton.TabIndex = 6;
             this.BDHCamPatchButton.Text = "Apply Patch";
             this.BDHCamPatchButton.UseVisualStyleBackColor = true;
-            this.BDHCamPatchButton.Click += new System.EventHandler(this.BDHCAMPatchButton_Click);
             // 
             // label7
             // 
@@ -175,7 +174,6 @@
             this.namesToSentenceCaseButton.TabIndex = 9;
             this.namesToSentenceCaseButton.Text = "Apply Patch";
             this.namesToSentenceCaseButton.UseVisualStyleBackColor = true;
-            this.namesToSentenceCaseButton.Click += new System.EventHandler(this.SentenceCasePatchButton_Click);
             // 
             // overlay1uncompressedLBL
             // 
@@ -204,7 +202,6 @@
             this.overlay1uncomprButton.TabIndex = 14;
             this.overlay1uncomprButton.Text = "Apply Patch";
             this.overlay1uncomprButton.UseVisualStyleBackColor = true;
-            this.overlay1uncomprButton.Click += new System.EventHandler(this.overlay1uncomprButton_Click);
             // 
             // BDHCamARM9requiredLBL
             // 
@@ -329,7 +326,6 @@
             this.expandMatrixButton.TabIndex = 21;
             this.expandMatrixButton.Text = "Apply Patch";
             this.expandMatrixButton.UseVisualStyleBackColor = true;
-            this.expandMatrixButton.Click += new System.EventHandler(this.expandMatrixButton_Click);
             // 
             // repointScrcmdCB
             // 
