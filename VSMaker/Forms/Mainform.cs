@@ -1375,7 +1375,7 @@ namespace VSMaker
                 var move = new Move
                 {
                     MoveId = i,
-                    MoveInfo = moveInfo[i],
+                    MoveInfo = moveInfo.ElementAtOrDefault(i) ?? "",
                     MoveName = moveNames[i]
                 };
 
