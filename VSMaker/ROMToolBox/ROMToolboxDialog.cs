@@ -53,59 +53,6 @@ namespace VSMaker
 
             return true;
         }
-        public static bool CheckFilesBDHCamPatchApplied()
-        {
-            BDHCAMPatchData data = new BDHCAMPatchData();
-
-            byte[] branchCode = DSUtils.HexStringToByteArray(data.branchString);
-            byte[] branchCodeRead = DSUtils.ARM9.ReadBytes(data.branchOffset, branchCode.Length);
-
-            if (branchCode.Length != branchCodeRead.Length || !branchCode.SequenceEqual(branchCodeRead))
-            {
-                return false;
-            }
-
-            string overlayFilePath = DSUtils.GetOverlayPath(data.overlayNumber);
-            DSUtils.DecompressOverlay(data.overlayNumber);
-
-            byte[] overlayCode1 = DSUtils.HexStringToByteArray(data.overlayString1);
-            byte[] overlayCode1Read = DSUtils.ReadFromFile(overlayFilePath, data.overlayOffset1, overlayCode1.Length);
-            if (overlayCode1.Length != overlayCode1Read.Length || !overlayCode1.SequenceEqual(overlayCode1Read))
-                return false;
-
-
-            byte[] overlayCode2 = DSUtils.HexStringToByteArray(data.overlayString2);
-            byte[] overlayCode2Read = DSUtils.ReadFromFile(overlayFilePath, data.overlayOffset2, overlayCode2.Length); //Write new overlayCode1
-            if (overlayCode2.Length != overlayCode2Read.Length || !overlayCode2.SequenceEqual(overlayCode2Read))
-                return false; //0 means BDHCAM patch has not been applied
-
-            String fullFilePath = RomInfo.gameDirs[DirNames.synthOverlay].unpackedDir + '\\' + ROMToolboxDialog.expandedARMfileID.ToString("D4");
-            byte[] subroutineRead = DSUtils.ReadFromFile(fullFilePath, BDHCAMPatchData.BDHCamSubroutineOffset, data.subroutine.Length); //Write new overlayCode1
-            if (data.subroutine.Length != subroutineRead.Length || !data.subroutine.SequenceEqual(subroutineRead))
-                return false; //0 means BDHCAM patch has not been applied
-
-            return true;
-        }
-        public static bool CheckFilesMatrixExpansionApplied()
-        {
-            foreach (KeyValuePair<uint[], string> kv in ToolboxDB.matrixExpansionDB)
-            {
-                foreach (uint offset in kv.Key)
-                {
-                    int languageOffset = 0;
-                    if (RomInfo.romID == "IPKE" || RomInfo.romID == "IPGE" || RomInfo.romID == "IPGS")
-                    {
-                        languageOffset = +8;
-                    }
-
-                    byte[] read = DSUtils.ARM9.ReadBytes((uint)(offset - DSUtils.ARM9.address + languageOffset), kv.Value.Length / 3 + 1);
-                    byte[] code = DSUtils.HexStringToByteArray(kv.Value);
-                    if (read.Length != code.Length || !read.SequenceEqual(code))
-                        return false;
-                }
-            }
-            return true;
-        }
         public string backupSuffix = ".backup";
         private bool CheckARM9ExpansionApplied()
         {
@@ -118,17 +65,6 @@ namespace VSMaker
             }
 
             ROMToolboxDialog.flag_arm9Expanded = true;
-
-            switch (RomInfo.gameFamily)
-            {
-                case gFamEnum.Plat:
-                case gFamEnum.HGSS:
-                    BDHCamARM9requiredLBL.Visible = false;
-                    BDHCamPatchButton.Enabled = true;
-                    BDHCamPatchLBL.Enabled = true;
-                    BDHCamPatchTextLBL.Enabled = true;
-                    break;
-            }
 
             return true;
         }
@@ -154,10 +90,10 @@ namespace VSMaker
                         break;
                 }
                 byte initValue = DSUtils.ARM9.ReadByte(position);
-                if (initValue > (byte)TrainerFile.maxNameLen)
+                if (initValue > (byte)TrainerFile.maxNameLen + 1)
                 {
                     ROMToolboxDialog.flag_TrainerNamesExpanded = true;
-                    ROMToolboxDialog.expandedTrainerNameLength = initValue;
+                    ROMToolboxDialog.expandedTrainerNameLength = initValue -1;
                 }
             }
         }
@@ -195,18 +131,6 @@ namespace VSMaker
                     }
 
                     ROMToolboxDialog.flag_arm9Expanded = true;
-
-                    switch (RomInfo.gameFamily)
-                    {
-                        case gFamEnum.Plat:
-                        case gFamEnum.HGSS:
-                            BDHCamPatchButton.Text = "Apply Patch";
-                            BDHCamPatchButton.Enabled = true;
-                            BDHCamPatchLBL.Enabled = true;
-                            BDHCamPatchTextLBL.Enabled = true;
-                            BDHCamARM9requiredLBL.Visible = false;
-                            break;
-                    }
 
                     MessageBox.Show("The ARM9's usable memory has been expanded.", "Operation successful.", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -268,7 +192,7 @@ namespace VSMaker
                     using (DSUtils.ARM9.Writer wr = new DSUtils.ARM9.Writer())
                     {
                         wr.BaseStream.Position = position;
-                        wr.Write((byte)ROMToolboxDialog.expandedTrainerNameLength);
+                        wr.Write((byte)(expandedTrainerNameLength+1));
                     }
                     ROMToolboxDialog.flag_TrainerNamesExpanded = true;
                     MessageBox.Show("Trainer Names have been expanded.", "Operation successful.", MessageBoxButtons.OK, MessageBoxIcon.Information);

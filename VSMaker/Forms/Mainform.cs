@@ -1160,6 +1160,7 @@ namespace VSMaker
 
         private bool ValidateTrainerName()
         {
+            using ROMToolboxDialog romToolbox = new();
             if (!ROMToolboxDialog.flag_TrainerNamesExpanded && trainer_Name.Text.Length > TrainerFile.maxNameLen)
             {
                 DialogResult d2;
@@ -1170,8 +1171,11 @@ namespace VSMaker
                 "Do you wish to expand this?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (d2 == DialogResult.Yes)
                 {
-                    using ROMToolboxDialog romToolbox = new();
                     romToolbox.ExpandTrainerNames();
+                }
+                else
+                {
+                    return false;
                 }
             }
 
