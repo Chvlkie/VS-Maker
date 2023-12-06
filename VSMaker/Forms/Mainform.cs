@@ -2205,7 +2205,7 @@ namespace VSMaker
             trainerFile.trp.chooseMoves = trainer_Poke_Moves_checkBox.Checked;
             trainerFile.trp.partyCount = (byte)trainer_NumPoke_num.Value;
 
-            for (int i = 0; i < trainerFile.trp.partyCount; i++)
+            for (int i = 0; i < 6; i++)
             {
                 ushort pokemonId = (ushort)pokeNames.FindIndex(x => x == pokeComboBoxes[i].SelectedItem.ToString());
                 trainerFile.party[i].pokeID = pokemonId;

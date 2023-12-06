@@ -58,7 +58,6 @@ namespace VSMaker.Forms
             if (gameFamily != gFamEnum.DP)
             {
                 int formId = trainerFile.party[partyIndex].formID;
-
                 if (formId > 0)
                 {
                     pokeId = PokemonForms.GetPokemonForms(pokeId, mainform.hgEngine).Find(x => x.FormId == formId).SpeciesId;
@@ -133,7 +132,8 @@ namespace VSMaker.Forms
                 }
 
                 pokeStat_Form_comboBox.Enabled = pokemonForms.Count > 1;
-                pokeStat_Form_comboBox.SelectedIndex = pokeStat_Form_comboBox.Enabled ? trainerFile.party[partyIndex].formID : 0;
+                ushort formId = pokeStat_Form_comboBox.Enabled ? trainerFile.party[partyIndex].formID : (ushort)0;
+                pokeStat_Form_comboBox.SelectedIndex = formId;
             }
             else
             {
@@ -180,14 +180,17 @@ namespace VSMaker.Forms
                         pokeStat_Gender_comboBox.SelectedIndex = Gender.PokemonGenders.Male;
                         pokeStat_Gender_comboBox.Enabled = false;
                         break;
+
                     case GENDER_RATIO_FEMALE:
                         pokeStat_Gender_comboBox.SelectedIndex = Gender.PokemonGenders.Female;
                         pokeStat_Gender_comboBox.Enabled = false;
                         break;
+
                     case GENDER_RATIO_GENDERLESS:
                         pokeStat_Gender_comboBox.SelectedIndex = Gender.PokemonGenders.Default;
                         pokeStat_Gender_comboBox.Enabled = false;
                         break;
+
                     default:
                         pokeStat_Gender_comboBox.Enabled = true;
 
@@ -215,7 +218,10 @@ namespace VSMaker.Forms
                 {
                     mainform.SetUnsavedChanges(true);
                 }
-                trainerFile.party[partyIndex].formID = (ushort)pokeStat_Form_comboBox.SelectedIndex;
+                ushort formId = (ushort)pokeStat_Form_comboBox.SelectedIndex;
+               
+                trainerFile.party[partyIndex].formID = formId;
+
                 mainform.ShowPartyPokemonPic((byte)partyIndex);
             }
         }
@@ -236,9 +242,11 @@ namespace VSMaker.Forms
                         case Gender.PokemonGenders.Default:
                             trainerFile.party[partyIndex].genderAndAbilityFlags = PartyPokemon.GenderAndAbilityFlags.NO_FLAGS;
                             break;
+
                         case Gender.PokemonGenders.Male:
                             trainerFile.party[partyIndex].genderAndAbilityFlags = PartyPokemon.GenderAndAbilityFlags.FORCE_MALE;
                             break;
+
                         case Gender.PokemonGenders.Female:
                             trainerFile.party[partyIndex].genderAndAbilityFlags = PartyPokemon.GenderAndAbilityFlags.FORCE_FEMALE;
                             break;
@@ -270,9 +278,11 @@ namespace VSMaker.Forms
                         case Gender.PokemonGenders.Default:
                             trainerFile.party[partyIndex].genderAndAbilityFlags = PartyPokemon.GenderAndAbilityFlags.NO_FLAGS;
                             break;
+
                         case Gender.PokemonGenders.Male:
                             trainerFile.party[partyIndex].genderAndAbilityFlags = PartyPokemon.GenderAndAbilityFlags.FORCE_MALE;
                             break;
+
                         case Gender.PokemonGenders.Female:
                             trainerFile.party[partyIndex].genderAndAbilityFlags = PartyPokemon.GenderAndAbilityFlags.FORCE_FEMALE;
                             break;
