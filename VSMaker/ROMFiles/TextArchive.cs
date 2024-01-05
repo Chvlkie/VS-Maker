@@ -17,11 +17,14 @@ namespace VSMaker.ROMFiles
     public class TextArchive : RomFile
     {
         #region Fields (2)
+
         public List<string> Messages;
         public int initialKey;
-        #endregion Fields
+
+        #endregion Fields (2)
 
         #region Constructors (1)
+
         public TextArchive(FileStream messageStream, List<string> msg, bool discardLines = false)
         {
             Dictionary<int, string> GetCharDictionary = TextDatabase.readTextDictionary;
@@ -53,13 +56,11 @@ namespace VSMaker.ROMFiles
             if (!discardLines)
             {
                 int key1 = (initialKey * 0x2FD) & 0xFFFF;
-                bool specialCharON = false;
                 int[] currentOffset = new int[stringCount];
                 int[] currentSize = new int[stringCount];
-                bool compressed = new bool();
 
                 for (int i = 0; i < stringCount; i++)
-                { // Reads and stores string offsets and sizes 
+                { // Reads and stores string offsets and sizes
                     int key2 = (key1 * (i + 1) & 0xFFFF);
                     int realKey = key2 | (key2 << 16);
                     currentOffset[i] = ((int)readText.ReadUInt32()) ^ realKey;
@@ -68,6 +69,8 @@ namespace VSMaker.ROMFiles
 
                 for (int i = 0; i < stringCount; i++)
                 { // Adds new string
+                    bool specialCharON = false;
+                    bool compressed = false;
                     key1 = (0x91BD3 * (i + 1)) & 0xFFFF;
                     readText.BaseStream.Position = currentOffset[i];
                     StringBuilder pokemonText = new StringBuilder("");
@@ -81,22 +84,28 @@ namespace VSMaker.ROMFiles
                             case 0xE000:
                                 pokemonText.Append(@"\n");
                                 break;
+
                             case 0x25BC:
                                 pokemonText.Append(@"\r");
                                 break;
+
                             case 0x25BD:
                                 pokemonText.Append(@"\f");
                                 break;
+
                             case 0xF100:
                                 compressed = true;
                                 break;
+
                             case 0xFFFE:
                                 pokemonText.Append(@"\v");
                                 specialCharON = true;
                                 break;
+
                             case 0xFFFF:
                                 pokemonText.Append("");
                                 break;
+
                             default:
                                 if (specialCharON)
                                 {
@@ -105,7 +114,8 @@ namespace VSMaker.ROMFiles
                                 }
                                 else if (compressed)
                                 {
-                                    #region Compressed String                                    
+                                    #region Compressed String
+
                                     int shift = 0;
                                     int trans = 0;
                                     string uncomp = "";
@@ -166,7 +176,9 @@ namespace VSMaker.ROMFiles
                                             j++;
                                         }
                                     }
-                                    #endregion
+
+                                    #endregion Compressed String
+
                                     pokemonText.Append(uncomp);
                                 }
                                 else
@@ -191,14 +203,17 @@ namespace VSMaker.ROMFiles
 
             readText.Dispose();
         }
+
         public TextArchive(int ID, List<string> msg = null, bool discardLines = false) : this(new FileStream(RomInfo.gameDirs[DirNames.textArchives].unpackedDir + "\\" + ID.ToString("D4"), FileMode.Open), msg, discardLines)
         {
         }
-        #endregion
+
+        #endregion Constructors (1)
 
         #region Methods (2)
+
         public int[] EncodeString(string currentMessage, int stringIndex, int stringSize)
-        { // Converts string to hex characters 
+        { // Converts string to hex characters
             ResourceManager GetByte = new ResourceManager("VSMaker.Resources.WriteText", Assembly.GetExecutingAssembly());
 
             int[] pokemonMessage = new int[stringSize - 1];
@@ -295,8 +310,9 @@ namespace VSMaker.ROMFiles
             }
             return pokemonMessage;
         }
+
         public int GetStringLength(string currentMessage)
-        { // Calculates string length 
+        { // Calculates string length
             int count = 0;
             var charArray = currentMessage.ToCharArray();
             for (int i = 0; i < currentMessage.Length; i++)
@@ -378,6 +394,7 @@ namespace VSMaker.ROMFiles
             count++;
             return count;
         }
+
         private byte[] ToByteArray(List<string> msgSource)
         {
             MemoryStream newData = new MemoryStream();
@@ -429,14 +446,17 @@ namespace VSMaker.ROMFiles
         {
             return this.ToByteArray(Messages);
         }
+
         public void SaveToFileDefaultDir(int IDtoReplace, bool showSuccessMessage = true)
         {
             SaveToFileDefaultDir(DirNames.textArchives, IDtoReplace, showSuccessMessage);
         }
+
         public void SaveToFileExplorePath(string suggestedFileName, bool showSuccessMessage = true)
         {
             SaveToFileExplorePath("Gen IV Text Archive", "msg", suggestedFileName, showSuccessMessage);
         }
-        #endregion
+
+        #endregion Methods (2)
     }
 }

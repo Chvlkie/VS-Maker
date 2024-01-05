@@ -96,7 +96,7 @@ namespace VSMaker
             this.vsMakerFont = vsMakerFont;
           
             InitializeComponent();
-            Text = $"{Text} - v{Application.ProductVersion}";
+            Text = $"{Text} - v0.4";
             vsMakerFont.InitializePokemonDsFont();
             trainer_Message.Text = string.Empty;
 
